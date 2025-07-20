@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Header } from "@/components/layout/Header"
 import { Sidebar } from "@/components/layout/Sidebar"
 import { StatsCard } from "@/components/dashboard/StatsCard"
@@ -40,9 +41,9 @@ const quickActions = [
   },
   {
     id: "2",
-    title: "문서 스캔 & 분류",
-    description: "OCR 자동 인식",
-    icon: "📸"
+    title: "문서 관리",
+    description: "일/주/월/연간 문서",
+    icon: "📁"
   },
   {
     id: "3",
@@ -90,10 +91,15 @@ const recentDocuments = [
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const router = useRouter()
 
   const handleActionClick = (actionId: string) => {
     if (actionId === "1") {
       setIsModalOpen(true)
+    } else if (actionId === "2") {
+      router.push("/documents")
+    } else if (actionId === "3") {
+      router.push("/documents/create?type=quarterly")
     }
   }
 

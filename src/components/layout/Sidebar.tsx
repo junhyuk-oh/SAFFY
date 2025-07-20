@@ -19,6 +19,7 @@ const sidebarSections: SidebarSection[] = [
     title: "빠른 접근",
     items: [
       { title: "종합 대시보드", href: "/", icon: "📊" },
+      { title: "문서 관리", href: "/documents", icon: "📁" },
       { title: "AI 문서 생성", href: "/ai-documents", icon: "⚡" },
       { title: "OCR 문서 스캔", href: "/ocr-scan", icon: "📸" },
       { title: "일정 관리", href: "/schedule", icon: "📅" },
@@ -52,7 +53,8 @@ export function Sidebar() {
         <div key={section.title} className="mb-6">
           <div className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{section.title}</div>
           {section.items.map((item) => {
-            const isActive = pathname === item.href
+            const isActive = pathname === item.href || 
+              (item.href === "/documents" && pathname.startsWith("/documents"))
             return (
               <Link
                 key={item.href}
