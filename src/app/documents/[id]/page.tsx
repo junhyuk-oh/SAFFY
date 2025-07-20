@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Header } from "@/components/layout/Header"
 import { Sidebar } from "@/components/layout/Sidebar"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
+import { BackButton } from "@/components/ui/back-button"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 
@@ -108,13 +110,15 @@ export default function DocumentDetailPage() {
           {/* Main Content */}
           <main className="flex-1">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-sm text-text-secondary mb-4">
-              <Link href="/documents" className="hover:text-primary transition-colors">
-                문서 관리
-              </Link>
-              <span>/</span>
-              <span className="text-text-primary">{mockDocument.title}</span>
-            </div>
+            <Breadcrumb 
+              items={[
+                { label: '홈', href: '/' },
+                { label: '문서 관리', href: '/documents' },
+                { label: mockDocument.title }
+              ]}
+              className="mb-4"
+            />
+            <BackButton href="/documents" label="문서 관리로 돌아가기" className="mb-4" />
 
             {/* Document Header */}
             <div className="bg-background-secondary rounded-notion-lg p-6 border border-border mb-6">

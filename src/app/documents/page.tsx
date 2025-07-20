@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { Header } from "@/components/layout/Header"
 import { Sidebar } from "@/components/layout/Sidebar"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { DocumentSearch, DocumentList } from "@/components/documents/shared"
 import Link from "next/link"
 
@@ -181,6 +182,13 @@ export default function DocumentsPage() {
           <main className="flex-1">
             {/* Page Header */}
             <div className="mb-6">
+              <Breadcrumb 
+                items={[
+                  { label: '홈', href: '/' },
+                  { label: '문서 관리' }
+                ]}
+                className="mb-4"
+              />
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h1 className="text-2xl font-bold text-text-primary">문서 관리</h1>

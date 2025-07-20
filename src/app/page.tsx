@@ -29,6 +29,13 @@ const statsData = [
     value: "D-7",
     change: { value: "3개 항목 대기", type: "negative" as const },
     icon: "📅"
+  },
+  {
+    title: "교육 이수율",
+    value: "75%",
+    change: { value: "5명 미이수", type: "negative" as const },
+    icon: "🎓",
+    progress: 75
   }
 ]
 
@@ -56,6 +63,12 @@ const quickActions = [
     title: "교육 일정 관리",
     description: "맞춤형 교육 추천",
     icon: "🎓"
+  },
+  {
+    id: "5",
+    title: "수료증 업로드",
+    description: "교육 이수 증명 등록",
+    icon: "📎"
   }
 ]
 
@@ -100,6 +113,10 @@ export default function Home() {
       router.push("/documents")
     } else if (actionId === "3") {
       router.push("/documents/create?type=quarterly")
+    } else if (actionId === "4") {
+      router.push("/education/manage")
+    } else if (actionId === "5") {
+      router.push("/education/status?action=upload")
     }
   }
 

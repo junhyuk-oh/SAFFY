@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Header } from "@/components/layout/Header"
 import { Sidebar } from "@/components/layout/Sidebar"
+import { Breadcrumb } from "@/components/ui/breadcrumb"
+import { BackButton } from "@/components/ui/back-button"
 import { DocumentWizard } from "@/components/documents/shared"
 import { useRouter } from "next/navigation"
 
@@ -39,6 +41,15 @@ export default function CreateDocumentPage() {
           <main className="flex-1">
             {/* Page Header */}
             <div className="mb-6">
+              <Breadcrumb 
+                items={[
+                  { label: '홈', href: '/' },
+                  { label: '문서 관리', href: '/documents' },
+                  { label: '새 문서 만들기' }
+                ]}
+                className="mb-4"
+              />
+              <BackButton href="/documents" label="문서 관리로 돌아가기" className="mb-4" />
               <h1 className="text-2xl font-bold text-text-primary">새 문서 만들기</h1>
               <p className="text-text-secondary mt-1">단계별 가이드를 따라 안전 문서를 쉽게 생성하세요</p>
             </div>
