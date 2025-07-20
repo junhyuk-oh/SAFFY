@@ -125,31 +125,25 @@ export default function Home() {
 
   return (
     <>
-      <Header />
-      
-      <div className="max-w-[1400px] mx-auto p-5">
-        <div className="flex gap-6 mt-6">
-          {/* Sidebar */}
-          <aside className="w-60 bg-background-secondary rounded-notion-md p-4 h-fit sticky top-24">
-            <Sidebar />
-          </aside>
-          
-          {/* Main Content */}
-          <main className="flex-1">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-              {statsData.map((stat, index) => (
-                <StatsCard key={index} {...stat} />
-              ))}
-            </div>
-
-            {/* Quick Actions */}
-            <QuickActions actions={actionsWithHandlers} />
-
-            {/* Recent Documents */}
-            <RecentDocuments documents={recentDocuments} />
-          </main>
+      <div className="p-6 max-w-7xl mx-auto">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-text-primary mb-2">종합 대시보드</h1>
+          <p className="text-text-secondary">안전관리 현황을 한눈에 확인하세요</p>
         </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+          {statsData.map((stat, index) => (
+            <StatsCard key={index} {...stat} />
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <QuickActions actions={actionsWithHandlers} />
+
+        {/* Recent Documents */}
+        <RecentDocuments documents={recentDocuments} />
       </div>
 
       <AiDocumentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

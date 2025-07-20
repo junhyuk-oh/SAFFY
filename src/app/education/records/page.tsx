@@ -11,7 +11,7 @@ export default function RecordsPage() {
   const [activeTab, setActiveTab] = useState('certificates')
 
   return (
-    <div className="container mx-auto p-6">
+    <main className="container mx-auto p-6">
       <div className="mb-6">
         <Breadcrumb 
           items={[
@@ -42,6 +42,6 @@ export default function RecordsPage() {
           <EducationStats />
         </TabsContent>
       </Tabs>
-    </div>
+    </main>
   )
 }
