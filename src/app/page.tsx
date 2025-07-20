@@ -2,8 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Header } from "@/components/layout/Header"
-import { Sidebar } from "@/components/layout/Sidebar"
 import { StatsCard } from "@/components/dashboard/StatsCard"
 import { QuickActions } from "@/components/dashboard/QuickActions"
 import { RecentDocuments } from "@/components/dashboard/RecentDocuments"

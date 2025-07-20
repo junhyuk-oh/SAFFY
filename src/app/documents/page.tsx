@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Header } from "@/components/layout/Header"
-import { Sidebar } from "@/components/layout/Sidebar"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { DocumentSearch, DocumentList } from "@/components/documents/shared"
 import Link from "next/link"
@@ -169,17 +167,6 @@ export default function DocumentsPage() {
 
   return (
     <>
-      <Header />
-      
-      <div className="max-w-[1400px] mx-auto p-5">
-        <div className="flex gap-6 mt-6">
-          {/* Sidebar */}
-          <aside className="w-60 bg-background-secondary rounded-notion-md p-4 h-fit sticky top-24">
-            <Sidebar />
-          </aside>
-          
-          {/* Main Content */}
-          <main className="flex-1">
             {/* Page Header */}
             <div className="mb-6">
               <Breadcrumb 
@@ -280,9 +267,6 @@ export default function DocumentsPage() {
                   : "아직 생성된 문서가 없습니다."
               }
             />
-          </main>
-        </div>
-      </div>
     </>
   )
 }

@@ -1,8 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Header } from "@/components/layout/Header"
-import { Sidebar } from "@/components/layout/Sidebar"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { BackButton } from "@/components/ui/back-button"
 import { DocumentWizard } from "@/components/documents/shared"
@@ -28,17 +26,6 @@ export default function CreateDocumentPage() {
 
   return (
     <>
-      <Header />
-      
-      <div className="max-w-[1400px] mx-auto p-5">
-        <div className="flex gap-6 mt-6">
-          {/* Sidebar */}
-          <aside className="w-60 bg-background-secondary rounded-notion-md p-4 h-fit sticky top-24">
-            <Sidebar />
-          </aside>
-          
-          {/* Main Content */}
-          <main className="flex-1">
             {/* Page Header */}
             <div className="mb-6">
               <Breadcrumb 
@@ -71,9 +58,6 @@ export default function CreateDocumentPage() {
                 </div>
               </div>
             )}
-          </main>
-        </div>
-      </div>
     </>
   )
 }
