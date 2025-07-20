@@ -17,13 +17,6 @@ const statsData = [
     progress: 87
   },
   {
-    title: "AI 자동화 절감 시간",
-    value: "248시간",
-    change: { value: "이번 달 절감", type: "positive" as const },
-    icon: "⏱️",
-    aiLabel: "AI로 90% 시간 단축"
-  },
-  {
     title: "법적 준수율",
     value: "100%",
     change: { value: "모든 요건 충족", type: "positive" as const },
