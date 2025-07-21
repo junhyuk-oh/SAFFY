@@ -22,11 +22,11 @@ export async function GET(request: NextRequest) {
     let filteredReports = result.documents
       .filter(doc => doc.type === UnifiedDocumentType.QUARTERLY_REPORT)
       .map(doc => {
-        const content = (doc.data as Record<string, unknown>) || {}
+        const content = (doc as any).data || {}
         return {
           id: doc.id,
           year: content.year as number || new Date().getFullYear(),
-          quarter: content.quarter as number || 1,
+          quarter: content.quarter as 1 | 2 | 3 | 4 || 1,
           department: doc.department,
           reportDate: content.reportDate as string || doc.createdAt,
           summary: content.summary as string || '',
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
           teamPerformance: content.teamPerformance as { totalEmployees: number; satisfactionScore: number; trainingHours: number } || { totalEmployees: 0, satisfactionScore: 0, trainingHours: 0 },
           createdAt: doc.createdAt,
           updatedAt: doc.updatedAt
-        } as QuarterlyReport
+        } as any
       })
 
     // 클라이언트 사이드 필터링 (더 정확한 필터링을 위해)
@@ -102,10 +102,10 @@ export async function POST(request: NextRequest) {
     }, 'current-user') // TODO: 실제 사용자 ID로 교체
 
     // QuarterlyReport 형태로 변환
-    const newReport: QuarterlyReport = {
+    const newReport = {
       id: newDocument.id,
       year: body.year,
-      quarter: body.quarter,
+      quarter: body.quarter as 1 | 2 | 3 | 4,
       department: newDocument.department,
       reportDate: body.reportDate || newDocument.createdAt,
       summary: body.summary || '',
@@ -150,31 +150,33 @@ export async function PUT(request: NextRequest) {
       updates: {
         title: updateData.year && updateData.quarter && updateData.department ? 
           `${updateData.year}년 ${updateData.quarter}분기 보고서 - ${updateData.department}` : undefined,
-        year: updateData.year,
-        quarter: updateData.quarter,
-        reportDate: updateData.reportDate,
-        summary: updateData.summary,
-        achievements: updateData.achievements,
-        challenges: updateData.challenges,
-        nextQuarterPlan: updateData.nextQuarterPlan,
-        kpis: updateData.kpis,
-        budgetStatus: updateData.budgetStatus,
-        teamPerformance: updateData.teamPerformance
+        data: {
+          year: updateData.year,
+          quarter: updateData.quarter,
+          reportDate: updateData.reportDate,
+          summary: updateData.summary,
+          achievements: updateData.achievements,
+          challenges: updateData.challenges,
+          nextQuarterPlan: updateData.nextQuarterPlan,
+          kpis: updateData.kpis,
+          budgetStatus: updateData.budgetStatus,
+          teamPerformance: updateData.teamPerformance
+        }
       }
     }, 'current-user') // TODO: 실제 사용자 ID로 교체
 
     // QuarterlyReport 형태로 변환
-    const content = updatedDocument as unknown as { [key: string]: unknown }
-    const updatedReport: QuarterlyReport = {
+    const content = (updatedDocument as any).data || {}
+    const updatedReport = {
       id: updatedDocument.id,
       year: content.year as number || new Date().getFullYear(),
-      quarter: content.quarter as number || 1,
+      quarter: content.quarter as 1 | 2 | 3 | 4 || 1,
       department: updatedDocument.department,
       reportDate: content.reportDate as string || updatedDocument.createdAt,
       summary: content.summary as string || '',
       achievements: content.achievements as string[] || [],
       challenges: content.challenges as string[] || [],
-      nextQuarterPlan: content.nextQuarterPlan as string[] || [],
+      nextQuarterPlan: content.nextQuarterPlan as any || [],
       kpis: content.kpis as Array<{ metric: string; target: number; actual: number; unit: string }> || [],
       budgetStatus: content.budgetStatus as { allocated: number; used: number; remaining: number } || { allocated: 0, used: 0, remaining: 0 },
       teamPerformance: content.teamPerformance as { totalEmployees: number; satisfactionScore: number; trainingHours: number } || { totalEmployees: 0, satisfactionScore: 0, trainingHours: 0 },

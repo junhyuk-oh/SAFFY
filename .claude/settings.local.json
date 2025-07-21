@@ -19,7 +19,8 @@
       "Bash(npm run lint)",
       "Bash(start \"\" npm run dev)",
       "Bash(cat:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(true)"
     ],
     "deny": []
   }

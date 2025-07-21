@@ -28,16 +28,6 @@ export function QuickAddModal({ isOpen, onClose, onSave }: QuickAddModalProps) {
   });
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    parseInput(input);
-  }, [input, parseInput]);
-
   const parseInput = useCallback((text: string) => {
     // 기본값 설정
     const parsed: ParsedSchedule = {
@@ -100,6 +90,16 @@ export function QuickAddModal({ isOpen, onClose, onSave }: QuickAddModalProps) {
     parsed.title = cleanTitle || text;
     setParsedData(parsed);
   }, [setParsedData]);
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    parseInput(input);
+  }, [input, parseInput]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

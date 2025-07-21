@@ -1,14 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { documentService } from '@/lib/services/documentService'
 import type { SafetyInspection, EducationLog, RiskAssessment } from '@/lib/types/documents'
-import { DocumentSearchParams, UnifiedDocumentType } from '@/lib/types'
+import { DocumentSearchParams, UnifiedDocumentType, Status } from '@/lib/types'
 
 // 유니온 타입 정의
 type MonthlyDocument = SafetyInspection | EducationLog | RiskAssessment;
 type DocumentType = 'safety-inspection' | 'education-log' | 'risk-assessment';
 
+// 공통 필드를 포함한 기본 타입
+interface BaseMonthlyFields {
+  id: string;
+  title: string;
+  status: Status;
+  author: string;
+  department: string;
+  createdAt: string;
+  updatedAt: string;
+  month?: string;
+}
+
 // 문서 타입 확장 (문서 타입 정보 포함)
-type DocumentWithType = MonthlyDocument & { documentType: DocumentType };
+type DocumentWithType = MonthlyDocument & BaseMonthlyFields & { documentType?: DocumentType };
 
 // 월별 문서 타입을 UnifiedDocumentType으로 매핑
 const MONTHLY_TYPE_MAP: Record<DocumentType, UnifiedDocumentType> = {
@@ -57,8 +69,8 @@ export async function GET(request: NextRequest) {
     const documents = result.documents
 
     // BaseDocument를 월별 문서 형식으로 변환
-    const results = documents.map(doc => {
-      const monthlyDoc: Partial<MonthlyDocument & { documentType: DocumentType }> = {
+    let results = documents.map(doc => {
+      const monthlyDoc: DocumentWithType = {
         id: doc.id,
         title: doc.title,
         status: doc.status,
@@ -66,33 +78,33 @@ export async function GET(request: NextRequest) {
         department: doc.department,
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt,
-        month: doc.metadata?.periodDate?.substring(0, 7) || new Date().toISOString().substring(0, 7) // YYYY-MM 형식
-      }
+        month: (doc.metadata?.periodDate as string)?.substring(0, 7) || new Date().toISOString().substring(0, 7), // YYYY-MM 형식
+      } as DocumentWithType
 
       // 문서 타입별 특정 필드 추가 (content에서 추출)
-      const docContent = doc as Record<string, unknown>
-      if (docContent.description) monthlyDoc.description = docContent.description
-      if (docContent.location) monthlyDoc.location = docContent.location
-      if (docContent.inspector) monthlyDoc.inspector = docContent.inspector
-      if (docContent.checkItems) monthlyDoc.checkItems = docContent.checkItems
-      if (docContent.findings) monthlyDoc.findings = docContent.findings
-      if (docContent.actions) monthlyDoc.actions = docContent.actions
-      if (docContent.participants) monthlyDoc.participants = docContent.participants
-      if (docContent.duration) monthlyDoc.duration = docContent.duration
-      if (docContent.materials) monthlyDoc.materials = docContent.materials
-      if (docContent.evaluation) monthlyDoc.evaluation = docContent.evaluation
-      if (docContent.riskLevel) monthlyDoc.riskLevel = docContent.riskLevel
-      if (docContent.probability) monthlyDoc.probability = docContent.probability
-      if (docContent.severity) monthlyDoc.severity = docContent.severity
-      if (docContent.controlMeasures) monthlyDoc.controlMeasures = docContent.controlMeasures
-      if (docContent.residualRisk) monthlyDoc.residualRisk = docContent.residualRisk
+      const docContent = doc as any
+      if (docContent.description) (monthlyDoc as any).description = docContent.description
+      if (docContent.location) (monthlyDoc as any).location = docContent.location
+      if (docContent.inspector) (monthlyDoc as any).inspector = docContent.inspector
+      if (docContent.checkItems) (monthlyDoc as any).checkItems = docContent.checkItems
+      if (docContent.findings) (monthlyDoc as any).findings = docContent.findings
+      if (docContent.actions) (monthlyDoc as any).actions = docContent.actions
+      if (docContent.participants) (monthlyDoc as any).participants = docContent.participants
+      if (docContent.duration) (monthlyDoc as any).duration = docContent.duration
+      if (docContent.materials) (monthlyDoc as any).materials = docContent.materials
+      if (docContent.evaluation) (monthlyDoc as any).evaluation = docContent.evaluation
+      if (docContent.riskLevel) (monthlyDoc as any).riskLevel = docContent.riskLevel
+      if (docContent.probability) (monthlyDoc as any).probability = docContent.probability
+      if (docContent.severity) (monthlyDoc as any).severity = docContent.severity
+      if (docContent.controlMeasures) (monthlyDoc as any).controlMeasures = docContent.controlMeasures
+      if (docContent.residualRisk) (monthlyDoc as any).residualRisk = docContent.residualRisk
 
       return monthlyDoc
     })
 
     // 타입이 지정되지 않은 경우 documentType 추가
     if (!type) {
-      results = results.map(doc => {
+      results = results.map((doc: any) => {
         const baseDoc = documents.find(d => d.id === doc.id)
         if (baseDoc && SUPABASE_TYPE_MAP[baseDoc.type]) {
           return { ...doc, documentType: SUPABASE_TYPE_MAP[baseDoc.type] }
@@ -103,7 +115,7 @@ export async function GET(request: NextRequest) {
 
     // 월별 필터링 (클라이언트 사이드에서 추가 필터링)
     if (month) {
-      results = results.filter(doc => doc.month === month)
+      results = results.filter((doc: any) => doc.month === month)
     }
 
     return NextResponse.json({
@@ -166,15 +178,15 @@ export async function POST(request: NextRequest) {
 
     // BaseDocument를 월별 문서 형식으로 변환하여 반환
     const monthlyDoc = {
+      ...data,
       id: savedDocument.id,
       title: savedDocument.title,
       author: savedDocument.author,
       department: savedDocument.department,
       createdAt: savedDocument.createdAt,
       updatedAt: savedDocument.updatedAt,
-      month: savedDocument.metadata?.periodDate?.substring(0, 7) || new Date().toISOString().substring(0, 7),
-      ...data
-    } as MonthlyDocument
+      month: (savedDocument.metadata?.periodDate as string)?.substring(0, 7) || new Date().toISOString().substring(0, 7)
+    } as any
 
     return NextResponse.json({
       success: true,
@@ -227,7 +239,9 @@ export async function PUT(request: NextRequest) {
         id,
         updates: {
           title: data.title || existingDoc.title,
-          ...data,
+          data: {
+            ...data
+          },
           metadata: {
             ...existingDoc.metadata,
             periodDate: data.month ? `${data.month}-01` : existingDoc.metadata?.periodDate
@@ -239,7 +253,8 @@ export async function PUT(request: NextRequest) {
       const updatedDocument = await documentService.updateDocument(updateRequest, 'current-user-id') // TODO: 실제 사용자 ID 사용
 
       // BaseDocument를 월별 문서 형식으로 변환하여 반환
-      const monthlyDoc: MonthlyDocument = {
+      const monthlyDoc = {
+        ...data,
         id: updatedDocument.id,
         title: updatedDocument.title,
         status: updatedDocument.status,
@@ -247,16 +262,15 @@ export async function PUT(request: NextRequest) {
         department: updatedDocument.department,
         createdAt: updatedDocument.createdAt,
         updatedAt: updatedDocument.updatedAt,
-        month: updatedDocument.metadata?.periodDate?.substring(0, 7) || new Date().toISOString().substring(0, 7),
-        ...data
-      } as MonthlyDocument
+        month: (updatedDocument.metadata?.periodDate as string)?.substring(0, 7) || new Date().toISOString().substring(0, 7)
+      } as any
 
       return NextResponse.json({
         success: true,
         data: monthlyDoc
       })
-    } catch (docError: unknown) {
-      if (docError.code === 'RESOURCE_NOT_FOUND') {
+    } catch (docError: any) {
+      if (docError?.code === 'RESOURCE_NOT_FOUND') {
         return NextResponse.json(
           { success: false, error: '문서를 찾을 수 없습니다.' },
           { status: 404 }
@@ -301,8 +315,8 @@ export async function DELETE(request: NextRequest) {
         success: true,
         message: '문서가 삭제되었습니다.'
       })
-    } catch (docError: unknown) {
-      if (docError.code === 'RESOURCE_NOT_FOUND') {
+    } catch (docError: any) {
+      if (docError?.code === 'RESOURCE_NOT_FOUND') {
         return NextResponse.json(
           { success: false, error: '문서를 찾을 수 없습니다.' },
           { status: 404 }

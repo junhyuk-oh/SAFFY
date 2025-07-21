@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useCallback, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -194,15 +194,20 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
 }
 
 // Props 인터페이스 추가
-// interface ScheduleCalendarProps {
-//   schedules?: Schedule[]
-//   onDateClick?: (date: Date) => void
-//   onEventClick?: (event: Schedule) => void
-//   isEditMode?: boolean
-// }
+interface ScheduleCalendarProps {
+  schedules?: Schedule[]
+  onDateClick?: () => void
+  onEventClick?: (event: Schedule) => void
+  isEditMode?: boolean
+}
 
 // 메인 캘린더 컴포넌트
-export function ScheduleCalendar(): JSX.Element {
+export function ScheduleCalendar({
+  schedules = [],
+  onDateClick,
+  onEventClick,
+  isEditMode = false
+}: ScheduleCalendarProps = {}) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('month')
@@ -278,9 +283,9 @@ export function ScheduleCalendar(): JSX.Element {
   // 이벤트 핸들러
   const handleDayClick = (date: Date) => {
     setSelectedDate(date)
-    if (viewMode !== 'day') {
+    if (viewMode !== 'day' && onDateClick) {
       // 날짜 클릭시 이벤트 추가 모달 열기
-      setIsAddingEvent(true)
+      onDateClick()
     }
   }
 
@@ -448,7 +453,7 @@ export function ScheduleCalendar(): JSX.Element {
             
             {/* 일정 추가 버튼 */}
             <Button
-              onClick={() => setIsAddingEvent(true)}
+              onClick={() => onDateClick && onDateClick()}
               className="flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />

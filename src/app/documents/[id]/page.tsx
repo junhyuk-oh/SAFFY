@@ -95,8 +95,14 @@ export default function DocumentDetailPage() {
   const handleDelete = async () => {
     if (confirm("정말로 이 문서를 삭제하시겠습니까?")) {
       try {
-        await deleteDocument()
-        router.push("/documents")
+        const response = await fetch(`/api/documents/${document.id}`, {
+          method: 'DELETE',
+        })
+        if (response.ok) {
+          router.push("/documents")
+        } else {
+          throw new Error('삭제 실패')
+        }
       } catch {
         alert("문서 삭제에 실패했습니다.")
       }
@@ -109,8 +115,8 @@ export default function DocumentDetailPage() {
   }
   
   // 문서 내용 파싱
-  const content = document.data ? (typeof document.data === 'string' ? JSON.parse(document.data) : document.data) : null
-  const tags: string[] = []
+  const content = (document as any).content || null
+  const tags: string[] = document.metadata?.tags || []
   const createdDate = new Date(document.createdAt).toLocaleDateString('ko-KR')
   const lastModified = document.updatedAt ? new Date(document.updatedAt).toLocaleDateString('ko-KR') : createdDate
 
