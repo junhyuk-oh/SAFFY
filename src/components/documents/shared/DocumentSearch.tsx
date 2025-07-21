@@ -14,6 +14,12 @@ interface FilterOptions {
   dateRange: string
 }
 
+interface FilterPreset {
+  id: string
+  name: string
+  filters: FilterOptions
+}
+
 export function DocumentSearch({ onSearch, onFilterChange, documentTypes }: DocumentSearchProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [filters, setFilters] = useState<FilterOptions>({
@@ -22,6 +28,18 @@ export function DocumentSearch({ onSearch, onFilterChange, documentTypes }: Docu
     dateRange: "all"
   })
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [savedPresets, setSavedPresets] = useState<FilterPreset[]>([
+    {
+      id: "1",
+      name: "최근 검토 중",
+      filters: { type: "all", status: "pending", dateRange: "week" }
+    },
+    {
+      id: "2",
+      name: "이번 달 완료",
+      filters: { type: "all", status: "completed", dateRange: "month" }
+    }
+  ])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,6 +51,25 @@ export function DocumentSearch({ onSearch, onFilterChange, documentTypes }: Docu
     setFilters(newFilters)
     onFilterChange(newFilters)
   }
+
+  const applyPreset = (preset: FilterPreset) => {
+    setFilters(preset.filters)
+    onFilterChange(preset.filters)
+  }
+
+  const saveCurrentFilters = () => {
+    const name = prompt("필터 프리셋 이름을 입력하세요:")
+    if (name) {
+      const newPreset: FilterPreset = {
+        id: Date.now().toString(),
+        name,
+        filters: { ...filters }
+      }
+      setSavedPresets([...savedPresets, newPreset])
+    }
+  }
+
+  const hasActiveFilters = filters.type !== "all" || filters.status !== "all" || filters.dateRange !== "all"
 
   const statuses = [
     { value: "all", label: "모든 상태" },
@@ -79,7 +116,7 @@ export function DocumentSearch({ onSearch, onFilterChange, documentTypes }: Docu
           >
             <span>🎯</span>
             <span>필터</span>
-            {(filters.type !== "all" || filters.status !== "all" || filters.dateRange !== "all") && (
+            {hasActiveFilters && (
               <span className="ml-1 w-2 h-2 bg-primary rounded-full"></span>
             )}
           </button>
@@ -87,7 +124,83 @@ export function DocumentSearch({ onSearch, onFilterChange, documentTypes }: Docu
       </form>
 
       {isFilterOpen && (
-        <div className="border-t border-border pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="border-t border-border pt-4">
+          {/* Filter Presets */}
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium text-text-secondary">필터 프리셋</label>
+              {hasActiveFilters && (
+                <button
+                  onClick={saveCurrentFilters}
+                  className="text-xs text-primary hover:text-primary-hover transition-colors"
+                >
+                  현재 필터 저장
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {savedPresets.map(preset => (
+                <button
+                  key={preset.id}
+                  onClick={() => applyPreset(preset)}
+                  className="px-3 py-1.5 bg-background rounded-notion-sm border border-border hover:bg-background-hover transition-colors text-sm"
+                >
+                  {preset.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Active Filters */}
+          {hasActiveFilters && (
+            <div className="mb-4">
+              <label className="text-sm font-medium text-text-secondary mb-2 block">활성 필터</label>
+              <div className="flex flex-wrap gap-2">
+                {filters.type !== "all" && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary-light text-primary rounded-notion-sm text-sm">
+                    타입: {filters.type}
+                    <button
+                      onClick={() => handleFilterChange("type", "all")}
+                      className="ml-1 hover:bg-primary-hover rounded-full p-0.5"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
+                )}
+                {filters.status !== "all" && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary-light text-primary rounded-notion-sm text-sm">
+                    상태: {statuses.find(s => s.value === filters.status)?.label}
+                    <button
+                      onClick={() => handleFilterChange("status", "all")}
+                      className="ml-1 hover:bg-primary-hover rounded-full p-0.5"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
+                )}
+                {filters.dateRange !== "all" && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-primary-light text-primary rounded-notion-sm text-sm">
+                    기간: {dateRanges.find(d => d.value === filters.dateRange)?.label}
+                    <button
+                      onClick={() => handleFilterChange("dateRange", "all")}
+                      className="ml-1 hover:bg-primary-hover rounded-full p-0.5"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Filter Options */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-2">
               문서 타입
@@ -132,6 +245,7 @@ export function DocumentSearch({ onSearch, onFilterChange, documentTypes }: Docu
                 <option key={range.value} value={range.value}>{range.label}</option>
               ))}
             </select>
+          </div>
           </div>
         </div>
       )}

@@ -102,6 +102,7 @@ export default function DocumentsPage() {
     dateRange: "all"
   })
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
 
   // 필터링된 문서 목록
   const filteredDocuments = useMemo(() => {
@@ -123,8 +124,11 @@ export default function DocumentsPage() {
         return false
       }
 
-      // 상태 필터
-      if (filters.status !== "all" && doc.status !== filters.status) {
+      // 상태 필터 (선택된 상태 카드 우선)
+      if (selectedStatus && doc.status !== selectedStatus) {
+        return false
+      }
+      if (!selectedStatus && filters.status !== "all" && doc.status !== filters.status) {
         return false
       }
 
@@ -152,7 +156,7 @@ export default function DocumentsPage() {
 
       return true
     })
-  }, [searchQuery, filters])
+  }, [searchQuery, filters, selectedStatus])
 
   // 상태별 문서 개수
   const statusCounts = useMemo(() => {
@@ -164,6 +168,41 @@ export default function DocumentsPage() {
       overdue: mockDocuments.filter(doc => doc.status === "overdue").length
     }
   }, [])
+
+  // 상태 카드 클릭 핸들러
+  const handleStatusCardClick = (status: string | null) => {
+    setSelectedStatus(status)
+    // 필터도 초기화
+    setFilters(prev => ({ ...prev, status: "all" }))
+  }
+
+  // 자주 사용하는 템플릿
+  const favoriteTemplates = [
+    {
+      id: "template-1",
+      icon: "⚠️",
+      title: "위험성평가",
+      description: "화학물질 및 실험 위험성 평가"
+    },
+    {
+      id: "template-2",
+      icon: "📝",
+      title: "실험계획서",
+      description: "연구 실험 계획 및 안전 대책"
+    },
+    {
+      id: "template-3",
+      icon: "🎓",
+      title: "교육일지",
+      description: "안전교육 진행 및 참석 기록"
+    },
+    {
+      id: "template-4",
+      icon: "✅",
+      title: "점검일지",
+      description: "정기 안전 점검 기록"
+    }
+  ]
 
   return (
     <>
@@ -191,26 +230,77 @@ export default function DocumentsPage() {
               </div>
 
               {/* Status Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
-                <div className="bg-background-secondary rounded-notion-md p-4 border border-border">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                <div 
+                  onClick={() => handleStatusCardClick(null)}
+                  className={`bg-background-secondary rounded-notion-md p-4 border cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+                    selectedStatus === null ? 'border-primary shadow-md' : 'border-border'
+                  }`}
+                >
                   <div className="text-2xl font-bold text-text-primary">{statusCounts.total}</div>
                   <div className="text-sm text-text-secondary">전체 문서</div>
                 </div>
-                <div className="bg-background-secondary rounded-notion-md p-4 border border-border">
+                <div 
+                  onClick={() => handleStatusCardClick('draft')}
+                  className={`bg-background-secondary rounded-notion-md p-4 border cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+                    selectedStatus === 'draft' ? 'border-primary shadow-md' : 'border-border'
+                  }`}
+                >
                   <div className="text-2xl font-bold text-text-primary">{statusCounts.draft}</div>
                   <div className="text-sm text-text-secondary">초안</div>
                 </div>
-                <div className="bg-warning-bg rounded-notion-md p-4 border border-warning">
+                <div 
+                  onClick={() => handleStatusCardClick('pending')}
+                  className={`bg-warning-bg rounded-notion-md p-4 border cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+                    selectedStatus === 'pending' ? 'border-primary shadow-md' : 'border-warning'
+                  }`}
+                >
                   <div className="text-2xl font-bold text-warning-text">{statusCounts.pending}</div>
                   <div className="text-sm text-warning-text">검토 중</div>
                 </div>
-                <div className="bg-success-bg rounded-notion-md p-4 border border-success">
+                <div 
+                  onClick={() => handleStatusCardClick('completed')}
+                  className={`bg-success-bg rounded-notion-md p-4 border cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+                    selectedStatus === 'completed' ? 'border-primary shadow-md' : 'border-success'
+                  }`}
+                >
                   <div className="text-2xl font-bold text-success-text">{statusCounts.completed}</div>
                   <div className="text-sm text-success-text">완료</div>
                 </div>
-                <div className="bg-error-bg rounded-notion-md p-4 border border-error">
+                <div 
+                  onClick={() => handleStatusCardClick('overdue')}
+                  className={`bg-error-bg rounded-notion-md p-4 border cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
+                    selectedStatus === 'overdue' ? 'border-primary shadow-md' : 'border-error'
+                  }`}
+                >
                   <div className="text-2xl font-bold text-error-text">{statusCounts.overdue}</div>
                   <div className="text-sm text-error-text">기한 초과</div>
+                </div>
+              </div>
+
+              {/* Favorite Templates */}
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-text-primary mb-3">자주 사용하는 템플릿</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {favoriteTemplates.map((template) => (
+                    <Link
+                      key={template.id}
+                      href={`/documents/create?template=${template.title}`}
+                      className="bg-background-secondary rounded-notion-md p-4 border border-border hover:border-primary hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl">{template.icon}</span>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-text-primary group-hover:text-primary transition-colors">
+                            {template.title}
+                          </h3>
+                          <p className="text-xs text-text-secondary mt-1">
+                            {template.description}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>
@@ -224,8 +314,21 @@ export default function DocumentsPage() {
 
             {/* View Mode Toggle */}
             <div className="flex justify-between items-center mb-4">
-              <div className="text-sm text-text-secondary">
-                {filteredDocuments.length}개의 문서를 찾았습니다
+              <div className="flex items-center gap-3">
+                <div className="text-sm text-text-secondary">
+                  {filteredDocuments.length}개의 문서를 찾았습니다
+                </div>
+                {selectedStatus && (
+                  <button
+                    onClick={() => handleStatusCardClick(null)}
+                    className="text-xs text-primary hover:text-primary-hover transition-colors flex items-center gap-1"
+                  >
+                    <span>필터 해제</span>
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
               <div className="flex gap-2">
                 <button
