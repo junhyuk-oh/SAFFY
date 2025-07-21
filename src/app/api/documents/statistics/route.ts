@@ -8,7 +8,8 @@ import {
   toApiError,
   AppError
 } from '@/lib/types';
-import { documentService } from '@/lib/services/documentService';
+// import { documentService } from '@/lib/services/documentService';
+import { mockDocumentService as documentService } from '@/lib/services/mockDocumentService';
 
 /**
  * 문서 통계 API

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { documentService } from '@/lib/services/documentService'
+// import { documentService } from '@/lib/services/documentService'
+import { mockDocumentService as documentService } from '@/lib/services/mockDocumentService'
 import type { SafetyInspection, EducationLog, RiskAssessment } from '@/lib/types/documents'
 import { DocumentSearchParams, UnifiedDocumentType, Status, BaseDocument } from '@/lib/types'
 

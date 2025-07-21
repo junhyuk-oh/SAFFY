@@ -92,10 +92,18 @@ export class DocumentService {
       const { data, error, count } = await query;
 
       if (error) {
+        console.error('Supabase error:', error);
         throw new AppError({
           message: '문서 조회 중 데이터베이스 오류가 발생했습니다.',
           code: ApiErrorCode.DATABASE_ERROR,
-          context: { metadata: { error: error.message } }
+          context: { 
+            metadata: { 
+              error: error.message,
+              code: error.code,
+              details: error.details,
+              hint: error.hint
+            } 
+          }
         });
       }
 

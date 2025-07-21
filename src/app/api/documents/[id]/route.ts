@@ -10,7 +10,8 @@ import {
   ValidationError,
   ResourceError
 } from '@/lib/types';
-import { documentService } from '@/lib/services/documentService';
+// import { documentService } from '@/lib/services/documentService';
+import { mockDocumentService as documentService } from '@/lib/services/mockDocumentService';
 
 /**
  * 개별 문서 CRUD API

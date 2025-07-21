@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { AnnualSafetyPlan } from '@/lib/types'
 import { UnifiedDocumentType } from '@/lib/types'
-import { documentService } from '@/lib/services/documentService'
+// import { documentService } from '@/lib/services/documentService'
+import { mockDocumentService as documentService } from '@/lib/services/mockDocumentService'
 import { AppError } from '@/lib/types/error'
 import type { BaseDocument } from '@/lib/types'
 

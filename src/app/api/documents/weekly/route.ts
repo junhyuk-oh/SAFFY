@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { WeeklyCheckList, ChemicalUsageReport } from '@/lib/types/documents';
-import { documentService } from '@/lib/services/documentService';
+// import { documentService } from '@/lib/services/documentService';
+import { mockDocumentService as documentService } from '@/lib/services/mockDocumentService';
 import { DocumentSearchParams } from '@/lib/types';
 import { UnifiedDocumentType } from '@/lib/types/document';
 

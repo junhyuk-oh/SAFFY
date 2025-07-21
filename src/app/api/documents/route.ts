@@ -13,7 +13,8 @@ import {
   AppError,
   ValidationError
 } from '@/lib/types';
-import { documentService } from '@/lib/services/documentService';
+// import { documentService } from '@/lib/services/documentService';
+import { mockDocumentService as documentService } from '@/lib/services/mockDocumentService';
 
 /**
  * 통합 문서 API

@@ -20,7 +20,10 @@
       "Bash(start \"\" npm run dev)",
       "Bash(cat:*)",
       "Bash(taskkill:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(npm cache clean:*)",
+      "Bash(mv:*)",
+      "Bash(ping:*)"
     ],
     "deny": []
   }

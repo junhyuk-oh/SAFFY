@@ -11,7 +11,8 @@ import {
   BaseDocument,
   UnifiedDocumentType
 } from '@/lib/types';
-import { documentService } from '@/lib/services/documentService';
+// import { documentService } from '@/lib/services/documentService';
+import { mockDocumentService as documentService } from '@/lib/services/mockDocumentService';
 
 export async function GET(request: NextRequest) {
   try {

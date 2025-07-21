@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { documentService } from '@/lib/services/documentService'
+// import { documentService } from '@/lib/services/documentService'
+import { mockDocumentService as documentService } from '@/lib/services/mockDocumentService'
 import { UnifiedDocumentType, BaseDocument } from '@/lib/types'
 
 export async function GET(request: NextRequest) {
