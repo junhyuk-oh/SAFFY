@@ -46,14 +46,43 @@ export function ScheduleSidebar({ schedules, onStatusUpdate }: ScheduleSidebarPr
     console.log(`일정 ${scheduleId}의 상태를 ${newStatus}로 변경`)
   }
 
-  // 실제 schedules가 없으면 mockSchedules 사용
-  const displaySchedules = schedules || mockSchedules as Schedule[]
+  // 실제 schedules가 없으면 mockSchedules를 Schedule 형태로 변환
+  const displaySchedules = schedules || mockSchedules.map((s): Schedule => ({
+    id: s.id,
+    title: s.title,
+    description: '',
+    categoryId: 'default',
+    type: 'other',
+    status: s.status === 'urgent' ? ScheduleStatus.OVERDUE : 
+           s.status === 'scheduled' ? ScheduleStatus.SCHEDULED : 
+           ScheduleStatus.COMPLETED,
+    priority: s.status === 'urgent' ? SchedulePriority.HIGH : SchedulePriority.MEDIUM,
+    startDate: new Date().toISOString(),
+    endDate: new Date().toISOString(),
+    allDay: false,
+    timezone: 'Asia/Seoul',
+    isRecurring: false,
+    organizerId: 'system',
+    participants: [],
+    location: undefined,
+    resources: [],
+    attachments: [],
+    tags: [],
+    completedAt: s.status === 'completed' ? new Date().toISOString() : undefined,
+    completedBy: s.status === 'completed' ? 'system' : undefined,
+    cancellationReason: undefined,
+    metadata: {},
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    createdBy: 'system',
+    updatedBy: 'system'
+  }))
   
   // 우선순위별로 일정 그룹화
   const groupedSchedules = {
-    urgent: displaySchedules.filter((s) => s.status === "urgent"),
-    scheduled: displaySchedules.filter((s) => s.status === "scheduled"),
-    completed: displaySchedules.filter((s) => s.status === "completed"),
+    urgent: displaySchedules.filter((s) => s.status === ScheduleStatus.OVERDUE),
+    scheduled: displaySchedules.filter((s) => s.status === ScheduleStatus.SCHEDULED),
+    completed: displaySchedules.filter((s) => s.status === ScheduleStatus.COMPLETED),
   }
 
   const sectionConfig = {
@@ -166,7 +195,7 @@ export function ScheduleSidebar({ schedules, onStatusUpdate }: ScheduleSidebarPr
                           </h4>
                           <div className="flex items-center gap-2 mt-1">
                             <span className="text-xs text-text-secondary">
-                              {schedule.time}
+                              {new Date(schedule.startDate).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                             <span className="text-xs text-text-tertiary">
                               • {schedule.type}

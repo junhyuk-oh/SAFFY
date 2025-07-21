@@ -354,9 +354,9 @@ export class DocumentService {
         .gte('updated_at', weekAgo.toISOString());
 
       // 클라이언트 사이드에서 통계 계산
-      const typeStats = this.calculateTypeStats(allDocs || []);
-      const statusStats = this.calculateStatusStats(allDocs || []);
-      const departmentStats = this.calculateDepartmentStats(allDocs || []);
+      const typeStats = this.calculateTypeStats(allDocs as unknown as BaseDocument[] || []);
+      const statusStats = this.calculateStatusStats(allDocs as unknown as BaseDocument[] || []);
+      const departmentStats = this.calculateDepartmentStats(allDocs as unknown as BaseDocument[] || []);
 
       // 통계 객체 생성
       const statistics: DocumentStatistics = {
@@ -478,33 +478,36 @@ export class DocumentService {
    * Supabase 문서 row를 BaseDocument로 변환
    */
   private mapToBaseDocument(doc: DocumentRow): BaseDocument {
+    const content = doc.content as { [key: string]: unknown } | null;
+    const metadata = content?.metadata as { [key: string]: unknown } | undefined;
+    
     return {
       id: doc.id,
-      type: doc.content?.type || 'daily-checklist' as any,
+      type: (content?.type as UnifiedDocumentType) || 'daily-checklist',
       title: doc.title,
-      status: doc.status as any,
-      author: doc.content?.author || 'Unknown',
+      status: doc.status as 'draft' | 'completed' | 'overdue',
+      author: (content?.author as string) || 'Unknown',
       authorId: doc.user_id,
-      department: doc.content?.department || '안전관리팀',
-      departmentId: doc.content?.departmentId,
+      department: (content?.department as string) || '안전관리팀',
+      departmentId: content?.departmentId as string | undefined,
       metadata: {
-        version: doc.content?.metadata?.version || 1,
-        isAiGenerated: doc.content?.metadata?.isAiGenerated || false,
+        version: (metadata?.version as number) || 1,
+        isAiGenerated: (metadata?.isAiGenerated as boolean) || false,
         templateId: doc.template_id || undefined,
-        parentDocumentId: doc.content?.metadata?.parentDocumentId,
-        tags: doc.content?.metadata?.tags || [],
-        category: doc.content?.metadata?.category,
-        period: doc.content?.metadata?.period,
-        periodDate: doc.content?.metadata?.periodDate
+        parentDocumentId: metadata?.parentDocumentId as string | undefined,
+        tags: (metadata?.tags as string[]) || [],
+        category: metadata?.category as string | undefined,
+        period: metadata?.period as string | undefined,
+        periodDate: metadata?.periodDate as string | undefined
       },
-      review: doc.content?.review,
-      approval: doc.content?.approval,
-      attachments: doc.content?.attachments || [],
-      permissions: doc.content?.permissions,
+      review: content?.review as BaseDocument['review'],
+      approval: content?.approval as BaseDocument['approval'],
+      attachments: (content?.attachments as BaseDocument['attachments']) || [],
+      permissions: content?.permissions as BaseDocument['permissions'],
       createdAt: doc.created_at,
       updatedAt: doc.updated_at,
-      signature: doc.content?.signature,
-      signedAt: doc.content?.signedAt
+      signature: content?.signature as BaseDocument['signature'],
+      signedAt: content?.signedAt as string | undefined
     };
   }
 
@@ -568,8 +571,8 @@ export class DocumentService {
    */
   private async saveDocumentHistory(
     documentId: string, 
-    oldData: Partial<Document>, 
-    newData: Partial<Document>, 
+    oldData: Partial<BaseDocument>, 
+    newData: Partial<BaseDocument>, 
     changedBy: string, 
     reason?: string
   ): Promise<void> {
@@ -598,7 +601,7 @@ export class DocumentService {
   /**
    * 변경사항 계산
    */
-  private calculateChanges(oldData: Partial<Document>, newData: Partial<Document>): Array<{ field: string; oldValue: unknown; newValue: unknown }> {
+  private calculateChanges(oldData: Partial<BaseDocument>, newData: Partial<BaseDocument>): Array<{ field: string; oldValue: unknown; newValue: unknown }> {
     const changes: Array<{ field: string; oldValue: unknown; newValue: unknown }> = [];
     
     // 간단한 변경사항 감지 로직
@@ -626,11 +629,11 @@ export class DocumentService {
   /**
    * 타입별 통계 계산
    */
-  private calculateTypeStats(docs: Document[]): Record<string, number> {
+  private calculateTypeStats(docs: BaseDocument[]): Record<string, number> {
     const result: Record<string, number> = {};
     
     docs.forEach(doc => {
-      const type = doc.content?.type;
+      const type = doc.type;
       if (type) {
         result[type] = (result[type] || 0) + 1;
       }
@@ -642,7 +645,7 @@ export class DocumentService {
   /**
    * 상태별 통계 계산
    */
-  private calculateStatusStats(docs: Document[]): Record<string, number> {
+  private calculateStatusStats(docs: BaseDocument[]): Record<string, number> {
     const result: Record<string, number> = {};
     
     docs.forEach(doc => {
@@ -658,11 +661,11 @@ export class DocumentService {
   /**
    * 부서별 통계 계산
    */
-  private calculateDepartmentStats(docs: Document[]): Record<string, number> {
+  private calculateDepartmentStats(docs: BaseDocument[]): Record<string, number> {
     const result: Record<string, number> = {};
     
     docs.forEach(doc => {
-      const department = doc.content?.department;
+      const department = doc.department;
       if (department) {
         result[department] = (result[department] || 0) + 1;
       }

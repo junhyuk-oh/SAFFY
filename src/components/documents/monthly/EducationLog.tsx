@@ -93,7 +93,7 @@ export function EducationLog({ onSave, initialData }: EducationLogProps) {
     }))
   }
 
-  const updateParticipant = (id: string, field: keyof EducationParticipant, value: any) => {
+  const updateParticipant = (id: string, field: keyof EducationParticipant, value: string | number | boolean) => {
     setFormData(prev => ({
       ...prev,
       participants: prev.participants?.map(p =>
@@ -241,7 +241,7 @@ export function EducationLog({ onSave, initialData }: EducationLogProps) {
                   <Label htmlFor="type">교육 유형</Label>
                   <Select
                     value={formData.type}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as any }))}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, type: value as 'regular' | 'special' | 'new-employee' }))}
                   >
                     <SelectTrigger>
                       <SelectValue />

@@ -3,7 +3,7 @@ import { documentTemplates, DocumentTemplate, Section, generateSampleData } from
 // 문서 생성 함수 (현재는 Mock 구현)
 export async function generateDocument(
   documentType: string,
-  inputData: Record<string, any>
+  inputData: Record<string, unknown>
 ): Promise<GeneratedDocument> {
   // 3초 지연 시뮬레이션
   await new Promise(resolve => setTimeout(resolve, 3000));
@@ -37,7 +37,7 @@ export async function generateDocument(
 // 템플릿에서 콘텐츠 생성
 function generateContentFromTemplate(
   template: DocumentTemplate,
-  data: Record<string, any>
+  data: Record<string, unknown>
 ): string {
   let content = `# ${template.title}\n\n`;
   content += `생성일: ${new Date().toLocaleString('ko-KR')}\n\n`;
@@ -62,7 +62,7 @@ function generateContentFromTemplate(
 // 섹션 콘텐츠 생성
 function generateSectionContent(
   section: Section,
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   level: number = 2
 ): string {
   const heading = '#'.repeat(level);
@@ -73,7 +73,7 @@ function generateSectionContent(
     if (typeof section.content === 'string') {
       content += section.content + '\n\n';
     } else if (Array.isArray(section.content)) {
-      section.content.forEach((item: string | Record<string, any>) => {
+      section.content.forEach((item: string | Record<string, unknown>) => {
         if (typeof item === 'string') {
           content += `- ${item}\n`;
         } else if (typeof item === 'object') {
@@ -117,7 +117,7 @@ function generateSectionContent(
 }
 
 // 객체를 포맷팅
-function formatObject(obj: Record<string, any>): string {
+function formatObject(obj: Record<string, unknown>): string {
   if (obj.category && Array.isArray(obj.items)) {
     return `\n**${obj.category}**:\n${obj.items.map((item: string) => `  - ${item}`).join('\n')}`;
   } else if (obj.principle && obj.description) {
@@ -131,7 +131,7 @@ function formatObject(obj: Record<string, any>): string {
         if (Array.isArray(value)) {
           return `**${formattedKey}**: ${value.join(', ')}`;
         } else if (typeof value === 'object' && value !== null) {
-          return `**${formattedKey}**:\n${formatObject(value as Record<string, any>)}`;
+          return `**${formattedKey}**:\n${formatObject(value as Record<string, unknown>)}`;
         } else {
           return `**${formattedKey}**: ${value}`;
         }
@@ -156,7 +156,7 @@ export interface GeneratedDocument {
   metadata: {
     generatedAt: string;
     version: string;
-    inputData: Record<string, any>;
+    inputData: Record<string, unknown>;
     aiModel: string;
   };
 }

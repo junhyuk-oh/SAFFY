@@ -103,7 +103,12 @@ export interface ApiResponse<T = unknown> {
 export interface ApiError {
   code: string;
   message: string;
-  details?: Record<string, unknown> | string | string[];
+  details?: Array<{
+    field?: string;
+    value?: unknown;
+    issue: string;
+    suggestion?: string;
+  }>;
   timestamp?: string;
   path?: string;
 }

@@ -114,7 +114,7 @@ export interface DailyEducationLog {
   durationMinutes: number
   instructorId: string
   location: string
-  attendanceStatus: 'present' | 'absent' | 'partial'
+  attendanceStatus: 'present' | 'absent' | 'excused'
   notes?: string
   createdAt: string
   updatedAt: string

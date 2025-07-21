@@ -214,7 +214,7 @@ export function ScheduleEventModal({
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => handleInputChange("priority", option.value as any)}
+                  onClick={() => handleInputChange("priority", option.value as 'high' | 'medium' | 'low')}
                   className={cn(
                     "flex-1 px-4 py-2 rounded-notion-sm border transition-all",
                     "flex items-center justify-center gap-2",
@@ -260,7 +260,7 @@ export function ScheduleEventModal({
             </label>
             <select
               value={formData.recurrence}
-              onChange={(e) => handleInputChange("recurrence", e.target.value as any)}
+              onChange={(e) => handleInputChange("recurrence", e.target.value as 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly')}
               className="w-full px-3 py-2 rounded-notion-sm border border-border hover:border-text-tertiary transition-colors focus:outline-none focus:ring-2 focus:ring-primary/20"
             >
               {recurrenceOptions.map((option) => (

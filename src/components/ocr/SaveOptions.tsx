@@ -3,8 +3,14 @@
 import { useState } from "react";
 interface ExtractedData {
   text?: string;
-  tables: any[];
-  forms: any[];
+  tables: Array<{
+    headers: string[];
+    rows: string[][];
+  }>;
+  forms: Array<{
+    name: string;
+    value: string;
+  }>;
   documentInfo?: {
     title?: string;
   };

@@ -2,7 +2,14 @@
 export interface AIGenerateOptions {
   templateType: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annual';
   documentType: string;
-  inputData: any;
+  inputData: {
+    startDate?: string;
+    endDate?: string;
+    month?: string;
+    year?: string;
+    quarter?: string;
+    [key: string]: unknown;
+  };
 }
 
 export async function generateDocument(options: AIGenerateOptions) {
@@ -46,7 +53,12 @@ function createPromptForDocument(options: AIGenerateOptions): string {
   return prompts[templateType] || '';
 }
 
-function generateMockSections(templateType: string): any[] {
+interface Section {
+  title: string;
+  content: string;
+}
+
+function generateMockSections(templateType: string): Section[] {
   const sectionsByType = {
     daily: [
       { title: '점검 항목', content: '모든 항목 정상' },

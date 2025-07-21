@@ -112,6 +112,11 @@ export interface ApiMetadata {
     remaining: number;
     reset: string; // ISO 8601
   };
+  [key: string]: string | number | boolean | undefined | {
+    limit: number;
+    remaining: number;
+    reset: string;
+  };
 }
 
 // 페이지네이션 응답

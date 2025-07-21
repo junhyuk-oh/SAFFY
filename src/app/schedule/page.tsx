@@ -361,11 +361,32 @@ export default function SchedulePage() {
       <QuickAddModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={(data: Partial<Schedule>) => {
+        onSave={(data) => {
           handleAddSchedule({
-            ...data,
-            status: ScheduleStatus.SCHEDULED
-          })
+            title: data.title,
+            description: data.description || '',
+            startDate: data.date + (data.time ? `T${data.time}:00` : 'T09:00:00'),
+            endDate: data.date + (data.time ? `T${data.time}:00` : 'T18:00:00'),
+            priority: (data.priority === 'high' ? SchedulePriority.HIGH : 
+                      data.priority === 'low' ? SchedulePriority.LOW : 
+                      SchedulePriority.MEDIUM),
+            status: ScheduleStatus.SCHEDULED,
+            categoryId: 'default',
+            type: 'other',
+            allDay: !data.time,
+            timezone: 'Asia/Seoul',
+            isRecurring: data.recurrence !== 'none',
+            organizerId: 'current-user',
+            participants: [],
+            resources: [],
+            attachments: [],
+            tags: [],
+            metadata: {},
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            createdBy: 'current-user',
+            updatedBy: 'current-user'
+          } as Omit<Schedule, 'id'>)
         }}
       />
       
@@ -380,8 +401,7 @@ export default function SchedulePage() {
           title: selectedSchedule.title,
           date: selectedSchedule.startDate,
           time: new Date(selectedSchedule.startDate).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
-          priority: selectedSchedule.priority === SchedulePriority.HIGH ? 'high' : 
-                   selectedSchedule.priority === SchedulePriority.MEDIUM ? 'medium' : 'low',
+          priority: selectedSchedule.priority as 'high' | 'medium' | 'low',
           category: selectedSchedule.type,
           description: selectedSchedule.description || '',
           recurrence: selectedSchedule.isRecurring ? 'daily' : 'none'
@@ -390,7 +410,12 @@ export default function SchedulePage() {
           if (selectedSchedule) {
             handleEditSchedule({
               ...selectedSchedule,
-              ...event
+              title: event.title || selectedSchedule.title,
+              description: event.description || selectedSchedule.description,
+              priority: event.priority ? 
+                (event.priority === 'high' ? SchedulePriority.HIGH : 
+                 event.priority === 'low' ? SchedulePriority.LOW : 
+                 SchedulePriority.MEDIUM) : selectedSchedule.priority
             })
           }
         }}

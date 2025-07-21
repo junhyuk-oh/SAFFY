@@ -5,6 +5,15 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Json type for Supabase
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
 // Database types
 export interface Database {
   public: {
@@ -15,12 +24,12 @@ export interface Database {
           template_id: string | null;
           user_id: string;
           title: string;
-          content: any;
+          content: Json;
           file_path: string | null;
           status: 'draft' | 'review' | 'completed' | 'overdue';
           document_type: 'daily_checklist' | 'experiment_log' | 'safety_inspection' | 'risk_assessment' | 'education_log' | 'chemical_usage_report' | 'weekly_checklist' | 'quarterly_report' | 'annual_safety_plan' | 'jha' | 'safety_meeting' | 'incident_report' | 'audit_report' | 'policy' | 'procedure' | 'general';
           department: string | null;
-          metadata: any;
+          metadata: Json;
           tags: string[];
           priority: 'low' | 'medium' | 'high' | 'urgent';
           assigned_to: string | null;
@@ -31,11 +40,11 @@ export interface Database {
           parent_document_id: string | null;
           is_template: boolean;
           approval_status: 'pending' | 'approved' | 'rejected' | 'revision_required';
-          approval_history: any[];
+          approval_history: Json[];
           file_size: number | null;
           file_type: string | null;
-          search_vector: any | null;
-          comments: any[];
+          search_vector: unknown | null;
+          comments: Json[];
           feedback_score: number | null;
           feedback_comment: string | null;
           created_at: string;
@@ -50,8 +59,8 @@ export interface Database {
           name: string;
           type: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annual';
           category: string;
-          template_data: any;
-          required_fields: any;
+          template_data: Json;
+          required_fields: Json;
           created_at: string;
         };
         Insert: Omit<Database['public']['Tables']['document_templates']['Row'], 'id' | 'created_at'>;
@@ -62,7 +71,7 @@ export interface Database {
           id: string;
           document_id: string;
           version: number;
-          changes: any;
+          changes: Json;
           changed_by: string;
           changed_at: string;
         };
@@ -92,7 +101,7 @@ export interface Database {
           id: string;
           category_id: string;
           rule_type: string;
-          rule_value: any;
+          rule_value: Json;
           priority: number;
           is_active: boolean;
           created_at: string;
@@ -226,13 +235,13 @@ export interface Database {
       create_document_version: {
         Args: {
           original_doc_id: string;
-          new_content: any;
+          new_content: Json;
           editor_id: string;
         };
         Returns: string;
       };
       check_overdue_requirements: {
-        Args: {};
+        Args: Record<string, never>;
         Returns: void;
       };
     };

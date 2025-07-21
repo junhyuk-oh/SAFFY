@@ -40,7 +40,7 @@ export function QuickAddModal({ isOpen, onClose, onSave }: QuickAddModalProps) {
 
   const parseInput = (text: string) => {
     // 기본값 설정
-    let parsed: ParsedSchedule = {
+    const parsed: ParsedSchedule = {
       title: text,
       priority: "medium",
       date: new Date().toISOString().split("T")[0],
@@ -89,7 +89,7 @@ export function QuickAddModal({ isOpen, onClose, onSave }: QuickAddModalProps) {
     }
 
     // 제목 정리 (파싱 키워드 제거)
-    let cleanTitle = text
+    const cleanTitle = text
       .replace(/!!!|!!|!/g, "")
       .replace(/긴급|중요|보통|나중에|언젠가/g, "")
       .replace(/내일|모레|다음주/g, "")
@@ -196,7 +196,7 @@ export function QuickAddModal({ isOpen, onClose, onSave }: QuickAddModalProps) {
                     value={priority.value}
                     checked={parsedData.priority === priority.value}
                     onChange={(e) =>
-                      setParsedData({ ...parsedData, priority: e.target.value as any })
+                      setParsedData({ ...parsedData, priority: e.target.value as 'high' | 'medium' | 'low' })
                     }
                     className="sr-only"
                   />
@@ -226,7 +226,7 @@ export function QuickAddModal({ isOpen, onClose, onSave }: QuickAddModalProps) {
             <select
               value={parsedData.recurrence}
               onChange={(e) =>
-                setParsedData({ ...parsedData, recurrence: e.target.value as any })
+                setParsedData({ ...parsedData, recurrence: e.target.value as 'none' | 'daily' | 'weekly' | 'monthly' })
               }
               className="mt-1 w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >

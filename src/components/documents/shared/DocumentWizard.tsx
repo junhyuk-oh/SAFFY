@@ -53,7 +53,15 @@ const documentTypes = [
 export function DocumentWizard({ onComplete }: DocumentWizardProps) {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
-  const [formData, setFormData] = useState<any>({
+  const [formData, setFormData] = useState<{
+    type: string;
+    title: string;
+    description: string;
+    author: string;
+    department: string;
+    tags: string[];
+    details: Record<string, unknown>;
+  }>({
     type: "",
     title: "",
     description: "",
@@ -82,7 +90,7 @@ export function DocumentWizard({ onComplete }: DocumentWizardProps) {
     router.push("/documents")
   }
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: string, value: string | string[] | Record<string, unknown>) => {
     setFormData({ ...formData, [field]: value })
   }
 

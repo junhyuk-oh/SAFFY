@@ -164,8 +164,14 @@ export function generateCertificateNumber(
   return `${trainingCode}-${year}${month}${day}-${random}`
 }
 
+// 교육 훈련 인터페이스
+interface UserTraining {
+  status: 'completed' | 'in-progress' | 'not-started' | 'overdue'
+  duration?: number
+}
+
 // 교육 통계 계산
-export function calculateTrainingStats(userTrainings: any[]): {
+export function calculateTrainingStats(userTrainings: UserTraining[]): {
   completed: number
   inProgress: number
   notStarted: number

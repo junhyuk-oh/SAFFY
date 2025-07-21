@@ -98,7 +98,7 @@ export function SafetyInspection({ onSave, initialData }: SafetyInspectionProps)
     }))
   }
 
-  const updateInspectionItem = (itemId: string, field: keyof InspectionItem, value: any) => {
+  const updateInspectionItem = (itemId: string, field: keyof InspectionItem, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       sections: {
@@ -451,7 +451,7 @@ export function SafetyInspection({ onSave, initialData }: SafetyInspectionProps)
                       value={plan.status}
                       onValueChange={(value) => {
                         const newPlans = [...(formData.improvementPlan || [])]
-                        newPlans[index] = { ...plan, status: value as any }
+                        newPlans[index] = { ...plan, status: value as 'pending' | 'in-progress' | 'completed' }
                         setFormData(prev => ({ ...prev, improvementPlan: newPlans }))
                       }}
                     >

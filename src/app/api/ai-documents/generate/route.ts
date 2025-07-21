@@ -4,6 +4,9 @@ import {
   ApiResponse,
   ApiStatusCode,
   ApiErrorCode,
+  ApiError
+} from '@/lib/types/api';
+import {
   AppError,
   ValidationError,
   toApiResponse,

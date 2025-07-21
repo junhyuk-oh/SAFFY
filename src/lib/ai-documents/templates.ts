@@ -4,13 +4,13 @@ export interface DocumentTemplate {
   type: string;
   title: string;
   sections: Section[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Section {
   id: string;
   title: string;
-  content: string | string[] | Record<string, any>;
+  content: string | string[] | Record<string, unknown> | Array<Record<string, unknown>>;
   subsections?: Section[];
 }
 
@@ -553,8 +553,8 @@ export const documentTemplates: Record<string, DocumentTemplate> = {
 };
 
 // 샘플 데이터 생성 함수
-export function generateSampleData(documentType: string): Record<string, any> {
-  const sampleData: Record<string, Record<string, any>> = {
+export function generateSampleData(documentType: string): Record<string, unknown> {
+  const sampleData: Record<string, Record<string, unknown>> = {
     'safety-assessment': {
       systemName: 'AI 고객 서비스 챗봇',
       version: '2.0',
