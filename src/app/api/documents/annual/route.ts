@@ -23,29 +23,29 @@ export async function GET(request: NextRequest) {
     
     // BaseDocument를 AnnualSafetyPlan 형태로 변환
     let filteredPlans = result.documents.map(doc => {
-      const content = doc as any // 타입 변환을 위해 임시로 any 사용
+      const content = doc as unknown as Record<string, unknown>
       return {
         id: doc.id,
-        year: content.year || new Date().getFullYear(),
+        year: (content.year as number) || new Date().getFullYear(),
         department: doc.department,
-        preparedBy: content.preparedBy || doc.author,
-        approvedBy: content.approvedBy || doc.approval?.approver || '',
-        approvalDate: doc.approval?.date || content.approvalDate,
-        previousYearAnalysis: content.previousYearAnalysis || {
+        preparedBy: (content.preparedBy as string) || doc.author,
+        approvedBy: (content.approvedBy as string) || doc.approval?.approver || '',
+        approvalDate: doc.approval?.date || (content.approvalDate as string),
+        previousYearAnalysis: (content.previousYearAnalysis as AnnualSafetyPlan['previousYearAnalysis']) || {
           achievements: [],
           challenges: [],
           incidentTrend: { total: 0, byType: {}, byDepartment: {} }
         },
-        objectives: content.objectives || [],
-        plans: content.plans || [],
-        budget: content.budget || { total: 0, breakdown: [] },
-        timeline: content.timeline || [],
-        riskAssessment: content.riskAssessment || [],
-        trainingProgram: content.trainingProgram || { programs: [], schedule: [] },
-        emergencyPreparedness: content.emergencyPreparedness || { procedures: [], drills: [] },
-        performanceIndicators: content.performanceIndicators || { kpis: [], targets: [] },
-        complianceChecklist: content.complianceChecklist || [],
-        reviewSchedule: content.reviewSchedule || { frequency: 'quarterly', dates: [] },
+        objectives: (content.objectives as AnnualSafetyPlan['objectives']) || [],
+        plans: (content.plans as AnnualSafetyPlan['plans']) || [],
+        budget: (content.budget as AnnualSafetyPlan['budget']) || { total: 0, breakdown: [] },
+        timeline: (content.timeline as AnnualSafetyPlan['timeline']) || [],
+        riskAssessment: (content.riskAssessment as AnnualSafetyPlan['riskAssessment']) || [],
+        trainingProgram: (content.trainingProgram as AnnualSafetyPlan['trainingProgram']) || { programs: [], schedule: [] },
+        emergencyPreparedness: (content.emergencyPreparedness as AnnualSafetyPlan['emergencyPreparedness']) || { procedures: [], drills: [] },
+        performanceIndicators: (content.performanceIndicators as AnnualSafetyPlan['performanceIndicators']) || { kpis: [], targets: [] },
+        complianceChecklist: (content.complianceChecklist as AnnualSafetyPlan['complianceChecklist']) || [],
+        reviewSchedule: (content.reviewSchedule as AnnualSafetyPlan['reviewSchedule']) || { frequency: 'quarterly', dates: [] },
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt
       } as AnnualSafetyPlan
@@ -105,8 +105,8 @@ export async function POST(request: NextRequest) {
     })
 
     const existingPlan = existingDocuments.documents.find(doc => {
-      const content = doc as any
-      return content.year === body.year
+      const content = doc as unknown as Record<string, unknown>
+      return (content.year as number) === body.year
     })
 
     if (existingPlan) {
@@ -146,10 +146,10 @@ export async function POST(request: NextRequest) {
     const newDocument = await documentService.createDocument(createRequest, 'system') // TODO: 실제 사용자 ID로 교체
 
     // BaseDocument를 AnnualSafetyPlan 형태로 변환하여 반환
-    const content = newDocument as any
+    const content = newDocument as unknown as Record<string, unknown>
     const newPlan: AnnualSafetyPlan = {
       id: newDocument.id,
-      year: content.year || body.year,
+      year: (content.year as number) || body.year,
       department: newDocument.department,
       preparedBy: content.preparedBy || body.preparedBy,
       approvedBy: content.approvedBy || body.approvedBy || '',
@@ -339,14 +339,8 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    const planIndex = annualPlans.findIndex(plan => plan.id === id)
-    
-    if (planIndex === -1) {
-      return NextResponse.json(
-        { success: false, error: '계획서를 찾을 수 없습니다.' },
-        { status: 404 }
-      )
-    }
+    // 기존 문서 조회
+    const existingDocument = await documentService.getDocumentById(id)
 
     if (action === 'approve') {
       if (!approvedBy) {
@@ -356,17 +350,58 @@ export async function PATCH(request: NextRequest) {
         )
       }
 
-      annualPlans[planIndex] = {
-        ...annualPlans[planIndex],
-        approvedBy,
-        approvalDate: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+      const approvalDate = new Date().toISOString()
+
+      // 승인 정보가 포함된 업데이트 요청 생성
+      const updateRequest = {
+        id: id,
+        updates: {
+          approvedBy: approvedBy,
+          approvalDate: approvalDate,
+          approval: {
+            approver: approvedBy,
+            date: approvalDate,
+            status: 'approved' as const,
+            comments: '연간 안전관리계획서 승인'
+          },
+          status: 'completed' as const
+        }
+      }
+
+      const updatedDocument = await documentService.updateDocument(updateRequest, 'system') // TODO: 실제 사용자 ID로 교체
+
+      // BaseDocument를 AnnualSafetyPlan 형태로 변환하여 반환
+      const content = updatedDocument as any
+      const approvedPlan: AnnualSafetyPlan = {
+        id: updatedDocument.id,
+        year: (content.year as number) || new Date().getFullYear(),
+        department: updatedDocument.department,
+        preparedBy: content.preparedBy || updatedDocument.author,
+        approvedBy: content.approvedBy || approvedBy,
+        approvalDate: content.approvalDate || approvalDate,
+        previousYearAnalysis: (content.previousYearAnalysis as AnnualSafetyPlan['previousYearAnalysis']) || {
+          achievements: [],
+          challenges: [],
+          incidentTrend: { total: 0, byType: {}, byDepartment: {} }
+        },
+        objectives: (content.objectives as AnnualSafetyPlan['objectives']) || [],
+        plans: (content.plans as AnnualSafetyPlan['plans']) || [],
+        budget: (content.budget as AnnualSafetyPlan['budget']) || { total: 0, breakdown: [] },
+        timeline: (content.timeline as AnnualSafetyPlan['timeline']) || [],
+        riskAssessment: (content.riskAssessment as AnnualSafetyPlan['riskAssessment']) || [],
+        trainingProgram: (content.trainingProgram as AnnualSafetyPlan['trainingProgram']) || { programs: [], schedule: [] },
+        emergencyPreparedness: (content.emergencyPreparedness as AnnualSafetyPlan['emergencyPreparedness']) || { procedures: [], drills: [] },
+        performanceIndicators: (content.performanceIndicators as AnnualSafetyPlan['performanceIndicators']) || { kpis: [], targets: [] },
+        complianceChecklist: (content.complianceChecklist as AnnualSafetyPlan['complianceChecklist']) || [],
+        reviewSchedule: (content.reviewSchedule as AnnualSafetyPlan['reviewSchedule']) || { frequency: 'quarterly', dates: [] },
+        createdAt: updatedDocument.createdAt,
+        updatedAt: updatedDocument.updatedAt
       }
 
       return NextResponse.json({ 
         success: true, 
         message: '계획서가 승인되었습니다.',
-        data: annualPlans[planIndex] 
+        data: approvedPlan 
       })
     }
 
@@ -376,6 +411,12 @@ export async function PATCH(request: NextRequest) {
     )
   } catch (error) {
     console.error('Error processing annual safety plan action:', error)
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: error.statusCode }
+      )
+    }
     return NextResponse.json(
       { success: false, error: '작업 처리에 실패했습니다.' },
       { status: 500 }

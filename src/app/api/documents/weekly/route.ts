@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { WeeklyCheckList, ChemicalUsageReport } from '@/lib/types/documents';
 import { documentService } from '@/lib/services/documentService';
-import { DocumentSearchParams } from '@/lib/types';
+import { DocumentSearchParams, UnifiedDocumentType } from '@/lib/types';
 
 // 유니온 타입 정의
 type WeeklyDocument = WeeklyCheckList | ChemicalUsageReport;
@@ -24,14 +24,14 @@ export async function GET(request: Request) {
       sortOrder: 'desc'
     };
 
-    // 타입 필터링 설정 ('weekly_checklist', 'chemical_usage_report')
+    // 타입 필터링 설정 (enum 값 사용)
     if (type === 'weekly-checklist') {
-      searchParamsObj.type = ['weekly_checklist'];
+      searchParamsObj.type = [UnifiedDocumentType.WEEKLY_CHECKLIST];
     } else if (type === 'chemical-usage-report') {
-      searchParamsObj.type = ['chemical_usage_report'];
+      searchParamsObj.type = [UnifiedDocumentType.CHEMICAL_USAGE_REPORT];
     } else {
       // type이 없으면 둘 다 조회
-      searchParamsObj.type = ['weekly_checklist', 'chemical_usage_report'];
+      searchParamsObj.type = [UnifiedDocumentType.WEEKLY_CHECKLIST, UnifiedDocumentType.CHEMICAL_USAGE_REPORT];
     }
 
     // 부서 필터링
@@ -208,32 +208,16 @@ export async function DELETE(request: Request) {
       );
     }
 
-    if (type === 'weekly-checklist') {
-      const index = weeklyCheckLists.findIndex(doc => doc.id === id);
-      if (index === -1) {
-        return NextResponse.json(
-          { success: false, error: 'Document not found' },
-          { status: 404 }
-        );
-      }
-      
-      weeklyCheckLists.splice(index, 1);
-    } else if (type === 'chemical-usage-report') {
-      const index = chemicalUsageReports.findIndex(doc => doc.id === id);
-      if (index === -1) {
-        return NextResponse.json(
-          { success: false, error: 'Document not found' },
-          { status: 404 }
-        );
-      }
-      
-      chemicalUsageReports.splice(index, 1);
-    } else {
+    // 타입 유효성 검증
+    if (type !== 'weekly-checklist' && type !== 'chemical-usage-report') {
       return NextResponse.json(
         { success: false, error: 'Invalid document type' },
         { status: 400 }
       );
     }
+
+    // documentService를 통해 문서 삭제
+    await documentService.deleteDocument(id);
 
     return NextResponse.json({
       success: true,
@@ -241,6 +225,15 @@ export async function DELETE(request: Request) {
     });
   } catch (error) {
     console.error('Error deleting weekly document:', error);
+    
+    // 404 오류인 경우 별도 처리
+    if (error instanceof Error && error.message.includes('문서를 찾을 수 없습니다')) {
+      return NextResponse.json(
+        { success: false, error: 'Document not found' },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(
       { success: false, error: 'Failed to delete document' },
       { status: 500 }

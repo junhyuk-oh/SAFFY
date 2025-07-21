@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { 
-  DailyCheckList, 
-  ExperimentLog, 
   DocumentMetadata,
   ApiResponse,
   ApiStatusCode,
   ApiErrorCode,
   AppError,
   ValidationError,
-  ResourceError,
   toApiResponse,
-  toApiError
+  toApiError,
+  BaseDocument
 } from '@/lib/types';
-
-// 임시 메모리 저장소 (실제 환경에서는 데이터베이스 사용)
-const checkLists: DailyCheckList[] = [];
-const experimentLogs: ExperimentLog[] = [];
+import { documentService } from '@/lib/services/documentService';
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,51 +19,45 @@ export async function GET(request: NextRequest) {
     const date = searchParams.get('date');
     const department = searchParams.get('department');
 
-    let results: (DailyCheckList | ExperimentLog)[] = [];
+    // documentService를 사용하여 문서 조회
+    const searchParams_obj = {
+      type: type ? (
+        type === 'checklist' ? ['daily-checklist'] :
+        type === 'experiment-log' ? ['experiment-log'] :
+        ['daily-checklist', 'experiment-log']
+      ) : ['daily-checklist', 'experiment-log'],
+      department: department ? [department] : undefined,
+      dateRange: date ? {
+        start: `${date}T00:00:00.000Z`,
+        end: `${date}T23:59:59.999Z`
+      } : undefined,
+      page: 1,
+      limit: 100
+    };
 
-    // 문서 타입에 따라 필터링
-    if (type === 'checklist') {
-      results = checkLists;
-    } else if (type === 'experiment-log') {
-      results = experimentLogs;
-    } else {
-      // 모든 문서 반환
-      results = [...checkLists, ...experimentLogs];
-    }
-
-    // 날짜 필터링
-    if (date) {
-      results = results.filter(doc => doc.date === date);
-    }
-
-    // 부서 필터링
-    if (department) {
-      results = results.filter(doc => 
-        doc.department.toLowerCase().includes(department.toLowerCase())
-      );
-    }
-
+    const result = await documentService.getDocuments(searchParams_obj);
+    
     // 메타데이터 형식으로 변환
-    const metadata: DocumentMetadata[] = results.map(doc => {
-      const isCheckList = 'checkItems' in doc;
+    const metadata: DocumentMetadata[] = result.documents.map((doc: BaseDocument) => {
+      const isCheckList = doc.type === 'daily-checklist';
       return {
         id: doc.id,
         type: isCheckList ? 'checklist' : 'experiment-log',
-        title: isCheckList ? `일일 안전점검표 - ${doc.date}` : (doc as ExperimentLog).experimentTitle,
-        date: doc.date,
-        creator: isCheckList ? (doc as DailyCheckList).inspectorName : (doc as ExperimentLog).researcher,
-        status: doc.signature ? 'completed' : 'draft',
+        title: doc.title,
+        date: doc.metadata?.periodDate || doc.createdAt.split('T')[0],
+        creator: doc.author,
+        status: doc.status === 'completed' ? 'completed' : 'draft',
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt,
-        author: isCheckList ? (doc as DailyCheckList).inspectorName : (doc as ExperimentLog).researcher,
-        department: doc.department || '안전관리팀',
-        version: '1.0.0'
+        author: doc.author,
+        department: doc.department,
+        version: `${doc.metadata?.version || 1}.0.0`
       };
     });
 
     const response: ApiResponse<{ documents: DocumentMetadata[]; count: number }> = toApiResponse({
       documents: metadata,
-      count: metadata.length
+      count: result.totalCount
     });
     
     return NextResponse.json(response, { status: ApiStatusCode.OK });
@@ -108,26 +97,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
-    let savedDocument;
+    let documentType: string;
+    let title: string;
 
     if (type === 'checklist') {
-      const checkList: DailyCheckList = {
-        ...data,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      checkLists.push(checkList);
-      savedDocument = checkList;
+      documentType = 'daily-checklist';
+      title = `일일 안전점검표 - ${data.date || new Date().toISOString().split('T')[0]}`;
     } else if (type === 'experiment-log') {
-      const experimentLog: ExperimentLog = {
-        ...data,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      experimentLogs.push(experimentLog);
-      savedDocument = experimentLog;
+      documentType = 'experiment-log';
+      title = data.experimentTitle || '실험 로그';
     } else {
       const error = new ValidationError('유효하지 않은 문서 타입입니다.', [
         { field: 'type', message: `문서 타입은 'checklist' 또는 'experiment-log'여야 합니다.`, value: type }
@@ -140,6 +118,20 @@ export async function POST(request: NextRequest) {
       
       return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
+
+    // documentService를 사용하여 문서 생성
+    const createRequest = {
+      type: documentType as 'daily-checklist' | 'experiment-log',
+      title: title,
+      department: data.department || '안전관리팀',
+      data: {
+        ...data,
+        periodDate: data.date || new Date().toISOString().split('T')[0]
+      },
+      isDraft: !data.signature
+    };
+
+    const savedDocument = await documentService.createDocument(createRequest, 'system-user');
 
     const response: ApiResponse = toApiResponse(savedDocument);
     response.message = '문서가 성공적으로 저장되었습니다.';
@@ -182,55 +174,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
-    let updatedDocument;
-
-    if (type === 'checklist') {
-      const index = checkLists.findIndex(doc => doc.id === id);
-      if (index === -1) {
-        const error = new ResourceError({
-          message: '문서를 찾을 수 없습니다.',
-          code: ApiErrorCode.RESOURCE_NOT_FOUND,
-          resourceType: 'checklist',
-          resourceId: id
-        });
-        
-        const response: ApiResponse = {
-          success: false,
-          error: toApiError(error)
-        };
-        
-        return NextResponse.json(response, { status: ApiStatusCode.NOT_FOUND });
-      }
-      checkLists[index] = {
-        ...checkLists[index],
-        ...data,
-        updatedAt: new Date().toISOString()
-      };
-      updatedDocument = checkLists[index];
-    } else if (type === 'experiment-log') {
-      const index = experimentLogs.findIndex(doc => doc.id === id);
-      if (index === -1) {
-        const error = new ResourceError({
-          message: '문서를 찾을 수 없습니다.',
-          code: ApiErrorCode.RESOURCE_NOT_FOUND,
-          resourceType: 'experiment-log',
-          resourceId: id
-        });
-        
-        const response: ApiResponse = {
-          success: false,
-          error: toApiError(error)
-        };
-        
-        return NextResponse.json(response, { status: ApiStatusCode.NOT_FOUND });
-      }
-      experimentLogs[index] = {
-        ...experimentLogs[index],
-        ...data,
-        updatedAt: new Date().toISOString()
-      };
-      updatedDocument = experimentLogs[index];
-    } else {
+    if (type !== 'checklist' && type !== 'experiment-log') {
       const error = new ValidationError('유효하지 않은 문서 타입입니다.', [
         { field: 'type', message: `문서 타입은 'checklist' 또는 'experiment-log'여야 합니다.`, value: type }
       ]);
@@ -242,6 +186,17 @@ export async function PUT(request: NextRequest) {
       
       return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
+
+    // documentService를 사용하여 문서 수정
+    const updateRequest = {
+      id: id,
+      updates: {
+        ...data,
+        status: data.signature ? 'completed' : 'draft'
+      }
+    };
+
+    const updatedDocument = await documentService.updateDocument(updateRequest, 'system-user');
 
     const response: ApiResponse = toApiResponse(updatedDocument);
     response.message = '문서가 성공적으로 업데이트되었습니다.';
@@ -284,43 +239,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
-    if (type === 'checklist') {
-      const index = checkLists.findIndex(doc => doc.id === id);
-      if (index === -1) {
-        const error = new ResourceError({
-          message: '문서를 찾을 수 없습니다.',
-          code: ApiErrorCode.RESOURCE_NOT_FOUND,
-          resourceType: 'checklist',
-          resourceId: id
-        });
-        
-        const response: ApiResponse = {
-          success: false,
-          error: toApiError(error)
-        };
-        
-        return NextResponse.json(response, { status: ApiStatusCode.NOT_FOUND });
-      }
-      checkLists.splice(index, 1);
-    } else if (type === 'experiment-log') {
-      const index = experimentLogs.findIndex(doc => doc.id === id);
-      if (index === -1) {
-        const error = new ResourceError({
-          message: '문서를 찾을 수 없습니다.',
-          code: ApiErrorCode.RESOURCE_NOT_FOUND,
-          resourceType: 'experiment-log',
-          resourceId: id
-        });
-        
-        const response: ApiResponse = {
-          success: false,
-          error: toApiError(error)
-        };
-        
-        return NextResponse.json(response, { status: ApiStatusCode.NOT_FOUND });
-      }
-      experimentLogs.splice(index, 1);
-    } else {
+    if (type !== 'checklist' && type !== 'experiment-log') {
       const error = new ValidationError('유효하지 않은 문서 타입입니다.', [
         { field: 'type', message: `문서 타입은 'checklist' 또는 'experiment-log'여야 합니다.`, value: type }
       ]);
@@ -332,6 +251,9 @@ export async function DELETE(request: NextRequest) {
       
       return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
+
+    // documentService를 사용하여 문서 삭제
+    await documentService.deleteDocument(id);
 
     const response: ApiResponse = toApiResponse({ deleted: true });
     response.message = '문서가 성공적으로 삭제되었습니다.';
