@@ -225,7 +225,7 @@ export default function WeeklyCheckList({ initialData, onSave, onCancel }: Weekl
             <div>
               <h3 className="text-lg font-medium text-text-primary">주간 전체 상태</h3>
               <p className="text-sm text-text-secondary mt-1">
-                평균 완료율: {Math.round(formData.dailySummaries?.reduce((sum, s) => sum + s.completionRate, 0) / (formData.dailySummaries?.length || 1))}%
+                평균 완료율: {Math.round((formData.dailySummaries?.reduce((sum, s) => sum + s.completionRate, 0) || 0) / (formData.dailySummaries?.length || 1))}%
               </p>
             </div>
             <div className="flex items-center gap-2">

@@ -107,7 +107,7 @@ export function Sidebar() {
             const isMainActive = isPathActive(item.href) && (!hasSubItems || pathname === item.href)
             
             // 서브메뉴 중 하나가 활성화되어 있는지 확인
-            const isSubMenuActive = hasSubItems && item.subItems.some(sub => isPathActive(sub.href))
+            const isSubMenuActive = hasSubItems && item.subItems?.some(sub => isPathActive(sub.href))
             
             // 전체적으로 활성화 상태인지
             const isActive = isMainActive || isSubMenuActive
@@ -173,7 +173,7 @@ export function Sidebar() {
                     }`}
                   >
                     <div className="ml-7 mt-1 pb-1 border-l-2 border-background-hover">
-                      {item.subItems.map((subItem) => {
+                      {item.subItems?.map((subItem) => {
                         const isSubActive = isPathActive(subItem.href)
                         return (
                           <Link

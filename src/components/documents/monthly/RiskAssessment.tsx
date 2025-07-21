@@ -138,7 +138,7 @@ export function RiskAssessment({ onSave, initialData }: RiskAssessmentProps) {
       const updatedItems = prev.riskItems?.map(item => {
         if (item.id === itemId) {
           const updatedMatrix = { ...item[matrixType] }
-          updatedMatrix[field] = value
+          updatedMatrix[field] = value as 1 | 2 | 3 | 4 | 5
           updatedMatrix.riskLevel = updatedMatrix.frequency * updatedMatrix.severity
           updatedMatrix.riskGrade = calculateRiskGrade(updatedMatrix.frequency, updatedMatrix.severity)
           return { ...item, [matrixType]: updatedMatrix }

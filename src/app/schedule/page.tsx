@@ -8,85 +8,152 @@ import {
   ScheduleEventModal,
   QuickAddModal
 } from '@/components/schedule'
+import type { ScheduleEvent } from '@/components/schedule/ScheduleEventModal'
 import { Card } from '@/components/ui/card'
 import { Calendar, List, Clock, MapPin, Users, CheckCircle, XCircle } from 'lucide-react'
-
-// 일정 타입 정의 (나중에 /lib/types/schedule.ts로 이동)
-interface Schedule {
-  id: string
-  title: string
-  date: string
-  time: string
-  priority: 'high' | 'medium' | 'low'
-  category: 'inspection' | 'education' | 'meeting' | 'audit' | 'training'
-  description?: string
-  location?: string
-  participants?: string[]
-  status: 'scheduled' | 'completed' | 'cancelled'
-  recurrence?: 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly'
-}
+import { type Schedule, ScheduleStatus, SchedulePriority } from '@/lib/types/schedule'
 
 // 샘플 데이터
 const sampleSchedules: Schedule[] = [
   {
     id: '1',
     title: '월간 안전점검',
-    date: '2025-07-20',
-    time: '10:00',
-    priority: 'high',
-    category: 'inspection',
     description: '연구실 전체 안전점검',
-    location: '제1연구동',
-    participants: ['김안전', '이점검'],
-    status: 'scheduled'
+    categoryId: 'cat-1',
+    type: 'safety-inspection' as const,
+    status: ScheduleStatus.SCHEDULED,
+    priority: SchedulePriority.HIGH,
+    startDate: '2025-07-20T10:00:00',
+    endDate: '2025-07-20T12:00:00',
+    allDay: false,
+    timezone: 'Asia/Seoul',
+    isRecurring: false,
+    location: {
+      name: '제1연구동',
+      address: '',
+      room: '',
+      onlineUrl: undefined
+    },
+    participants: [
+      { userId: 'user1', role: 'required' as const, responseStatus: 'accepted' },
+      { userId: 'user2', role: 'required' as const, responseStatus: 'accepted' }
+    ],
+    organizerId: 'admin',
+    tags: [],
+    createdBy: 'admin',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'admin'
   },
   {
     id: '2',
     title: '신입사원 안전교육',
-    date: '2025-07-21',
-    time: '14:00',
-    priority: 'medium',
-    category: 'education',
     description: '신규 입사자 대상 안전교육',
-    location: '교육장 A',
-    participants: ['박교육', '신입사원 5명'],
-    status: 'scheduled'
+    categoryId: 'cat-2',
+    type: 'education' as const,
+    status: ScheduleStatus.SCHEDULED,
+    priority: SchedulePriority.MEDIUM,
+    startDate: '2025-07-21T14:00:00',
+    endDate: '2025-07-21T16:00:00',
+    allDay: false,
+    timezone: 'Asia/Seoul',
+    isRecurring: false,
+    location: {
+      name: '교육장 A',
+      address: '',
+      room: '',
+      onlineUrl: undefined
+    },
+    participants: [
+      { userId: 'user3', role: 'required' as const, responseStatus: 'accepted' }
+    ],
+    organizerId: 'admin',
+    tags: [],
+    createdBy: 'admin',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'admin'
   },
   {
     id: '3',
     title: '안전관리위원회 회의',
-    date: '2025-07-25',
-    time: '15:00',
-    priority: 'medium',
-    category: 'meeting',
     description: '분기별 안전관리 현황 검토',
-    location: '회의실 301',
-    participants: ['위원회 전원'],
-    status: 'scheduled'
+    categoryId: 'cat-3',
+    type: 'meeting' as const,
+    status: ScheduleStatus.SCHEDULED,
+    priority: SchedulePriority.MEDIUM,
+    startDate: '2025-07-25T15:00:00',
+    endDate: '2025-07-25T17:00:00',
+    allDay: false,
+    timezone: 'Asia/Seoul',
+    isRecurring: false,
+    location: {
+      name: '회의실 301',
+      address: '',
+      room: '301',
+      onlineUrl: undefined
+    },
+    participants: [],
+    organizerId: 'admin',
+    tags: [],
+    createdBy: 'admin',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'admin'
   },
   {
     id: '4',
     title: '외부 안전감사',
-    date: '2025-07-27',
-    time: '09:00',
-    priority: 'high',
-    category: 'audit',
     description: '정부 안전감사',
-    location: '전체 사업장',
-    participants: ['감사팀', '안전관리팀'],
-    status: 'scheduled'
+    categoryId: 'cat-4',
+    type: 'audit' as const,
+    status: ScheduleStatus.SCHEDULED,
+    priority: SchedulePriority.HIGH,
+    startDate: '2025-07-27T09:00:00',
+    endDate: '2025-07-27T18:00:00',
+    allDay: false,
+    timezone: 'Asia/Seoul',
+    isRecurring: false,
+    location: {
+      name: '전체 사업장',
+      address: '',
+      room: '',
+      onlineUrl: undefined
+    },
+    participants: [],
+    organizerId: 'admin',
+    tags: [],
+    createdBy: 'admin',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'admin'
   },
   {
     id: '5',
     title: '비상대피 훈련',
-    date: '2025-07-30',
-    time: '16:00',
-    priority: 'high',
-    category: 'training',
     description: '화재 대피 훈련',
-    location: '전 건물',
-    participants: ['전 직원'],
-    status: 'scheduled'
+    categoryId: 'cat-5',
+    type: 'other' as const,
+    status: ScheduleStatus.SCHEDULED,
+    priority: SchedulePriority.HIGH,
+    startDate: '2025-07-30T16:00:00',
+    endDate: '2025-07-30T17:00:00',
+    allDay: false,
+    timezone: 'Asia/Seoul',
+    isRecurring: false,
+    location: {
+      name: '전 건물',
+      address: '',
+      room: '',
+      onlineUrl: undefined
+    },
+    participants: [],
+    organizerId: 'admin',
+    tags: [],
+    createdBy: 'admin',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'admin'
   }
 ]
 
@@ -109,11 +176,13 @@ function ScheduleListView({
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'inspection': return '🔍'
+      case 'safety-inspection': return '🔍'
       case 'education': return '🎓'
       case 'meeting': return '💼'
       case 'audit': return '📋'
-      case 'training': return '🚨'
+      case 'equipment-maintenance': return '🔧'
+      case 'document-submission': return '📄'
+      case 'other': return '🚨'
       default: return '📅'
     }
   }
@@ -137,7 +206,7 @@ function ScheduleListView({
           <div className="flex items-start justify-between">
             <div className="flex gap-4 flex-1">
               {/* 카테고리 아이콘 */}
-              <div className="text-3xl">{getCategoryIcon(schedule.category)}</div>
+              <div className="text-3xl">{getCategoryIcon(schedule.type)}</div>
               
               {/* 일정 정보 */}
               <div className="flex-1">
@@ -160,22 +229,22 @@ function ScheduleListView({
                 <div className="flex flex-wrap gap-4 text-sm text-text-secondary">
                   <div className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    <span>{new Date(schedule.date).toLocaleDateString('ko-KR')}</span>
+                    <span>{new Date(schedule.startDate).toLocaleDateString('ko-KR')}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    <span>{schedule.time}</span>
+                    <span>{new Date(schedule.startDate).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
-                  {schedule.location && (
+                  {schedule.location?.name && (
                     <div className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
-                      <span>{schedule.location}</span>
+                      <span>{schedule.location.name}</span>
                     </div>
                   )}
                   {schedule.participants && schedule.participants.length > 0 && (
                     <div className="flex items-center gap-1">
                       <Users className="w-4 h-4" />
-                      <span>{schedule.participants[0]}{schedule.participants.length > 1 && ` 외 ${schedule.participants.length - 1}명`}</span>
+                      <span>참여자 {schedule.participants.length}명</span>
                     </div>
                   )}
                 </div>
@@ -184,9 +253,9 @@ function ScheduleListView({
             
             {/* 상태 */}
             <div className="text-sm text-text-secondary">
-              {schedule.status === 'scheduled' && '예정'}
-              {schedule.status === 'completed' && '완료'}
-              {schedule.status === 'cancelled' && '취소'}
+              {schedule.status === ScheduleStatus.SCHEDULED && '예정'}
+              {schedule.status === ScheduleStatus.COMPLETED && '완료'}
+              {schedule.status === ScheduleStatus.CANCELLED && '취소'}
             </div>
           </div>
         </Card>
@@ -208,7 +277,7 @@ export default function SchedulePage() {
     const schedule: Schedule = {
       ...newSchedule,
       id: Date.now().toString(),
-      status: 'scheduled'
+      status: ScheduleStatus.SCHEDULED
     }
     setSchedules([...schedules, schedule])
   }
@@ -281,7 +350,7 @@ export default function SchedulePage() {
             schedules={schedules}
             onStatusUpdate={(scheduleId: string, newStatus: string) => {
               setSchedules(schedules.map(s => 
-                s.id === scheduleId ? { ...s, status: newStatus as 'scheduled' | 'completed' | 'cancelled' } : s
+                s.id === scheduleId ? { ...s, status: newStatus as ScheduleStatus } : s
               ))
             }}
           />
@@ -295,7 +364,7 @@ export default function SchedulePage() {
         onSave={(data: any) => {
           handleAddSchedule({
             ...data,
-            status: 'scheduled' as const
+            status: ScheduleStatus.SCHEDULED
           })
         }}
       />
@@ -309,13 +378,14 @@ export default function SchedulePage() {
         event={selectedSchedule ? {
           id: selectedSchedule.id,
           title: selectedSchedule.title,
-          date: selectedSchedule.date,
-          time: selectedSchedule.time,
-          priority: selectedSchedule.priority,
-          category: selectedSchedule.category,
+          date: selectedSchedule.startDate,
+          time: new Date(selectedSchedule.startDate).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+          priority: selectedSchedule.priority === SchedulePriority.HIGH ? 'high' : 
+                   selectedSchedule.priority === SchedulePriority.MEDIUM ? 'medium' : 'low',
+          category: selectedSchedule.type,
           description: selectedSchedule.description || '',
-          recurrence: selectedSchedule.recurrence || 'none'
-        } : null}
+          recurrence: selectedSchedule.isRecurring ? 'daily' : 'none'
+        } as ScheduleEvent : null}
         onSave={(event: any) => {
           if (selectedSchedule) {
             handleEditSchedule({

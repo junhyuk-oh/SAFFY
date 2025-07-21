@@ -5,7 +5,7 @@ import { Modal, ModalHeader, ModalBody, ModalFooter, ConfirmModal } from "@/comp
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-interface ScheduleEvent {
+export interface ScheduleEvent {
   id: string
   title: string
   date: string

@@ -23,6 +23,14 @@ export async function GET(request: NextRequest) {
     if (type === 'overview') {
       // 전체 개요 통계
       const stats: EducationStatistics = {
+        totalTrainings: 0,
+        completedTrainings: 0,
+        inProgressTrainings: 0,
+        overdueTrainings: 0,
+        completionRate: 0,
+        totalHours: 0,
+        upcomingDeadlines: [],
+        // DB 필드 호환성을 위한 추가 속성
         total_requirements: 0,
         completed_requirements: 0,
         pending_requirements: 0,

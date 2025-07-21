@@ -25,8 +25,16 @@ export type {
 
 export { DOCUMENT_CATEGORIES, DOCUMENT_TYPE_CATEGORY_MAP } from './document';
 
-// API 관련 타입 (중복 export 제외)
-export type * from './api';
+// API 관련 타입 (common과 중복 제외)
+export { 
+  ApiErrorCode,
+  ApiStatusCode,
+  type PaginatedResponse,
+  type ApiResponseTransformer,
+  type ApiErrorHandler,
+  type ApiErrorDetail,
+  RealtimeEventType
+} from './api';
 
 // 에러 관련 타입
 export * from './error';
@@ -111,5 +119,3 @@ export const toApiError = (
   };
 };
 
-// 상수 re-export
-export { ApiStatusCode, ApiErrorCode, RealtimeEventType } from './api';

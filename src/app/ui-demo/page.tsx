@@ -102,7 +102,7 @@ export default function UIDemo() {
                 </FormField>
                 <FormField>
                   <Label htmlFor="category">카테고리</Label>
-                  <Select id="category">
+                  <Select>
                     <option>화학 실험실</option>
                     <option>생물 실험실</option>
                     <option>물리 실험실</option>

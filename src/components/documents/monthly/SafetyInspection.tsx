@@ -236,7 +236,7 @@ export function SafetyInspection({ onSave, initialData }: SafetyInspectionProps)
                   className="rounded-b-none"
                 >
                   {sectionTitles[section]}
-                  {formData.sections?.[section]?.length > 0 && (
+                  {formData.sections?.[section] && formData.sections[section].length > 0 && (
                     <Badge variant="secondary" className="ml-2">
                       {formData.sections[section].length}
                     </Badge>

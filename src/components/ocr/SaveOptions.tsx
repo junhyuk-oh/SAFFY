@@ -33,7 +33,7 @@ const DOCUMENT_TYPES = [
   { value: "other", label: "기타" },
 ];
 
-export default function SaveOptions({ extractedData, onSave, onCancel }: SaveOptionsProps) {
+function SaveOptions({ extractedData, onSave, onCancel }: SaveOptionsProps) {
   const [title, setTitle] = useState(extractedData.documentInfo?.title || "");
   const [documentType, setDocumentType] = useState("other");
   const [tags, setTags] = useState<string[]>([]);

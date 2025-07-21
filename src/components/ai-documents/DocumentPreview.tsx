@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { toast } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/toast'
 
 export interface DocumentPreviewProps {
   title: string
@@ -28,6 +28,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 }) => {
   const [isSaving, setIsSaving] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
+  const { showToast } = useToast()
 
   const handleSave = async () => {
     if (!onSave) return
@@ -35,16 +36,16 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     setIsSaving(true)
     try {
       await onSave(content)
-      toast({
+      showToast({
+        type: "success",
         title: "저장 완료",
-        description: "문서가 성공적으로 저장되었습니다.",
-        variant: "success"
+        message: "문서가 성공적으로 저장되었습니다."
       })
     } catch (error) {
-      toast({
+      showToast({
+        type: "error",
         title: "저장 실패",
-        description: "문서 저장 중 오류가 발생했습니다.",
-        variant: "error"
+        message: "문서 저장 중 오류가 발생했습니다."
       })
     } finally {
       setIsSaving(false)
@@ -57,16 +58,16 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     setIsDownloading(true)
     try {
       await onDownload()
-      toast({
+      showToast({
+        type: "info",
         title: "다운로드 시작",
-        description: "문서 다운로드가 시작되었습니다.",
-        variant: "success"
+        message: "문서 다운로드가 시작되었습니다."
       })
     } catch (error) {
-      toast({
+      showToast({
+        type: "error",
         title: "다운로드 실패",
-        description: "문서 다운로드 중 오류가 발생했습니다.",
-        variant: "error"
+        message: "문서 다운로드 중 오류가 발생했습니다."
       })
     } finally {
       setIsDownloading(false)

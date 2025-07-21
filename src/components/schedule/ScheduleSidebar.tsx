@@ -3,8 +3,9 @@
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { type Schedule, ScheduleStatus } from "@/lib/types/schedule"
 
-interface Schedule {
+interface SidebarSchedule {
   id: string
   title: string
   time: string
@@ -13,7 +14,7 @@ interface Schedule {
 }
 
 // 샘플 데이터 - 실제로는 props나 API로 받아올 것
-const mockSchedules: Schedule[] = [
+const mockSchedules: SidebarSchedule[] = [
   { id: "1", title: "화학물질 재고 점검", time: "09:00", type: "점검", status: "urgent" },
   { id: "2", title: "신입 연구원 안전교육", time: "10:00", type: "교육", status: "urgent" },
   { id: "3", title: "월간 안전점검 보고서 제출", time: "14:00", type: "보고", status: "scheduled" },
@@ -25,9 +26,10 @@ const mockSchedules: Schedule[] = [
 
 interface ScheduleSidebarProps {
   schedules?: Schedule[]
+  onStatusUpdate?: (scheduleId: string, newStatus: string) => void
 }
 
-export function ScheduleSidebar({ schedules = mockSchedules }: ScheduleSidebarProps) {
+export function ScheduleSidebar({ schedules, onStatusUpdate }: ScheduleSidebarProps) {
   const [collapsedSections, setCollapsedSections] = useState<string[]>([])
   const [selectedSchedule, setSelectedSchedule] = useState<string | null>(null)
 
@@ -39,16 +41,19 @@ export function ScheduleSidebar({ schedules = mockSchedules }: ScheduleSidebarPr
     )
   }
 
-  const updateStatus = (scheduleId: string, newStatus: Schedule["status"]) => {
+  const updateStatus = (scheduleId: string, newStatus: string) => {
     // API 호출 또는 상태 업데이트 로직
     console.log(`일정 ${scheduleId}의 상태를 ${newStatus}로 변경`)
   }
 
+  // 실제 schedules가 없으면 mockSchedules 사용
+  const displaySchedules = schedules || mockSchedules as any[]
+  
   // 우선순위별로 일정 그룹화
   const groupedSchedules = {
-    urgent: schedules.filter(s => s.status === "urgent"),
-    scheduled: schedules.filter(s => s.status === "scheduled"),
-    completed: schedules.filter(s => s.status === "completed"),
+    urgent: displaySchedules.filter((s: any) => s.status === "urgent"),
+    scheduled: displaySchedules.filter((s: any) => s.status === "scheduled"),
+    completed: displaySchedules.filter((s: any) => s.status === "completed"),
   }
 
   const sectionConfig = {
@@ -180,6 +185,7 @@ export function ScheduleSidebar({ schedules = mockSchedules }: ScheduleSidebarPr
                               onClick={(e) => {
                                 e.stopPropagation()
                                 updateStatus(schedule.id, "scheduled")
+                              onStatusUpdate?.(schedule.id, "scheduled")
                               }}
                             >
                               예정으로
@@ -192,6 +198,7 @@ export function ScheduleSidebar({ schedules = mockSchedules }: ScheduleSidebarPr
                             onClick={(e) => {
                               e.stopPropagation()
                               updateStatus(schedule.id, "completed")
+                              onStatusUpdate?.(schedule.id, "completed")
                             }}
                           >
                             완료
@@ -208,6 +215,7 @@ export function ScheduleSidebar({ schedules = mockSchedules }: ScheduleSidebarPr
                             onClick={(e) => {
                               e.stopPropagation()
                               updateStatus(schedule.id, "scheduled")
+                              onStatusUpdate?.(schedule.id, "scheduled")
                             }}
                           >
                             다시 예정

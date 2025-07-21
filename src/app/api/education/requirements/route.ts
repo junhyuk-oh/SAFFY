@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    const body: CreateEducationRequirementDTO = await request.json();
+    const body = await request.json() as CreateEducationRequirementDTO;
     
     // 필수 필드 검증
     if (!body.user_ids || body.user_ids.length === 0 || !body.category_id) {
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     }
     
     // 날짜 검증
-    if (new Date(body.due_date) < new Date(body.required_date)) {
+    if (body.due_date && body.required_date && new Date(body.due_date) < new Date(body.required_date)) {
       return NextResponse.json(
         { error: '완료 기한은 시작일보다 이후여야 합니다.' },
         { status: 400 }
@@ -199,16 +199,14 @@ export async function PUT(request: NextRequest) {
       );
     }
     
-    const body: Partial<UserEducationRequirement> = await request.json();
+    const body = await request.json() as Partial<UserEducationRequirement>;
     
     // 날짜 검증
-    if (body.due_date && body.required_date) {
-      if (new Date(body.due_date) < new Date(body.required_date)) {
-        return NextResponse.json(
-          { error: '완료 기한은 시작일보다 이후여야 합니다.' },
-          { status: 400 }
-        );
-      }
+    if (body.due_date && body.required_date && new Date(body.due_date) < new Date(body.required_date)) {
+      return NextResponse.json(
+        { error: '완료 기한은 시작일보다 이후여야 합니다.' },
+        { status: 400 }
+      );
     }
     
     const updateData: any = {};

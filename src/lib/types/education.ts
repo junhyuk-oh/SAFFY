@@ -201,21 +201,32 @@ export enum VerificationStatus {
 export interface UserEducationRequirement {
   id: string
   userId: string
-  trainingId: string
-  requiredByDate: string
+  user_id?: string // DB 필드명과 일치
+  trainingId?: string
+  category_id?: string // 교육 카테고리 ID
+  requiredByDate?: string
+  required_date?: string // DB 필드명과 일치
+  due_date?: string // 완료 기한
   status: string
-  assignedBy: string
-  assignedDate: string
+  assignedBy?: string
+  assignedDate?: string
   completedDate?: string
+  completion_date?: string // DB 필드명과 일치
+  exemption_reason?: string // 면제 사유
+  is_exempted?: boolean // 면제 여부
   createdAt: string
   updatedAt: string
 }
 
 export interface CreateEducationRequirementDTO {
-  userId: string
-  trainingId: string
-  requiredByDate: string
-  assignedBy: string
+  userId?: string // POST 요청에서 user_ids를 별도로 받으므로 optional
+  user_ids?: string[] // 대량 생성을 위한 사용자 ID 배열
+  trainingId?: string
+  category_id?: string // 교육 카테고리 ID
+  requiredByDate?: string
+  required_date?: string // DB 필드명과 일치
+  due_date?: string // 완료 기한
+  assignedBy?: string
   reason?: string
 }
 
@@ -232,6 +243,26 @@ export interface EducationStatistics {
     trainingName: string
     dueDate: string
   }>
+  // DB 필드명과 맞추기 위한 추가 속성
+  total_requirements?: number
+  completed_requirements?: number
+  pending_requirements?: number
+  overdue_requirements?: number
+  completion_rate?: number
+  total_hours?: number
+  recent_education?: any[]
+  upcoming_due_dates?: any[]
+}
+
+export interface CategoryStatistics {
+  category_id: string
+  category_name: string
+  total_users: number
+  completed_users: number
+  pending_users: number
+  overdue_users: number
+  completion_rate: number
+  average_hours: number
 }
 
 export interface TargetRule {
@@ -244,4 +275,10 @@ export interface TargetRule {
   isActive: boolean
   createdAt: string
   updatedAt: string
+  // DB 필드명과 맞추기 위한 추가 속성
+  category_id?: string
+  rule_type?: string
+  rule_value?: string
+  priority?: number
+  is_active?: boolean
 }

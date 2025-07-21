@@ -20,7 +20,7 @@ interface ResultPreviewProps {
   metadata: Metadata
 }
 
-export default function ResultPreview({
+function ResultPreview({
   originalImage,
   extractedText,
   detectedType,
