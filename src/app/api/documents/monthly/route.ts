@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { documentService } from '@/lib/services/documentService'
 import type { SafetyInspection, EducationLog, RiskAssessment } from '@/lib/types/documents'
-import { DocumentSearchParams, UnifiedDocumentType, Status } from '@/lib/types'
+import { DocumentSearchParams, UnifiedDocumentType, Status, BaseDocument } from '@/lib/types'
 
 // 유니온 타입 정의
 type MonthlyDocument = SafetyInspection | EducationLog | RiskAssessment;
@@ -82,29 +82,31 @@ export async function GET(request: NextRequest) {
       } as DocumentWithType
 
       // 문서 타입별 특정 필드 추가 (content에서 추출)
-      const docContent = doc as any
-      if (docContent.description) (monthlyDoc as any).description = docContent.description
-      if (docContent.location) (monthlyDoc as any).location = docContent.location
-      if (docContent.inspector) (monthlyDoc as any).inspector = docContent.inspector
-      if (docContent.checkItems) (monthlyDoc as any).checkItems = docContent.checkItems
-      if (docContent.findings) (monthlyDoc as any).findings = docContent.findings
-      if (docContent.actions) (monthlyDoc as any).actions = docContent.actions
-      if (docContent.participants) (monthlyDoc as any).participants = docContent.participants
-      if (docContent.duration) (monthlyDoc as any).duration = docContent.duration
-      if (docContent.materials) (monthlyDoc as any).materials = docContent.materials
-      if (docContent.evaluation) (monthlyDoc as any).evaluation = docContent.evaluation
-      if (docContent.riskLevel) (monthlyDoc as any).riskLevel = docContent.riskLevel
-      if (docContent.probability) (monthlyDoc as any).probability = docContent.probability
-      if (docContent.severity) (monthlyDoc as any).severity = docContent.severity
-      if (docContent.controlMeasures) (monthlyDoc as any).controlMeasures = docContent.controlMeasures
-      if (docContent.residualRisk) (monthlyDoc as any).residualRisk = docContent.residualRisk
+      const docWithData = doc as BaseDocument & { [key: string]: unknown }
+      const extendedDoc = monthlyDoc as DocumentWithType & { [key: string]: unknown }
+      
+      if (docWithData.description) extendedDoc.description = docWithData.description
+      if (docWithData.location) extendedDoc.location = docWithData.location
+      if (docWithData.inspector) extendedDoc.inspector = docWithData.inspector
+      if (docWithData.checkItems) extendedDoc.checkItems = docWithData.checkItems
+      if (docWithData.findings) extendedDoc.findings = docWithData.findings
+      if (docWithData.actions) extendedDoc.actions = docWithData.actions
+      if (docWithData.participants) extendedDoc.participants = docWithData.participants
+      if (docWithData.duration) extendedDoc.duration = docWithData.duration
+      if (docWithData.materials) extendedDoc.materials = docWithData.materials
+      if (docWithData.evaluation) extendedDoc.evaluation = docWithData.evaluation
+      if (docWithData.riskLevel) extendedDoc.riskLevel = docWithData.riskLevel
+      if (docWithData.probability) extendedDoc.probability = docWithData.probability
+      if (docWithData.severity) extendedDoc.severity = docWithData.severity
+      if (docWithData.controlMeasures) extendedDoc.controlMeasures = docWithData.controlMeasures
+      if (docWithData.residualRisk) extendedDoc.residualRisk = docWithData.residualRisk
 
       return monthlyDoc
     })
 
     // 타입이 지정되지 않은 경우 documentType 추가
     if (!type) {
-      results = results.map((doc: any) => {
+      results = results.map((doc) => {
         const baseDoc = documents.find(d => d.id === doc.id)
         if (baseDoc && SUPABASE_TYPE_MAP[baseDoc.type]) {
           return { ...doc, documentType: SUPABASE_TYPE_MAP[baseDoc.type] }
@@ -115,7 +117,7 @@ export async function GET(request: NextRequest) {
 
     // 월별 필터링 (클라이언트 사이드에서 추가 필터링)
     if (month) {
-      results = results.filter((doc: any) => doc.month === month)
+      results = results.filter((doc) => doc.month === month)
     }
 
     return NextResponse.json({
@@ -186,7 +188,7 @@ export async function POST(request: NextRequest) {
       createdAt: savedDocument.createdAt,
       updatedAt: savedDocument.updatedAt,
       month: (savedDocument.metadata?.periodDate as string)?.substring(0, 7) || new Date().toISOString().substring(0, 7)
-    } as any
+    } as unknown as MonthlyDocument
 
     return NextResponse.json({
       success: true,
@@ -263,14 +265,14 @@ export async function PUT(request: NextRequest) {
         createdAt: updatedDocument.createdAt,
         updatedAt: updatedDocument.updatedAt,
         month: (updatedDocument.metadata?.periodDate as string)?.substring(0, 7) || new Date().toISOString().substring(0, 7)
-      } as any
+      } as unknown as MonthlyDocument
 
       return NextResponse.json({
         success: true,
         data: monthlyDoc
       })
-    } catch (docError: any) {
-      if (docError?.code === 'RESOURCE_NOT_FOUND') {
+    } catch (docError) {
+      if ((docError as { code?: string })?.code === 'RESOURCE_NOT_FOUND') {
         return NextResponse.json(
           { success: false, error: '문서를 찾을 수 없습니다.' },
           { status: 404 }
@@ -315,8 +317,8 @@ export async function DELETE(request: NextRequest) {
         success: true,
         message: '문서가 삭제되었습니다.'
       })
-    } catch (docError: any) {
-      if (docError?.code === 'RESOURCE_NOT_FOUND') {
+    } catch (docError) {
+      if ((docError as { code?: string })?.code === 'RESOURCE_NOT_FOUND') {
         return NextResponse.json(
           { success: false, error: '문서를 찾을 수 없습니다.' },
           { status: 404 }

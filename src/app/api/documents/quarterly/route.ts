@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import type { QuarterlyReport } from '@/lib/types/documents'
 import { documentService } from '@/lib/services/documentService'
-import { UnifiedDocumentType } from '@/lib/types'
+import { UnifiedDocumentType, BaseDocument } from '@/lib/types'
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,7 +21,8 @@ export async function GET(request: NextRequest) {
     let filteredReports = result.documents
       .filter(doc => doc.type === UnifiedDocumentType.QUARTERLY_REPORT)
       .map(doc => {
-        const content = (doc as any).data || {}
+        const docWithData = doc as BaseDocument & { data?: Record<string, unknown> }
+        const content = docWithData.data || {}
         return {
           id: doc.id,
           year: content.year as number || new Date().getFullYear(),
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
           teamPerformance: content.teamPerformance as { totalEmployees: number; satisfactionScore: number; trainingHours: number } || { totalEmployees: 0, satisfactionScore: 0, trainingHours: 0 },
           createdAt: doc.createdAt,
           updatedAt: doc.updatedAt
-        } as any
+        }
       })
 
     // 클라이언트 사이드 필터링 (더 정확한 필터링을 위해)
@@ -166,7 +166,8 @@ export async function PUT(request: NextRequest) {
     }, 'current-user') // TODO: 실제 사용자 ID로 교체
 
     // QuarterlyReport 형태로 변환
-    const content = (updatedDocument as any).data || {}
+    const docWithData = updatedDocument as BaseDocument & { data?: Record<string, unknown> }
+    const content = docWithData.data || {}
     const updatedReport = {
       id: updatedDocument.id,
       year: content.year as number || new Date().getFullYear(),
@@ -176,7 +177,7 @@ export async function PUT(request: NextRequest) {
       summary: content.summary as string || '',
       achievements: content.achievements as string[] || [],
       challenges: content.challenges as string[] || [],
-      nextQuarterPlan: content.nextQuarterPlan as any || [],
+      nextQuarterPlan: content.nextQuarterPlan as string[] || [],
       kpis: content.kpis as Array<{ metric: string; target: number; actual: number; unit: string }> || [],
       budgetStatus: content.budgetStatus as { allocated: number; used: number; remaining: number } || { allocated: 0, used: 0, remaining: 0 },
       teamPerformance: content.teamPerformance as { totalEmployees: number; satisfactionScore: number; trainingHours: number } || { totalEmployees: 0, satisfactionScore: 0, trainingHours: 0 },

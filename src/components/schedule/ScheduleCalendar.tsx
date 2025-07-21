@@ -203,10 +203,7 @@ interface ScheduleCalendarProps {
 
 // 메인 캘린더 컴포넌트
 export function ScheduleCalendar({
-  schedules = [],
   onDateClick,
-  onEventClick,
-  isEditMode = false
 }: ScheduleCalendarProps = {}) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)

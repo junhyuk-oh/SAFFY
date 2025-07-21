@@ -5,30 +5,11 @@ import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { BackButton } from "@/components/ui/back-button"
 import { useParams, useRouter } from "next/navigation"
 import { useDocument } from "@/lib/hooks/use-documents"
+import { BaseDocument, Status } from "@/lib/types"
+import { STATUS_CONFIG } from "@/lib/constants/status"
+import { formatKoreanDate } from "@/lib/utils/date"
 
 
-const statusConfig = {
-  draft: {
-    label: "초안",
-    color: "text-text-secondary",
-    bg: "bg-background-hover"
-  },
-  pending: {
-    label: "검토 중",
-    color: "text-warning-text",
-    bg: "bg-warning-bg"
-  },
-  completed: {
-    label: "완료",
-    color: "text-success-text",
-    bg: "bg-success-bg"
-  },
-  overdue: {
-    label: "기한 초과",
-    color: "text-error-text",
-    bg: "bg-error-bg"
-  }
-}
 
 export default function DocumentDetailPage() {
   const router = useRouter()
@@ -85,7 +66,7 @@ export default function DocumentDetailPage() {
     )
   }
 
-  const statusInfo = statusConfig[document.status as keyof typeof statusConfig]
+  const statusInfo = STATUS_CONFIG[document.status as Status]
 
   const handleEdit = () => {
     // 편집 모드로 전환
@@ -115,10 +96,15 @@ export default function DocumentDetailPage() {
   }
   
   // 문서 내용 파싱
-  const content = (document as any).content || null
+  interface DocumentContent {
+    summary?: string;
+    sections?: Array<{ title: string; content: string }>;
+    attachments?: Array<{ name: string; size?: number }>;
+  }
+  const content = (document as BaseDocument & { content?: DocumentContent }).content || null
   const tags: string[] = document.metadata?.tags || []
-  const createdDate = new Date(document.createdAt).toLocaleDateString('ko-KR')
-  const lastModified = document.updatedAt ? new Date(document.updatedAt).toLocaleDateString('ko-KR') : createdDate
+  const createdDate = formatKoreanDate(document.createdAt)
+  const lastModified = document.updatedAt ? formatKoreanDate(document.updatedAt) : createdDate
 
   return (
     <>
