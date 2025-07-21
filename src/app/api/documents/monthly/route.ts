@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import type { SafetyInspection, EducationLog, RiskAssessment } from '@/lib/types/documents'
 
 // 임시 메모리 저장소 (실제로는 데이터베이스를 사용해야 함)
-let safetyInspections: SafetyInspection[] = []
-let educationLogs: EducationLog[] = []
-let riskAssessments: RiskAssessment[] = []
+const safetyInspections: SafetyInspection[] = []
+const educationLogs: EducationLog[] = []
+const riskAssessments: RiskAssessment[] = []
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams

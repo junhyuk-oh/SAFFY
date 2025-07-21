@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { WeeklyCheckList, ChemicalUsageReport } from '@/lib/types/documents';
 
 // 임시 메모리 저장소 (실제로는 데이터베이스 사용)
-let weeklyCheckLists: WeeklyCheckList[] = [];
-let chemicalUsageReports: ChemicalUsageReport[] = [];
+const weeklyCheckLists: WeeklyCheckList[] = [];
+const chemicalUsageReports: ChemicalUsageReport[] = [];
 
 // GET: 주별 문서 조회
 export async function GET(request: Request) {

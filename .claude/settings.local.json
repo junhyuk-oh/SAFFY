@@ -12,7 +12,9 @@
       "Bash(find:*)",
       "Bash(grep:*)",
       "Bash(npx tsc:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": []
   }

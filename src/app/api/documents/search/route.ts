@@ -5,9 +5,7 @@ import {
   ApiErrorCode,
   PaginatedResponse,
   BaseDocument,
-  UnifiedDocumentType,
   DocumentSearchParams,
-  CreateDocumentRequest,
   toApiResponse,
   toApiError,
   AppError,
@@ -16,19 +14,26 @@ import {
 import { documentService } from '@/lib/services/documentService';
 
 /**
- * 통합 문서 API
- * 모든 문서 타입에 대한 CRUD 작업을 처리합니다.
+ * 문서 검색 API
+ * 고급 검색 기능을 제공합니다.
  */
 
-// GET: 문서 목록 조회
+// GET: 문서 검색
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     
-    // 검색 파라미터 파싱
-    const params: DocumentSearchParams = {
-      query: searchParams.get('query') || undefined,
-      type: searchParams.getAll('type') as UnifiedDocumentType[],
+    const query = searchParams.get('q') || searchParams.get('query');
+    
+    if (!query) {
+      throw new ValidationError('검색어가 필요합니다.', [
+        { field: 'query', message: '검색어를 입력해주세요.' }
+      ]);
+    }
+
+    // 검색 필터 파라미터 파싱
+    const filters: Partial<DocumentSearchParams> = {
+      type: searchParams.getAll('type') as any[],
       status: searchParams.getAll('status') as any[],
       department: searchParams.getAll('department'),
       author: searchParams.get('author') || undefined,
@@ -48,8 +53,8 @@ export async function GET(request: NextRequest) {
       sortOrder: searchParams.get('sortOrder') as any || 'desc'
     };
 
-    // DocumentService를 통해 문서 조회
-    const result = await documentService.getDocuments(params);
+    // DocumentService를 통해 검색 수행
+    const result = await documentService.searchDocuments(query, filters);
     
     // 응답 구성
     const response: PaginatedResponse<BaseDocument> = {
@@ -62,18 +67,19 @@ export async function GET(request: NextRequest) {
         totalPages: result.totalPages
       },
       sort: {
-        field: params.sortBy!,
-        order: params.sortOrder!
+        field: filters.sortBy!,
+        order: filters.sortOrder!
       },
       filters: {
-        query: params.query,
-        type: Array.isArray(params.type) ? params.type.join(',') : params.type,
-        status: Array.isArray(params.status) ? params.status.join(',') : params.status as any,
-        department: Array.isArray(params.department) ? params.department.join(',') : params.department,
-        startDate: params.dateRange?.start,
-        endDate: params.dateRange?.end,
-        tags: params.tags?.join(','),
-        isAiGenerated: params.isAiGenerated?.toString()
+        query,
+        type: Array.isArray(filters.type) ? filters.type.join(',') : filters.type,
+        status: Array.isArray(filters.status) ? filters.status.join(',') : filters.status as any,
+        department: Array.isArray(filters.department) ? filters.department.join(',') : filters.department,
+        author: filters.author,
+        startDate: filters.dateRange?.start,
+        endDate: filters.dateRange?.end,
+        tags: filters.tags?.join(','),
+        isAiGenerated: filters.isAiGenerated?.toString()
       },
       metadata: {
         timestamp: new Date().toISOString(),
@@ -84,42 +90,10 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json(response, { status: ApiStatusCode.OK });
   } catch (error) {
-    console.error('Error fetching documents:', error);
+    console.error('Error searching documents:', error);
     
     const appError = error instanceof AppError ? error : new AppError({
-      message: '문서 목록을 불러오는 중 오류가 발생했습니다.',
-      code: ApiErrorCode.INTERNAL_ERROR
-    });
-    
-    const response: ApiResponse = {
-      success: false,
-      error: toApiError(appError)
-    };
-    
-    return NextResponse.json(response, { status: ApiStatusCode.INTERNAL_SERVER_ERROR });
-  }
-}
-
-// POST: 새 문서 생성
-export async function POST(request: NextRequest) {
-  try {
-    const body: CreateDocumentRequest = await request.json();
-    
-    // 사용자 ID 가져오기 (실제 환경에서는 인증 정보에서 추출)
-    const userId = 'temp-user-id'; // TODO: 실제 사용자 ID로 교체
-
-    // DocumentService를 통해 문서 생성
-    const createdDocument = await documentService.createDocument(body, userId);
-
-    const response: ApiResponse<BaseDocument> = toApiResponse(createdDocument);
-    response.message = '문서가 성공적으로 생성되었습니다.';
-    
-    return NextResponse.json(response, { status: ApiStatusCode.CREATED });
-  } catch (error) {
-    console.error('Error creating document:', error);
-    
-    const appError = error instanceof AppError ? error : new AppError({
-      message: '문서 생성 중 오류가 발생했습니다.',
+      message: '문서 검색 중 오류가 발생했습니다.',
       code: ApiErrorCode.INTERNAL_ERROR
     });
     

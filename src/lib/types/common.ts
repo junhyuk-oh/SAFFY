@@ -24,7 +24,7 @@ export interface Attachment {
 }
 
 // 상태 타입
-export type Status = 'draft' | 'pending' | 'in-progress' | 'completed' | 'approved' | 'rejected' | 'archived';
+export type Status = 'draft' | 'pending' | 'in-progress' | 'completed' | 'approved' | 'rejected' | 'archived' | 'overdue';
 
 // 우선순위 타입
 export type Priority = 'critical' | 'high' | 'medium' | 'low';

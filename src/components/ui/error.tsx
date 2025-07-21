@@ -76,3 +76,6 @@ export function EmptyState({
     </div>
   )
 }
+
+// ErrorDisplay alias for ErrorPage
+export const ErrorDisplay = ErrorPage

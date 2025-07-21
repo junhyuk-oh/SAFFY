@@ -14,8 +14,8 @@ import {
 } from '@/lib/types';
 
 // 임시 메모리 저장소 (실제 환경에서는 데이터베이스 사용)
-let checkLists: DailyCheckList[] = [];
-let experimentLogs: ExperimentLog[] = [];
+const checkLists: DailyCheckList[] = [];
+const experimentLogs: ExperimentLog[] = [];
 
 export async function GET(request: NextRequest) {
   try {

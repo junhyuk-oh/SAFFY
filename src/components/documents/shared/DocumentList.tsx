@@ -1,22 +1,10 @@
 "use client"
 
 import { DocumentCard } from "./DocumentCard"
-
-interface Document {
-  id: string
-  title: string
-  type: string
-  status: "draft" | "pending" | "completed" | "overdue"
-  createdDate: string
-  author: string
-  description?: string
-  lastModified?: string
-  tags?: string[]
-  icon?: string
-}
+import { BaseDocument } from "@/lib/types"
 
 interface DocumentListProps {
-  documents: Document[]
+  documents: BaseDocument[]
   viewMode?: "grid" | "list"
   emptyMessage?: string
 }
