@@ -53,6 +53,16 @@ const sidebarSections: SidebarSection[] = [
       { title: "연구실안전법", href: "/lab-safety", icon: "🏛️" },
       { title: "화학물질관리법", href: "/chemical-management", icon: "🧪" },
     ]
+  },
+  {
+    title: "시설관리",
+    items: [
+      { title: "통합 대시보드", href: "/facility", icon: "🏢" },
+      { title: "유지보수 관리", href: "/facility/maintenance", icon: "🔧" },
+      { title: "작업허가서", href: "/facility/permits", icon: "🛡️" },
+      { title: "장비 관리", href: "/facility/equipment", icon: "⚙️" },
+      { title: "알림 센터", href: "/facility/alerts", icon: "🔔" },
+    ]
   }
 ]
 

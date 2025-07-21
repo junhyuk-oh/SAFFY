@@ -138,3 +138,6 @@ export const toApiError = (
 };
 
 // Enum exports are already handled above
+
+// 시설관리 타입
+export * from './facility'

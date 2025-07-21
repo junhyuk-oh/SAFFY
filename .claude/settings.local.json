@@ -23,7 +23,10 @@
       "Bash(true)",
       "Bash(npm cache clean:*)",
       "Bash(mv:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(mkdir:*)",
+      "Bash(mkdir:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }

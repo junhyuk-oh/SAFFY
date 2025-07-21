@@ -34,6 +34,19 @@ const statsData = [
     change: { value: "5명 미이수", type: "negative" as const },
     icon: "🎓",
     progress: 75
+  },
+  {
+    title: "시설 건강도",
+    value: "85%",
+    change: { value: "정상 운영", type: "positive" as const },
+    icon: "🏢",
+    progress: 85
+  },
+  {
+    title: "긴급 작업",
+    value: "2건",
+    change: { value: "즉시 확인 필요", type: "negative" as const },
+    icon: "🚨"
   }
 ]
 
@@ -67,6 +80,18 @@ const quickActions = [
     title: "수료증 업로드",
     description: "교육 이수 증명 등록",
     icon: "📎"
+  },
+  {
+    id: "6",
+    title: "유지보수 작업 생성",
+    description: "시설 유지보수 계획",
+    icon: "🔧"
+  },
+  {
+    id: "7",
+    title: "작업허가서 신청",
+    description: "안전 작업 승인",
+    icon: "🛡️"
   }
 ]
 
