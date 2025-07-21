@@ -29,22 +29,42 @@ export { DOCUMENT_CATEGORIES, DOCUMENT_TYPE_CATEGORY_MAP } from './document';
 export type * from './api';
 
 // 에러 관련 타입
-export type * from './error';
+export * from './error';
 
 // 기존 타입 파일들 (점진적 마이그레이션을 위해 유지)
 export type {
   DocumentType,
   DailyCheckItem,
+  DailyCheckList,
   ChemicalUsage,
+  ExperimentLog,
   WeeklyCheckSummary,
+  WeeklyCheckList,
   ChemicalUsageReport,
   ChemicalInventory,
-  ChemicalUsageTrend
+  ChemicalUsageTrend,
+  InspectionItem,
+  SafetyInspection,
+  EducationParticipant,
+  EducationLog,
+  HazardIdentification,
+  RiskMatrix,
+  RiskAssessmentItem,
+  RiskAssessment,
+  QuarterlySafetyMetrics,
+  QuarterlyImprovement,
+  QuarterlyReport,
+  AnnualGoal,
+  AnnualBudgetItem,
+  AnnualEducationPlan,
+  AnnualInspectionSchedule,
+  AnnualSafetyPlan
 } from './documents';
 
 export type * from './ai-documents';
 export type * from './education';
 export type * from './schedule';
+export type { TargetRule } from './education';
 
 // 타입 가드 유틸리티
 export const isError = (value: any): value is Error => {
@@ -94,4 +114,3 @@ export const toApiError = (
 
 // 상수 re-export
 export { ApiStatusCode, ApiErrorCode, RealtimeEventType } from './api';
-export { ErrorSeverity, ErrorCategory, ERROR_MESSAGES, HTTP_STATUS_TO_ERROR_CODE } from './error';

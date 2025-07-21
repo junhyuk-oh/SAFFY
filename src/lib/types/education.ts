@@ -221,3 +221,15 @@ export interface EducationStatistics {
     dueDate: string
   }>
 }
+
+export interface TargetRule {
+  id: string
+  target: string
+  department?: string
+  position?: string
+  experience?: number
+  trainingIds: string[]
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
