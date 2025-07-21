@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     const documents = result.documents
 
     // BaseDocument를 월별 문서 형식으로 변환
-    const results: MonthlyDocument[] | DocumentWithType[] = documents.map(doc => {
+    const results = documents.map(doc => {
       const monthlyDoc: Partial<MonthlyDocument & { documentType: DocumentType }> = {
         id: doc.id,
         title: doc.title,

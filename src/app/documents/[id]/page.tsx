@@ -258,7 +258,7 @@ export default function DocumentDetailPage() {
                     )}
 
                     {/* Sections */}
-                    {content.sections && content.sections.map((section: any, index: number) => (
+                    {content.sections && content.sections.map((section: { title: string; content: string }, index: number) => (
                       <div key={index} className="bg-background-secondary rounded-notion-md p-5 border border-border">
                         <h3 className="font-semibold text-text-primary mb-3">{section.title}</h3>
                         <div className="text-text-secondary whitespace-pre-line">{section.content}</div>
@@ -270,7 +270,7 @@ export default function DocumentDetailPage() {
                       <div className="bg-background-secondary rounded-notion-md p-5 border border-border">
                         <h3 className="font-semibold text-text-primary mb-3">📎 첨부파일</h3>
                         <div className="space-y-2">
-                          {content.attachments.map((file: any, index: number) => (
+                          {content.attachments.map((file: { name: string; size?: number }, index: number) => (
                             <div
                               key={index}
                               className="flex items-center justify-between p-3 bg-background rounded-notion-sm border border-border hover:border-border-hover transition-colors cursor-pointer"
