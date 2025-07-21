@@ -64,7 +64,6 @@ export type {
 export type * from './ai-documents';
 export type * from './education';
 export type * from './schedule';
-export type { TargetRule } from './education';
 
 // 타입 가드 유틸리티
 export const isError = (value: any): value is Error => {

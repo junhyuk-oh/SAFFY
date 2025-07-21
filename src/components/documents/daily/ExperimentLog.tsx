@@ -51,7 +51,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
 
   const handleAddChemical = () => {
     if (newChemical.name && newChemical.amount) {
-      setFormData(prev => ({
+      setFormData((prev: Partial<ExperimentLog>) => ({
         ...prev,
         chemicals: [...(prev.chemicals || []), { ...newChemical }]
       }));
@@ -60,15 +60,15 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
   };
 
   const handleRemoveChemical = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev: Partial<ExperimentLog>) => ({
       ...prev,
-      chemicals: prev.chemicals?.filter((_, i) => i !== index)
+      chemicals: prev.chemicals?.filter((_: ChemicalUsage, i: number) => i !== index)
     }));
   };
 
   const handleAddEquipment = () => {
     if (newEquipment.trim()) {
-      setFormData(prev => ({
+      setFormData((prev: Partial<ExperimentLog>) => ({
         ...prev,
         equipment: [...(prev.equipment || []), newEquipment.trim()]
       }));
@@ -77,15 +77,15 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
   };
 
   const handleRemoveEquipment = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev: Partial<ExperimentLog>) => ({
       ...prev,
-      equipment: prev.equipment?.filter((_, i) => i !== index)
+      equipment: prev.equipment?.filter((_: string, i: number) => i !== index)
     }));
   };
 
   const handleAddSafetyMeasure = () => {
     if (newSafetyMeasure.trim()) {
-      setFormData(prev => ({
+      setFormData((prev: Partial<ExperimentLog>) => ({
         ...prev,
         safetyMeasures: [...(prev.safetyMeasures || []), newSafetyMeasure.trim()]
       }));
@@ -94,9 +94,9 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
   };
 
   const handleRemoveSafetyMeasure = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev: Partial<ExperimentLog>) => ({
       ...prev,
-      safetyMeasures: prev.safetyMeasures?.filter((_, i) => i !== index)
+      safetyMeasures: prev.safetyMeasures?.filter((_: string, i: number) => i !== index)
     }));
   };
 
@@ -143,7 +143,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
             <input
               type="text"
               value={formData.experimentTitle}
-              onChange={(e) => setFormData(prev => ({ ...prev, experimentTitle: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, experimentTitle: e.target.value }))}
               placeholder="실험 제목을 입력하세요"
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
@@ -158,7 +158,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
             <input
               type="date"
               value={formData.date}
-              onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, date: e.target.value }))}
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               required
@@ -172,7 +172,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
             <input
               type="text"
               value={formData.researcher}
-              onChange={(e) => setFormData(prev => ({ ...prev, researcher: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, researcher: e.target.value }))}
               placeholder="이름을 입력하세요"
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
@@ -187,7 +187,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
             <input
               type="text"
               value={formData.department}
-              onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, department: e.target.value }))}
               placeholder="부서명을 입력하세요"
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
@@ -206,7 +206,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
             <input
               type="time"
               value={formData.startTime}
-              onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, startTime: e.target.value }))}
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               required
@@ -220,7 +220,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
             <input
               type="time"
               value={formData.endTime}
-              onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, endTime: e.target.value }))}
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               required
@@ -235,7 +235,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
           </label>
           <textarea
             value={formData.purpose}
-            onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
+            onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, purpose: e.target.value }))}
             placeholder="실험의 목적을 입력하세요"
             rows={3}
             className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
@@ -280,7 +280,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
               type="text"
               placeholder="화학물질명"
               value={newChemical.name}
-              onChange={(e) => setNewChemical(prev => ({ ...prev, name: e.target.value }))}
+              onChange={(e) => setNewChemical((prev: ChemicalUsage) => ({ ...prev, name: e.target.value }))}
               className="md:col-span-2 px-3 py-2 rounded-notion-sm border border-border 
                 bg-background focus:ring-2 focus:ring-primary focus:border-transparent 
                 transition-all duration-200"
@@ -289,7 +289,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
               type="text"
               placeholder="CAS 번호 (선택)"
               value={newChemical.casNumber}
-              onChange={(e) => setNewChemical(prev => ({ ...prev, casNumber: e.target.value }))}
+              onChange={(e) => setNewChemical((prev: ChemicalUsage) => ({ ...prev, casNumber: e.target.value }))}
               className="px-3 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
             />
@@ -298,13 +298,13 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
                 type="text"
                 placeholder="사용량"
                 value={newChemical.amount}
-                onChange={(e) => setNewChemical(prev => ({ ...prev, amount: e.target.value }))}
+                onChange={(e) => setNewChemical((prev: ChemicalUsage) => ({ ...prev, amount: e.target.value }))}
                 className="flex-1 px-3 py-2 rounded-notion-sm border border-border bg-background 
                   focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               />
               <select
                 value={newChemical.unit}
-                onChange={(e) => setNewChemical(prev => ({ ...prev, unit: e.target.value }))}
+                onChange={(e) => setNewChemical((prev: ChemicalUsage) => ({ ...prev, unit: e.target.value }))}
                 className="px-3 py-2 rounded-notion-sm border border-border bg-background 
                   focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               >
@@ -426,7 +426,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
           </label>
           <textarea
             value={formData.procedures}
-            onChange={(e) => setFormData(prev => ({ ...prev, procedures: e.target.value }))}
+            onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, procedures: e.target.value }))}
             placeholder="실험 절차를 상세히 입력하세요"
             rows={6}
             className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
@@ -443,7 +443,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
           </label>
           <textarea
             value={formData.results}
-            onChange={(e) => setFormData(prev => ({ ...prev, results: e.target.value }))}
+            onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, results: e.target.value }))}
             placeholder="실험 결과를 입력하세요"
             rows={4}
             className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
@@ -460,7 +460,7 @@ export default function ExperimentLog({ initialData, onSave, onCancel }: Experim
           </label>
           <textarea
             value={formData.incidents}
-            onChange={(e) => setFormData(prev => ({ ...prev, incidents: e.target.value }))}
+            onChange={(e) => setFormData((prev: Partial<ExperimentLog>) => ({ ...prev, incidents: e.target.value }))}
             placeholder="사고나 특이사항이 있었다면 기록하세요"
             rows={3}
             className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 

@@ -113,12 +113,12 @@ export async function POST(request: NextRequest) {
         name: body.name,
         code: body.code,
         description: body.description,
-        is_mandatory: body.is_mandatory || false,
-        required_hours: body.required_hours || 0,
-        validity_months: body.validity_months,
-        parent_id: body.parent_id,
-        display_order: body.display_order || 0,
-        is_active: body.is_active !== false
+        is_mandatory: body.isMandatory || false,
+        required_hours: body.requiredHours || 0,
+        validity_months: body.validityMonths,
+        parent_id: body.parentId,
+        display_order: body.displayOrder || 0,
+        is_active: body.isActive !== false
       })
       .select()
       .single();
@@ -202,12 +202,12 @@ export async function PUT(request: NextRequest) {
         name: body.name,
         code: body.code,
         description: body.description,
-        is_mandatory: body.is_mandatory,
-        required_hours: body.required_hours,
-        validity_months: body.validity_months,
-        parent_id: body.parent_id,
-        display_order: body.display_order,
-        is_active: body.is_active
+        is_mandatory: body.isMandatory,
+        required_hours: body.requiredHours,
+        validity_months: body.validityMonths,
+        parent_id: body.parentId,
+        display_order: body.displayOrder,
+        is_active: body.isActive
       })
       .eq('id', id)
       .select()

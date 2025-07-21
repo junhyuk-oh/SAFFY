@@ -1,4 +1,4 @@
-import { documentTemplates, DocumentTemplate, generateSampleData } from './templates';
+import { documentTemplates, DocumentTemplate, Section, generateSampleData } from './templates';
 
 // 문서 생성 함수 (현재는 Mock 구현)
 export async function generateDocument(
@@ -61,7 +61,7 @@ function generateContentFromTemplate(
 
 // 섹션 콘텐츠 생성
 function generateSectionContent(
-  section: any,
+  section: Section,
   data: Record<string, any>,
   level: number = 2
 ): string {
@@ -73,7 +73,7 @@ function generateSectionContent(
     if (typeof section.content === 'string') {
       content += section.content + '\n\n';
     } else if (Array.isArray(section.content)) {
-      section.content.forEach(item => {
+      section.content.forEach((item: string | Record<string, any>) => {
         if (typeof item === 'string') {
           content += `- ${item}\n`;
         } else if (typeof item === 'object') {
@@ -108,7 +108,7 @@ function generateSectionContent(
 
   // 하위 섹션 처리
   if (section.subsections) {
-    section.subsections.forEach((subsection: any) => {
+    section.subsections.forEach((subsection: Section) => {
       content += generateSectionContent(subsection, data, level + 1);
     });
   }
@@ -117,21 +117,21 @@ function generateSectionContent(
 }
 
 // 객체를 포맷팅
-function formatObject(obj: any): string {
-  if (obj.category) {
+function formatObject(obj: Record<string, any>): string {
+  if (obj.category && Array.isArray(obj.items)) {
     return `\n**${obj.category}**:\n${obj.items.map((item: string) => `  - ${item}`).join('\n')}`;
-  } else if (obj.principle) {
+  } else if (obj.principle && obj.description) {
     return `\n**${obj.principle}**: ${obj.description}`;
-  } else if (obj.risk_type) {
+  } else if (obj.risk_type && Array.isArray(obj.examples)) {
     return `\n**${obj.risk_type}**: ${obj.examples.join(', ')}`;
   } else {
     return Object.entries(obj)
       .map(([key, value]) => {
-        const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
         if (Array.isArray(value)) {
           return `**${formattedKey}**: ${value.join(', ')}`;
-        } else if (typeof value === 'object') {
-          return `**${formattedKey}**:\n${formatObject(value)}`;
+        } else if (typeof value === 'object' && value !== null) {
+          return `**${formattedKey}**:\n${formatObject(value as Record<string, any>)}`;
         } else {
           return `**${formattedKey}**: ${value}`;
         }

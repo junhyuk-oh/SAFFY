@@ -4,12 +4,12 @@ export interface EducationCategory {
   description: string
   isLegalRequirement: boolean
   code?: string
-  is_mandatory?: boolean
-  required_hours?: number
-  validity_months?: number
-  parent_id?: string | null
-  display_order?: number
-  is_active?: boolean
+  isMandatory?: boolean
+  requiredHours?: number
+  validityMonths?: number
+  parentId?: string | null
+  displayOrder?: number
+  isActive?: boolean
 }
 
 export interface Training {
@@ -108,13 +108,13 @@ export interface TrainingNotification {
 export interface DailyEducationLog {
   id: string
   userId: string
-  education_date: string
-  education_type: string
+  educationDate: string
+  educationType: string
   topic: string
-  duration_minutes: number
-  instructor_id: string
+  durationMinutes: number
+  instructorId: string
   location: string
-  attendance_status: 'present' | 'absent' | 'partial'
+  attendanceStatus: 'present' | 'absent' | 'partial'
   notes?: string
   createdAt: string
   updatedAt: string
@@ -122,13 +122,13 @@ export interface DailyEducationLog {
 
 export interface CreateDailyEducationLogDTO {
   userId: string
-  education_date: string
-  education_type: string
+  educationDate: string
+  educationType: string
   topic: string
-  duration_minutes: number
-  instructor_id: string
+  durationMinutes: number
+  instructorId: string
   location: string
-  attendance_records: Array<{
+  attendanceRecords: Array<{
     userId: string
     present: boolean
     notes?: string
@@ -146,38 +146,50 @@ export interface PaginationParams {
   page?: number
   limit?: number
   offset?: number
-  sort_by?: string
-  sort_order?: 'asc' | 'desc'
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
 }
 
 export interface EducationRecord {
   id: string
-  userId: string
-  trainingId: string
-  status: string
-  enrolledDate: string
-  completionDate?: string
-  score?: number
-  certificateUrl?: string
-  createdAt: string
-  updatedAt: string
+  user_id: string
+  category_id: string
+  requirement_id?: string
+  education_date: string
+  education_hours: number
+  provider?: string
+  certificate_number?: string
+  certificate_url?: string
+  certificate_file_path?: string
+  expiry_date?: string
+  verification_status: VerificationStatus
+  verification_date?: string
+  verified_by?: string
+  rejection_reason?: string
+  notes?: string
+  created_at: string
+  updated_at: string
 }
 
 export interface CreateEducationRecordDTO {
-  userId: string
-  trainingId: string
-  status: string
-  enrolledDate: string
-  completionDate?: string
-  score?: number
+  user_id: string
+  category_id: string
+  requirement_id?: string
+  education_date: string
+  education_hours: number
+  provider?: string
+  certificate_number?: string
+  certificate_file?: File
+  expiry_date?: string
+  notes?: string
 }
 
 export interface EducationFilterOptions {
-  userId?: string
-  status?: string
-  startDate?: string
-  endDate?: string
-  trainingId?: string
+  category_id?: string
+  user_id?: string
+  date_from?: string
+  date_to?: string
+  verification_status?: VerificationStatus
 }
 
 export enum VerificationStatus {

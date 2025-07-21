@@ -17,9 +17,9 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     // 필터 파라미터
-    const filters: EducationFilterOptions = {
+    const filters = {
       category_id: searchParams.get('category_id') || undefined,
-      status: searchParams.get('status') as any || undefined,
+      status: searchParams.get('status') || undefined,
       user_id: searchParams.get('user_id') || undefined,
       department: searchParams.get('department') || undefined,
       date_from: searchParams.get('date_from') || undefined,
@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
     const pagination: PaginationParams = {
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '20'),
-      sort_by: searchParams.get('sort_by') || 'due_date',
-      sort_order: (searchParams.get('sort_order') || 'asc') as 'asc' | 'desc'
+      sortBy: searchParams.get('sort_by') || 'due_date',
+      sortOrder: (searchParams.get('sort_order') || 'asc') as 'asc' | 'desc'
     };
     
     // 기본 쿼리
@@ -66,13 +66,15 @@ export async function GET(request: NextRequest) {
     }
     
     // 정렬
-    query = query.order(pagination.sort_by, { 
-      ascending: pagination.sort_order === 'asc' 
+    query = query.order(pagination.sortBy || 'due_date', { 
+      ascending: pagination.sortOrder === 'asc' 
     });
     
     // 페이지네이션
-    const start = (pagination.page - 1) * pagination.limit;
-    const end = start + pagination.limit - 1;
+    const page = pagination.page || 1;
+    const limit = pagination.limit || 20;
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
     query = query.range(start, end);
     
     const { data, error, count } = await query;
@@ -87,10 +89,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       data,
       pagination: {
-        page: pagination.page,
-        limit: pagination.limit,
+        page: pagination.page || 1,
+        limit: pagination.limit || 20,
         total: count || 0,
-        total_pages: Math.ceil((count || 0) / pagination.limit)
+        total_pages: Math.ceil((count || 0) / (pagination.limit || 20))
       }
     });
   } catch (error) {

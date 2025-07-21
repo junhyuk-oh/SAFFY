@@ -41,18 +41,18 @@ export default function DailyCheckList({ initialData, onSave, onCancel }: DailyC
   });
 
   const handleCheckChange = (itemId: string, checked: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev: Partial<DailyCheckList>) => ({
       ...prev,
-      checkItems: prev.checkItems?.map(item =>
+      checkItems: prev.checkItems?.map((item: DailyCheckItem) =>
         item.id === itemId ? { ...item, checked } : item
       )
     }));
   };
 
   const handleNotesChange = (itemId: string, notes: string) => {
-    setFormData(prev => ({
+    setFormData((prev: Partial<DailyCheckList>) => ({
       ...prev,
-      checkItems: prev.checkItems?.map(item =>
+      checkItems: prev.checkItems?.map((item: DailyCheckItem) =>
         item.id === itemId ? { ...item, notes } : item
       )
     }));
@@ -60,7 +60,7 @@ export default function DailyCheckList({ initialData, onSave, onCancel }: DailyC
 
   const calculateOverallStatus = () => {
     const items = formData.checkItems || [];
-    const checkedCount = items.filter(item => item.checked).length;
+    const checkedCount = items.filter((item: DailyCheckItem) => item.checked).length;
     const percentage = (checkedCount / items.length) * 100;
 
     if (percentage === 100) return 'safe';
@@ -109,7 +109,7 @@ export default function DailyCheckList({ initialData, onSave, onCancel }: DailyC
     }
   };
 
-  const groupedItems = formData.checkItems?.reduce((acc, item) => {
+  const groupedItems = formData.checkItems?.reduce((acc: Record<string, DailyCheckItem[]>, item: DailyCheckItem) => {
     if (!acc[item.category]) {
       acc[item.category] = [];
     }
@@ -136,7 +136,7 @@ export default function DailyCheckList({ initialData, onSave, onCancel }: DailyC
             <input
               type="date"
               value={formData.date}
-              onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<DailyCheckList>) => ({ ...prev, date: e.target.value }))}
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
               required
@@ -150,7 +150,7 @@ export default function DailyCheckList({ initialData, onSave, onCancel }: DailyC
             <input
               type="text"
               value={formData.inspectorName}
-              onChange={(e) => setFormData(prev => ({ ...prev, inspectorName: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<DailyCheckList>) => ({ ...prev, inspectorName: e.target.value }))}
               placeholder="이름을 입력하세요"
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
@@ -165,7 +165,7 @@ export default function DailyCheckList({ initialData, onSave, onCancel }: DailyC
             <input
               type="text"
               value={formData.department}
-              onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+              onChange={(e) => setFormData((prev: Partial<DailyCheckList>) => ({ ...prev, department: e.target.value }))}
               placeholder="부서명을 입력하세요"
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background 
                 focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
@@ -180,7 +180,7 @@ export default function DailyCheckList({ initialData, onSave, onCancel }: DailyC
             <div>
               <h3 className="text-lg font-medium text-text-primary">전체 상태</h3>
               <p className="text-sm text-text-secondary mt-1">
-                {formData.checkItems?.filter(item => item.checked).length} / {formData.checkItems?.length} 항목 완료
+                {formData.checkItems?.filter((item: DailyCheckItem) => item.checked).length} / {formData.checkItems?.length} 항목 완료
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -196,7 +196,7 @@ export default function DailyCheckList({ initialData, onSave, onCancel }: DailyC
             <div key={category} className="bg-background rounded-notion-sm border border-border p-4">
               <h3 className="text-lg font-medium text-text-primary mb-4">{category}</h3>
               <div className="space-y-3">
-                {items.map((item) => (
+                {items.map((item: DailyCheckItem) => (
                   <div key={item.id} className="space-y-2">
                     <div className="flex items-start gap-3">
                       <input

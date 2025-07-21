@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
     const pagination: PaginationParams = {
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '50'),
-      sort_by: searchParams.get('sort_by') || 'education_date',
-      sort_order: (searchParams.get('sort_order') || 'desc') as 'asc' | 'desc'
+      sortBy: searchParams.get('sort_by') || 'education_date',
+      sortOrder: (searchParams.get('sort_order') || 'desc') as 'asc' | 'desc'
     };
     
     // 기본 쿼리
@@ -57,13 +57,15 @@ export async function GET(request: NextRequest) {
     }
     
     // 정렬
-    query = query.order(pagination.sort_by, { 
-      ascending: pagination.sort_order === 'asc' 
+    query = query.order(pagination.sortBy || 'education_date', { 
+      ascending: pagination.sortOrder === 'asc' 
     });
     
     // 페이지네이션
-    const start = (pagination.page - 1) * pagination.limit;
-    const end = start + pagination.limit - 1;
+    const page = pagination.page || 1;
+    const limit = pagination.limit || 50;
+    const start = (page - 1) * limit;
+    const end = start + limit - 1;
     query = query.range(start, end);
     
     const { data, error, count } = await query;
@@ -78,10 +80,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       data,
       pagination: {
-        page: pagination.page,
-        limit: pagination.limit,
+        page: pagination.page || 1,
+        limit: pagination.limit || 50,
         total: count || 0,
-        total_pages: Math.ceil((count || 0) / pagination.limit)
+        total_pages: Math.ceil((count || 0) / (pagination.limit || 50))
       }
     });
   } catch (error) {
@@ -100,14 +102,14 @@ export async function POST(request: NextRequest) {
     const body: CreateDailyEducationLogDTO = await request.json();
     
     // 필수 필드 검증
-    if (!body.education_date || !body.education_type || !body.topic) {
+    if (!body.educationDate || !body.educationType || !body.topic) {
       return NextResponse.json(
         { error: '교육일, 교육 유형, 주제는 필수 항목입니다.' },
         { status: 400 }
       );
     }
     
-    if (!body.attendance_records || body.attendance_records.length === 0) {
+    if (!body.attendanceRecords || body.attendanceRecords.length === 0) {
       return NextResponse.json(
         { error: '출석 기록이 필요합니다.' },
         { status: 400 }
@@ -118,18 +120,18 @@ export async function POST(request: NextRequest) {
     const logs = [];
     const errors = [];
     
-    for (const attendance of body.attendance_records) {
+    for (const attendance of body.attendanceRecords) {
       // 중복 확인
       const { data: existing } = await supabase
         .from('daily_education_logs')
         .select('id')
-        .eq('user_id', attendance.user_id)
-        .eq('education_date', body.education_date)
-        .eq('education_type', body.education_type)
+        .eq('user_id', attendance.userId)
+        .eq('education_date', body.educationDate)
+        .eq('education_type', body.educationType)
         .single();
       
       if (existing) {
-        errors.push(`사용자 ${attendance.user_id}의 ${body.education_date} ${body.education_type} 기록이 이미 존재합니다.`);
+        errors.push(`사용자 ${attendance.userId}의 ${body.educationDate} ${body.educationType} 기록이 이미 존재합니다.`);
         continue;
       }
       
@@ -137,14 +139,14 @@ export async function POST(request: NextRequest) {
       const { data, error } = await supabase
         .from('daily_education_logs')
         .insert({
-          user_id: attendance.user_id,
-          education_date: body.education_date,
-          education_type: body.education_type,
+          user_id: attendance.userId,
+          education_date: body.educationDate,
+          education_type: body.educationType,
           topic: body.topic,
-          duration_minutes: body.duration_minutes || 0,
-          instructor_id: body.instructor_id,
+          duration_minutes: body.durationMinutes || 0,
+          instructor_id: body.instructorId,
           location: body.location,
-          attendance_status: attendance.attendance_status,
+          attendance_status: attendance.present ? 'present' : 'absent',
           notes: attendance.notes
         })
         .select(`
@@ -155,7 +157,7 @@ export async function POST(request: NextRequest) {
         .single();
       
       if (error) {
-        errors.push(`사용자 ${attendance.user_id}: ${error.message}`);
+        errors.push(`사용자 ${attendance.userId}: ${error.message}`);
       } else {
         logs.push(data);
       }
@@ -201,10 +203,10 @@ export async function PUT(request: NextRequest) {
     
     // 수정 가능한 필드만 업데이트
     if (body.topic) updateData.topic = body.topic;
-    if (body.duration_minutes !== undefined) updateData.duration_minutes = body.duration_minutes;
-    if (body.instructor_id !== undefined) updateData.instructor_id = body.instructor_id;
+    if (body.durationMinutes !== undefined) updateData.duration_minutes = body.durationMinutes;
+    if (body.instructorId !== undefined) updateData.instructor_id = body.instructorId;
     if (body.location !== undefined) updateData.location = body.location;
-    if (body.attendance_status) updateData.attendance_status = body.attendance_status;
+    if (body.attendanceStatus) updateData.attendance_status = body.attendanceStatus;
     if (body.notes !== undefined) updateData.notes = body.notes;
     
     const { data, error } = await supabase
