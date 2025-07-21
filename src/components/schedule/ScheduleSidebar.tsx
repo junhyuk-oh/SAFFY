@@ -47,13 +47,13 @@ export function ScheduleSidebar({ schedules, onStatusUpdate }: ScheduleSidebarPr
   }
 
   // 실제 schedules가 없으면 mockSchedules 사용
-  const displaySchedules = schedules || mockSchedules as any[]
+  const displaySchedules = schedules || mockSchedules as Schedule[]
   
   // 우선순위별로 일정 그룹화
   const groupedSchedules = {
-    urgent: displaySchedules.filter((s: any) => s.status === "urgent"),
-    scheduled: displaySchedules.filter((s: any) => s.status === "scheduled"),
-    completed: displaySchedules.filter((s: any) => s.status === "completed"),
+    urgent: displaySchedules.filter((s) => s.status === "urgent"),
+    scheduled: displaySchedules.filter((s) => s.status === "scheduled"),
+    completed: displaySchedules.filter((s) => s.status === "completed"),
   }
 
   const sectionConfig = {

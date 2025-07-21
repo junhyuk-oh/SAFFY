@@ -10,7 +10,7 @@ export default function CreateDocumentPage() {
   const router = useRouter()
   const [isCreating, setIsCreating] = useState(false)
 
-  const handleDocumentCreate = async (data: any) => {
+  const handleDocumentCreate = async () => {
     setIsCreating(true)
     
     // 여기서 API 호출로 문서 생성

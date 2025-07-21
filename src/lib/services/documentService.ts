@@ -525,7 +525,7 @@ export class DocumentService {
    * 문서 생성 요청 유효성 검증
    */
   private validateCreateRequest(request: CreateDocumentRequest): void {
-    const errors: Array<{ field: string; message: string; value?: any }> = [];
+    const errors: Array<{ field: string; message: string; value?: unknown }> = [];
 
     if (!request.type) {
       errors.push({ field: 'type', message: '문서 타입은 필수입니다.' });
@@ -568,8 +568,8 @@ export class DocumentService {
    */
   private async saveDocumentHistory(
     documentId: string, 
-    oldData: any, 
-    newData: any, 
+    oldData: Partial<Document>, 
+    newData: Partial<Document>, 
     changedBy: string, 
     reason?: string
   ): Promise<void> {
@@ -598,8 +598,8 @@ export class DocumentService {
   /**
    * 변경사항 계산
    */
-  private calculateChanges(oldData: any, newData: any): any[] {
-    const changes: any[] = [];
+  private calculateChanges(oldData: Partial<Document>, newData: Partial<Document>): Array<{ field: string; oldValue: unknown; newValue: unknown }> {
+    const changes: Array<{ field: string; oldValue: unknown; newValue: unknown }> = [];
     
     // 간단한 변경사항 감지 로직
     if (oldData.title !== newData.title) {
@@ -626,7 +626,7 @@ export class DocumentService {
   /**
    * 타입별 통계 계산
    */
-  private calculateTypeStats(docs: any[]): Record<string, number> {
+  private calculateTypeStats(docs: Document[]): Record<string, number> {
     const result: Record<string, number> = {};
     
     docs.forEach(doc => {
@@ -642,7 +642,7 @@ export class DocumentService {
   /**
    * 상태별 통계 계산
    */
-  private calculateStatusStats(docs: any[]): Record<string, number> {
+  private calculateStatusStats(docs: Document[]): Record<string, number> {
     const result: Record<string, number> = {};
     
     docs.forEach(doc => {
@@ -658,7 +658,7 @@ export class DocumentService {
   /**
    * 부서별 통계 계산
    */
-  private calculateDepartmentStats(docs: any[]): Record<string, number> {
+  private calculateDepartmentStats(docs: Document[]): Record<string, number> {
     const result: Record<string, number> = {};
     
     docs.forEach(doc => {

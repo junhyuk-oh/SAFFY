@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const params: DocumentSearchParams = {
       query: searchParams.get('query') || undefined,
       type: searchParams.getAll('type') as UnifiedDocumentType[],
-      status: searchParams.getAll('status') as any[],
+      status: searchParams.getAll('status') as ('draft' | 'completed' | 'archived')[],
       department: searchParams.getAll('department'),
       author: searchParams.get('author') || undefined,
       dateRange: searchParams.get('startDate') && searchParams.get('endDate') 
@@ -44,8 +44,8 @@ export async function GET(request: NextRequest) {
         : undefined,
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '20'),
-      sortBy: searchParams.get('sortBy') as any || 'createdAt',
-      sortOrder: searchParams.get('sortOrder') as any || 'desc'
+      sortBy: (searchParams.get('sortBy') || 'createdAt') as 'createdAt' | 'updatedAt' | 'title' | 'author',
+      sortOrder: (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc'
     };
 
     // DocumentService를 통해 문서 조회
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       filters: {
         query: params.query,
         type: Array.isArray(params.type) ? params.type.join(',') : params.type,
-        status: Array.isArray(params.status) ? params.status.join(',') : params.status as any,
+        status: Array.isArray(params.status) ? params.status.join(',') : params.status,
         department: Array.isArray(params.department) ? params.department.join(',') : params.department,
         startDate: params.dateRange?.start,
         endDate: params.dateRange?.end,

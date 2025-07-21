@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { SafetyInspection, EducationLog, RiskAssessment } from '@/lib/types/documents'
 
+// 유니온 타입 정의
+type MonthlyDocument = SafetyInspection | EducationLog | RiskAssessment;
+type DocumentType = 'safety-inspection' | 'education-log' | 'risk-assessment';
+
+// 문서 타입 확장 (문서 타입 정보 포함)
+type DocumentWithType = MonthlyDocument & { documentType: DocumentType };
+
 // 임시 메모리 저장소 (실제로는 데이터베이스를 사용해야 함)
 const safetyInspections: SafetyInspection[] = []
 const educationLogs: EducationLog[] = []
@@ -13,7 +20,7 @@ export async function GET(request: NextRequest) {
   const department = searchParams.get('department')
 
   try {
-    let results: any[] = []
+    let results: MonthlyDocument[] | DocumentWithType[] = []
 
     // 문서 타입별로 필터링
     switch (type) {
@@ -29,9 +36,9 @@ export async function GET(request: NextRequest) {
       default:
         // 타입이 지정되지 않은 경우 모든 문서 반환
         results = [
-          ...safetyInspections.map(doc => ({ ...doc, documentType: 'safety-inspection' })),
-          ...educationLogs.map(doc => ({ ...doc, documentType: 'education-log' })),
-          ...riskAssessments.map(doc => ({ ...doc, documentType: 'risk-assessment' }))
+          ...safetyInspections.map(doc => ({ ...doc, documentType: 'safety-inspection' as const })),
+          ...educationLogs.map(doc => ({ ...doc, documentType: 'education-log' as const })),
+          ...riskAssessments.map(doc => ({ ...doc, documentType: 'risk-assessment' as const }))
         ]
     }
 
@@ -62,9 +69,14 @@ export async function GET(request: NextRequest) {
   }
 }
 
+interface PostRequestBody {
+  type: DocumentType;
+  data: Partial<MonthlyDocument>;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json() as PostRequestBody
     const { type, data } = body
 
     if (!type || !data) {
@@ -77,7 +89,7 @@ export async function POST(request: NextRequest) {
     const timestamp = new Date().toISOString()
     const id = `${type}-${Date.now()}`
 
-    let savedDocument: any
+    let savedDocument: MonthlyDocument
 
     switch (type) {
       case 'safety-inspection':
@@ -130,9 +142,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
+interface PutRequestBody {
+  type: DocumentType;
+  id: string;
+  data: Partial<MonthlyDocument>;
+}
+
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
+    const body = await request.json() as PutRequestBody
     const { type, id, data } = body
 
     if (!type || !id || !data) {
@@ -143,7 +161,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const timestamp = new Date().toISOString()
-    let updatedDocument: any
+    let updatedDocument: MonthlyDocument
 
     switch (type) {
       case 'safety-inspection':

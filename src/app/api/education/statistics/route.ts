@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
       const categoryStats: CategoryStatistics[] = [];
       
       for (const category of categories) {
-        let query = supabase
+        const query = supabase
           .from('user_education_requirements')
           .select('status, user_id', { count: 'exact' })
           .eq('category_id', category.id)

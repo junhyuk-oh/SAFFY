@@ -45,7 +45,7 @@ export interface ErrorContext {
   requestId?: string;
   action?: string;
   resource?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 // 애플리케이션 에러 클래스
@@ -104,7 +104,7 @@ export class ValidationError extends AppError {
 // 유효성 검사 에러 필드
 export interface ValidationErrorField {
   field: string;
-  value?: any;
+  value?: unknown;
   message: string;
   code?: string;
   constraint?: string;
@@ -230,9 +230,9 @@ export class NetworkError extends AppError {
 // 외부 서비스 에러
 export class ExternalServiceError extends AppError {
   service: string;
-  originalError?: any;
+  originalError?: Error | Record<string, unknown>;
   
-  constructor(service: string, message: string, originalError?: any) {
+  constructor(service: string, message: string, originalError?: Error | Record<string, unknown>) {
     super({
       message,
       code: ApiErrorCode.DEPENDENCY_ERROR,
@@ -259,7 +259,7 @@ export interface ErrorLog {
     userAgent?: string;
     ip?: string;
   };
-  additionalInfo?: Record<string, any>;
+  additionalInfo?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -292,7 +292,7 @@ export interface ErrorReport {
 export type ErrorHandler<T extends Error = Error> = (error: T) => void | Promise<void>;
 
 // 에러 변환기 타입
-export type ErrorTransformer<T extends Error = Error, R = any> = (error: T) => R;
+export type ErrorTransformer<T extends Error = Error, R = unknown> = (error: T) => R;
 
 // 에러 복구 전략
 export interface ErrorRecoveryStrategy {

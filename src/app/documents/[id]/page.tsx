@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { BackButton } from "@/components/ui/back-button"
-import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 
 // Mock data - 실제로는 API에서 가져올 데이터
@@ -70,16 +69,14 @@ const statusConfig = {
 }
 
 export default function DocumentDetailPage() {
-  const params = useParams()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<"content" | "history" | "comments">("content")
-  const [isEditing, setIsEditing] = useState(false)
 
   const statusInfo = statusConfig[mockDocument.status]
 
   const handleEdit = () => {
-    setIsEditing(true)
     // 편집 모드로 전환
+    router.push(`/documents/${mockDocument.id}/edit`)
   }
 
   const handleDelete = () => {

@@ -81,11 +81,11 @@ export interface FilterOptions {
   department?: string;
   status?: Status;
   type?: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | Status | undefined;
 }
 
 // API 응답 기본 구조
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: ApiError;
@@ -93,7 +93,9 @@ export interface ApiResponse<T = any> {
   metadata?: {
     timestamp: string;
     version?: string;
-    [key: string]: any;
+    requestId?: string;
+    duration?: number;
+    [key: string]: string | number | boolean | undefined;
   };
 }
 
@@ -101,7 +103,7 @@ export interface ApiResponse<T = any> {
 export interface ApiError {
   code: string;
   message: string;
-  details?: any;
+  details?: Record<string, unknown> | string | string[];
   timestamp?: string;
   path?: string;
 }
@@ -134,7 +136,7 @@ export interface ChartDataPoint {
   x: string | number;
   y: number;
   label?: string;
-  meta?: any;
+  meta?: Record<string, unknown>;
 }
 
 // 알림 타입
@@ -152,11 +154,11 @@ export interface Notification {
 }
 
 // 액션 타입 (Redux나 상태 관리용)
-export interface Action<T = any> {
+export interface Action<T = unknown> {
   type: string;
   payload?: T;
   error?: boolean;
-  meta?: any;
+  meta?: Record<string, unknown>;
 }
 
 // 폼 필드 에러
@@ -210,8 +212,8 @@ export interface AuditLog {
   resourceType: string;
   resourceId: string;
   changes?: {
-    before: any;
-    after: any;
+    before: Record<string, unknown>;
+    after: Record<string, unknown>;
   };
   ip?: string;
   userAgent?: string;

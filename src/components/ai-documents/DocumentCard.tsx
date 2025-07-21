@@ -18,8 +18,7 @@ export function DocumentCard({
   description,
   estimatedTime,
   onClick,
-  isSelected = false,
-  documentType
+  isSelected = false
 }: DocumentCardProps) {
   return (
     <button

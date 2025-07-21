@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChevronLeft, ChevronRight, Plus, Calendar, Clock, Grid3x3, List } from 'lucide-react'
+import type { Schedule } from '@/lib/types/schedule'
 
 // 타입 정의
 interface CalendarEvent {
@@ -194,9 +195,9 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
 
 // Props 인터페이스 추가
 interface ScheduleCalendarProps {
-  schedules?: any[]
+  schedules?: Schedule[]
   onDateClick?: (date: Date) => void
-  onEventClick?: (event: any) => void
+  onEventClick?: (event: Schedule) => void
   isEditMode?: boolean
 }
 

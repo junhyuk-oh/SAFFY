@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateDocument } from '@/lib/ai-documents/generator';
+import { generateDocument, GeneratedDocument } from '@/lib/ai-documents/generator';
 import { 
   ApiResponse,
   ApiStatusCode,
@@ -26,9 +26,15 @@ const VALID_DOCUMENT_TYPES = [
 
 type ValidDocumentType = typeof VALID_DOCUMENT_TYPES[number];
 
+// 요청 본문 타입 정의
+interface GenerateDocumentRequestBody {
+  documentType: string;
+  data: Record<string, unknown>;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await request.json() as GenerateDocumentRequestBody;
     const { documentType, data } = body;
 
     // 필수 파라미터 검증
@@ -74,7 +80,7 @@ export async function POST(request: NextRequest) {
     const document = await generateDocument(documentType, data);
 
     const response: ApiResponse<{
-      document: any;
+      document: GeneratedDocument;
       generatedAt: string;
       documentType: string;
     }> = toApiResponse({
@@ -106,7 +112,7 @@ export async function POST(request: NextRequest) {
 }
 
 // OPTIONS 메서드 지원 (CORS)
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS() {
   return new NextResponse(null, {
     status: ApiStatusCode.NO_CONTENT,
     headers: {

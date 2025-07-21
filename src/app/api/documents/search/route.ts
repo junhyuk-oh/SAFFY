@@ -6,6 +6,8 @@ import {
   PaginatedResponse,
   BaseDocument,
   DocumentSearchParams,
+  UnifiedDocumentType,
+  Status,
   toApiResponse,
   toApiError,
   AppError,
@@ -33,8 +35,8 @@ export async function GET(request: NextRequest) {
 
     // 검색 필터 파라미터 파싱
     const filters: Partial<DocumentSearchParams> = {
-      type: searchParams.getAll('type') as any[],
-      status: searchParams.getAll('status') as any[],
+      type: searchParams.getAll('type') as UnifiedDocumentType[],
+      status: searchParams.getAll('status') as Status[],
       department: searchParams.getAll('department'),
       author: searchParams.get('author') || undefined,
       dateRange: searchParams.get('startDate') && searchParams.get('endDate') 
@@ -49,8 +51,8 @@ export async function GET(request: NextRequest) {
         : undefined,
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '20'),
-      sortBy: searchParams.get('sortBy') as any || 'createdAt',
-      sortOrder: searchParams.get('sortOrder') as any || 'desc'
+      sortBy: (searchParams.get('sortBy') || 'createdAt') as 'createdAt' | 'updatedAt' | 'title' | 'status',
+      sortOrder: (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc'
     };
 
     // DocumentService를 통해 검색 수행
@@ -73,7 +75,7 @@ export async function GET(request: NextRequest) {
       filters: {
         query,
         type: Array.isArray(filters.type) ? filters.type.join(',') : filters.type,
-        status: Array.isArray(filters.status) ? filters.status.join(',') : filters.status as any,
+        status: Array.isArray(filters.status) ? filters.status.join(',') : filters.status,
         department: Array.isArray(filters.department) ? filters.department.join(',') : filters.department,
         author: filters.author,
         startDate: filters.dateRange?.start,

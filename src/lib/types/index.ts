@@ -74,16 +74,16 @@ export type * from './education';
 export type * from './schedule';
 
 // 타입 가드 유틸리티
-export const isError = (value: any): value is Error => {
+export const isError = (value: unknown): value is Error => {
   return value instanceof Error;
 };
 
-export const isApiError = (value: any): value is import('./api').ApiError => {
-  return value && typeof value === 'object' && 'code' in value && 'message' in value;
+export const isApiError = (value: unknown): value is import('./api').ApiError => {
+  return value !== null && typeof value === 'object' && 'code' in value && 'message' in value;
 };
 
-export const isBaseDocument = (value: any): value is import('./document').BaseDocument => {
-  return value && typeof value === 'object' && 'id' in value && 'type' in value && 'metadata' in value;
+export const isBaseDocument = (value: unknown): value is import('./document').BaseDocument => {
+  return value !== null && typeof value === 'object' && 'id' in value && 'type' in value && 'metadata' in value;
 };
 
 // 타입 변환 유틸리티

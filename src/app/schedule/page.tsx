@@ -10,7 +10,7 @@ import {
 } from '@/components/schedule'
 import type { ScheduleEvent } from '@/components/schedule/ScheduleEventModal'
 import { Card } from '@/components/ui/card'
-import { Calendar, List, Clock, MapPin, Users, CheckCircle, XCircle } from 'lucide-react'
+import { Calendar, Clock, MapPin, Users, CheckCircle, XCircle } from 'lucide-react'
 import { type Schedule, ScheduleStatus, SchedulePriority } from '@/lib/types/schedule'
 
 // 샘플 데이터
@@ -323,10 +323,10 @@ export default function SchedulePage() {
             {viewType === 'calendar' ? (
               <ScheduleCalendar 
                 schedules={schedules}
-                onDateClick={(date: Date) => {
+                onDateClick={() => {
                   setIsModalOpen(true)
                 }}
-                onEventClick={(schedule: any) => {
+                onEventClick={(schedule: Schedule) => {
                   setSelectedSchedule(schedule)
                   setIsEditModalOpen(true)
                 }}
@@ -361,7 +361,7 @@ export default function SchedulePage() {
       <QuickAddModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={(data: any) => {
+        onSave={(data: Partial<Schedule>) => {
           handleAddSchedule({
             ...data,
             status: ScheduleStatus.SCHEDULED
@@ -386,7 +386,7 @@ export default function SchedulePage() {
           description: selectedSchedule.description || '',
           recurrence: selectedSchedule.isRecurring ? 'daily' : 'none'
         } as ScheduleEvent : null}
-        onSave={(event: any) => {
+        onSave={(event: Partial<ScheduleEvent>) => {
           if (selectedSchedule) {
             handleEditSchedule({
               ...selectedSchedule,

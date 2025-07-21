@@ -250,8 +250,14 @@ export interface EducationStatistics {
   overdue_requirements?: number
   completion_rate?: number
   total_hours?: number
-  recent_education?: any[]
-  upcoming_due_dates?: any[]
+  recent_education?: EducationRecord[]
+  upcoming_due_dates?: Array<{
+    id: string;
+    user_id: string;
+    training_name: string;
+    due_date: string;
+    category_id: string;
+  }>
 }
 
 export interface CategoryStatistics {

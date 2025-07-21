@@ -118,7 +118,7 @@ export interface Schedule {
   
   // 태그 및 메타데이터
   tags: string[];
-  customFields?: Record<string, any>;
+  customFields?: Record<string, unknown>;
   
   // 추적 정보
   createdBy: string;
@@ -391,8 +391,8 @@ export interface ScheduleHistory {
   action: 'created' | 'updated' | 'status_changed' | 'rescheduled' | 'cancelled' | 'completed';
   changes: {
     field: string;
-    oldValue: any;
-    newValue: any;
+    oldValue: unknown;
+    newValue: unknown;
   }[];
   performedBy: string;
   performedAt: string;
@@ -431,7 +431,7 @@ export interface ScheduleTemplate {
     priority: SchedulePriority;
     duration: number;       // 분 단위
     notifications: Omit<ScheduleNotification, 'id' | 'scheduleId' | 'createdAt'>[];
-    customFields?: Record<string, any>;
+    customFields?: Record<string, unknown>;
   };
   
   // 사용 조건

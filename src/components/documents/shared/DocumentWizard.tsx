@@ -11,7 +11,7 @@ interface WizardStep {
 }
 
 interface DocumentWizardProps {
-  onComplete: (data: any) => void
+  onComplete: () => void
 }
 
 const wizardSteps: WizardStep[] = [
@@ -78,7 +78,7 @@ export function DocumentWizard({ onComplete }: DocumentWizardProps) {
   }
 
   const handleComplete = () => {
-    onComplete(formData)
+    onComplete()
     router.push("/documents")
   }
 

@@ -130,7 +130,7 @@ export interface CreateDocumentRequest {
   title: string;
   department: string;
   templateId?: string;
-  data: any; // 문서 타입별 특정 데이터
+  data: Record<string, unknown>; // 문서 타입별 특정 데이터
   isDraft?: boolean;
   aiOptions?: AiGenerationOptions;
 }
@@ -153,7 +153,7 @@ export interface AiGenerationOptions {
 export interface UpdateDocumentRequest {
   id: string;
   updates: Partial<BaseDocument> & {
-    data?: any; // 문서 타입별 특정 데이터
+    data?: Record<string, unknown>; // 문서 타입별 특정 데이터
   };
   reason?: string; // 수정 사유
 }
@@ -170,11 +170,17 @@ export interface DocumentTemplate {
       title: string;
       type: 'text' | 'table' | 'checklist' | 'form' | 'custom';
       required: boolean;
-      defaultValue?: any;
-      validation?: any;
+      defaultValue?: unknown;
+      validation?: {
+        required?: boolean;
+        pattern?: string;
+        min?: number;
+        max?: number;
+        custom?: (value: unknown) => boolean | string;
+      };
     }>;
   };
-  sampleData?: any;
+  sampleData?: Record<string, unknown>;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -187,8 +193,8 @@ export interface DocumentVersion {
   version: number;
   changes: {
     field: string;
-    oldValue: any;
-    newValue: any;
+    oldValue: unknown;
+    newValue: unknown;
   }[];
   changedBy: string;
   changedAt: string;
@@ -241,7 +247,11 @@ export interface DocumentWorkflow {
     name: string;
     type: 'review' | 'approval' | 'notification';
     assignees: string[]; // 사용자 또는 역할 ID
-    conditions?: any; // 조건부 로직
+    conditions?: {
+      field: string;
+      operator: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than';
+      value: unknown;
+    }[]; // 조건부 로직
     deadline?: number; // 일 단위
   }>;
   isActive: boolean;

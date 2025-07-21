@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { WeeklyCheckList, ChemicalUsageReport } from '@/lib/types/documents';
 
+// 유니온 타입 정의
+type WeeklyDocument = WeeklyCheckList | ChemicalUsageReport;
+type WeeklyDocumentType = 'weekly-checklist' | 'chemical-usage-report';
+
 // 임시 메모리 저장소 (실제로는 데이터베이스 사용)
 const weeklyCheckLists: WeeklyCheckList[] = [];
 const chemicalUsageReports: ChemicalUsageReport[] = [];
@@ -14,7 +18,7 @@ export async function GET(request: Request) {
     const weekEnd = searchParams.get('weekEnd');
     const department = searchParams.get('department');
 
-    let results: any[] = [];
+    let results: WeeklyDocument[] = [];
 
     if (type === 'weekly-checklist' || !type) {
       let filteredCheckLists = [...weeklyCheckLists];
@@ -84,10 +88,15 @@ export async function GET(request: Request) {
   }
 }
 
+interface PostRequestBody {
+  type: WeeklyDocumentType;
+  data: Partial<WeeklyDocument>;
+}
+
 // POST: 새 주별 문서 생성
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = await request.json() as PostRequestBody;
     const { type, data } = body;
 
     if (!type || !data) {
@@ -97,7 +106,7 @@ export async function POST(request: Request) {
       );
     }
 
-    let newDocument: any;
+    let newDocument: WeeklyDocument;
 
     if (type === 'weekly-checklist') {
       newDocument = {
@@ -137,10 +146,16 @@ export async function POST(request: Request) {
   }
 }
 
+interface PutRequestBody {
+  type: WeeklyDocumentType;
+  id: string;
+  data: Partial<WeeklyDocument>;
+}
+
 // PUT: 주별 문서 수정
 export async function PUT(request: Request) {
   try {
-    const body = await request.json();
+    const body = await request.json() as PutRequestBody;
     const { type, id, data } = body;
 
     if (!type || !id || !data) {
@@ -150,7 +165,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    let updatedDocument: any;
+    let updatedDocument: WeeklyDocument;
 
     if (type === 'weekly-checklist') {
       const index = weeklyCheckLists.findIndex(doc => doc.id === id);
