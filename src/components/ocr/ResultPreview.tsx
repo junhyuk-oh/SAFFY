@@ -100,3 +100,5 @@ export default function ResultPreview({
     </div>
   )
 }
+
+export default ResultPreview

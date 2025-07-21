@@ -59,7 +59,10 @@ export async function GET(request: NextRequest) {
         creator: isCheckList ? (doc as DailyCheckList).inspectorName : (doc as ExperimentLog).researcher,
         status: doc.signature ? 'completed' : 'draft',
         createdAt: doc.createdAt,
-        updatedAt: doc.updatedAt
+        updatedAt: doc.updatedAt,
+        author: isCheckList ? (doc as DailyCheckList).inspectorName : (doc as ExperimentLog).researcher,
+        department: doc.department || '안전관리팀',
+        version: '1.0.0'
       };
     });
 

@@ -4,11 +4,11 @@
  */
 
 // 공통 타입
-export * from './common';
-export { DocumentMetadata } from './common';
+export type * from './common';
+export type { DocumentMetadata } from './common';
 
 // 문서 관련 타입 (중복 export 제외)
-export {
+export type {
   UnifiedDocumentType,
   BaseDocument,
   DocumentSearchParams,
@@ -20,33 +20,19 @@ export {
   DocumentStatistics,
   DocumentExportRequest,
   DocumentWorkflow,
-  DocumentNotificationSettings,
-  DOCUMENT_CATEGORIES,
-  DOCUMENT_TYPE_CATEGORY_MAP
+  DocumentNotificationSettings
 } from './document';
 
+export { DOCUMENT_CATEGORIES, DOCUMENT_TYPE_CATEGORY_MAP } from './document';
+
 // API 관련 타입 (중복 export 제외)
-export * from './api';
+export type * from './api';
 
 // 에러 관련 타입
-export * from './error';
+export type * from './error';
 
 // 기존 타입 파일들 (점진적 마이그레이션을 위해 유지)
-export {
-  DocumentFormData,
-  DailyCheckListData,
-  DailyCheckListData as DailyCheckList,
-  WeeklyCheckListData,
-  WeeklyCheckListData as WeeklyCheckList,
-  MonthlyRiskAssessmentData,
-  QuarterlySafetyReportData,
-  AnnualSafetyPlanData,
-  AnnualSafetyPlanData as AnnualSafetyPlan,
-  DocumentListItem,
-  ChemicalUsageData,
-  ExperimentLogData,
-  ExperimentLogData as ExperimentLog,
-  SafetyInspectionData,
+export type {
   DocumentType,
   DailyCheckItem,
   ChemicalUsage,
@@ -55,9 +41,10 @@ export {
   ChemicalInventory,
   ChemicalUsageTrend
 } from './documents';
-export * from './ai-documents';
-export * from './education';
-export * from './schedule';
+
+export type * from './ai-documents';
+export type * from './education';
+export type * from './schedule';
 
 // 타입 가드 유틸리티
 export const isError = (value: any): value is Error => {
@@ -105,6 +92,6 @@ export const toApiError = (
   };
 };
 
-// 상수 re-export (이미 위에서 export됨)
+// 상수 re-export
 export { ApiStatusCode, ApiErrorCode, RealtimeEventType } from './api';
 export { ErrorSeverity, ErrorCategory, ERROR_MESSAGES, HTTP_STATUS_TO_ERROR_CODE } from './error';

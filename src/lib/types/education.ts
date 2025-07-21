@@ -108,9 +108,13 @@ export interface TrainingNotification {
 export interface DailyEducationLog {
   id: string
   userId: string
-  date: string
-  trainingId: string
-  duration: number
+  education_date: string
+  education_type: string
+  topic: string
+  duration_minutes: number
+  instructor_id: string
+  location: string
+  attendance_status: 'present' | 'absent' | 'partial'
   notes?: string
   createdAt: string
   updatedAt: string
@@ -118,9 +122,17 @@ export interface DailyEducationLog {
 
 export interface CreateDailyEducationLogDTO {
   userId: string
-  date: string
-  trainingId: string
-  duration: number
+  education_date: string
+  education_type: string
+  topic: string
+  duration_minutes: number
+  instructor_id: string
+  location: string
+  attendance_records: Array<{
+    userId: string
+    present: boolean
+    notes?: string
+  }>
   notes?: string
 }
 
@@ -134,6 +146,8 @@ export interface PaginationParams {
   page?: number
   limit?: number
   offset?: number
+  sort_by?: string
+  sort_order?: 'asc' | 'desc'
 }
 
 export interface EducationRecord {

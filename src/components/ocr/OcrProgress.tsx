@@ -157,3 +157,5 @@ export function OcrProgress({ progress, currentStep, startTime }: OcrProgressPro
     </div>
   )
 }
+
+export default OcrProgress

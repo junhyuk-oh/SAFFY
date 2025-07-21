@@ -228,3 +228,5 @@ export default function SaveOptions({ extractedData, onSave, onCancel }: SaveOpt
     </div>
   );
 }
+
+export default SaveOptions
