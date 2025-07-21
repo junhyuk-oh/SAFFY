@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { WeeklyCheckList, ChemicalUsageReport } from '@/lib/types/documents';
+import { documentService } from '@/lib/services/documentService';
+import { DocumentSearchParams } from '@/lib/types';
 
 // 유니온 타입 정의
 type WeeklyDocument = WeeklyCheckList | ChemicalUsageReport;
 type WeeklyDocumentType = 'weekly-checklist' | 'chemical-usage-report';
-
-// 임시 메모리 저장소 (실제로는 데이터베이스 사용)
-const weeklyCheckLists: WeeklyCheckList[] = [];
-const chemicalUsageReports: ChemicalUsageReport[] = [];
 
 // GET: 주별 문서 조회
 export async function GET(request: Request) {
@@ -18,66 +16,57 @@ export async function GET(request: Request) {
     const weekEnd = searchParams.get('weekEnd');
     const department = searchParams.get('department');
 
-    let results: WeeklyDocument[] = [];
+    // DocumentSearchParams 구성
+    const searchParamsObj: DocumentSearchParams = {
+      page: 1,
+      limit: 100, // 충분히 큰 값으로 설정
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    };
 
-    if (type === 'weekly-checklist' || !type) {
-      let filteredCheckLists = [...weeklyCheckLists];
-      
-      if (weekStart) {
-        filteredCheckLists = filteredCheckLists.filter(
-          doc => new Date(doc.weekStartDate) >= new Date(weekStart)
-        );
-      }
-      
-      if (weekEnd) {
-        filteredCheckLists = filteredCheckLists.filter(
-          doc => new Date(doc.weekEndDate) <= new Date(weekEnd)
-        );
-      }
-      
-      if (department) {
-        filteredCheckLists = filteredCheckLists.filter(
-          doc => doc.department.toLowerCase().includes(department.toLowerCase())
-        );
-      }
-      
-      results = [...results, ...filteredCheckLists];
+    // 타입 필터링 설정 ('weekly_checklist', 'chemical_usage_report')
+    if (type === 'weekly-checklist') {
+      searchParamsObj.type = ['weekly_checklist'];
+    } else if (type === 'chemical-usage-report') {
+      searchParamsObj.type = ['chemical_usage_report'];
+    } else {
+      // type이 없으면 둘 다 조회
+      searchParamsObj.type = ['weekly_checklist', 'chemical_usage_report'];
     }
 
-    if (type === 'chemical-usage-report' || !type) {
-      let filteredReports = [...chemicalUsageReports];
-      
-      if (weekStart) {
-        filteredReports = filteredReports.filter(
-          doc => new Date(doc.weekStartDate) >= new Date(weekStart)
-        );
-      }
-      
-      if (weekEnd) {
-        filteredReports = filteredReports.filter(
-          doc => new Date(doc.weekEndDate) <= new Date(weekEnd)
-        );
-      }
-      
-      if (department) {
-        filteredReports = filteredReports.filter(
-          doc => doc.department.toLowerCase().includes(department.toLowerCase())
-        );
-      }
-      
-      results = [...results, ...filteredReports];
+    // 부서 필터링
+    if (department) {
+      searchParamsObj.department = department;
     }
 
-    // 날짜 기준 내림차순 정렬
-    results.sort((a, b) => 
-      new Date(b.weekStartDate || b.createdAt).getTime() - 
-      new Date(a.weekStartDate || a.createdAt).getTime()
-    );
+    // 날짜 범위 필터링
+    if (weekStart && weekEnd) {
+      searchParamsObj.dateRange = {
+        start: weekStart,
+        end: weekEnd
+      };
+    } else if (weekStart) {
+      searchParamsObj.dateRange = {
+        start: weekStart,
+        end: new Date().toISOString()
+      };
+    } else if (weekEnd) {
+      // 시작 날짜를 충분히 과거로 설정
+      searchParamsObj.dateRange = {
+        start: '2020-01-01T00:00:00.000Z',
+        end: weekEnd
+      };
+    }
+
+    // documentService를 통해 데이터 조회
+    const result = await documentService.getDocuments(searchParamsObj);
 
     return NextResponse.json({
       success: true,
-      data: results,
-      count: results.length
+      data: result.documents,
+      count: result.totalCount,
+      totalPages: result.totalPages,
+      currentPage: result.currentPage
     });
   } catch (error) {
     console.error('Error fetching weekly documents:', error);
@@ -106,32 +95,33 @@ export async function POST(request: Request) {
       );
     }
 
-    let newDocument: WeeklyDocument;
-
+    // 타입을 언더스코어 형태로 변환
+    let documentType: 'weekly_checklist' | 'chemical_usage_report';
     if (type === 'weekly-checklist') {
-      newDocument = {
-        ...data,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } as WeeklyCheckList;
-      
-      weeklyCheckLists.push(newDocument);
+      documentType = 'weekly_checklist';
     } else if (type === 'chemical-usage-report') {
-      newDocument = {
-        ...data,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      } as ChemicalUsageReport;
-      
-      chemicalUsageReports.push(newDocument);
+      documentType = 'chemical_usage_report';
     } else {
       return NextResponse.json(
         { success: false, error: 'Invalid document type' },
         { status: 400 }
       );
     }
+
+    // CreateDocumentRequest 구성
+    const createRequest = {
+      type: documentType,
+      title: data.title || `${type} - ${new Date().toLocaleDateString()}`,
+      department: data.department || '안전관리팀',
+      data: data,
+      isDraft: false
+    };
+
+    // 임시 사용자 ID (실제로는 인증에서 가져와야 함)
+    const userId = 'temp-user-id';
+
+    // documentService를 통해 문서 생성
+    const newDocument = await documentService.createDocument(createRequest, userId);
 
     return NextResponse.json({
       success: true,
@@ -165,48 +155,22 @@ export async function PUT(request: Request) {
       );
     }
 
-    let updatedDocument: WeeklyDocument;
+    // UpdateDocumentRequest 구성
+    const updateRequest = {
+      id,
+      updates: {
+        title: data.title,
+        status: data.status,
+        ...data
+      },
+      reason: 'Weekly document update'
+    };
 
-    if (type === 'weekly-checklist') {
-      const index = weeklyCheckLists.findIndex(doc => doc.id === id);
-      if (index === -1) {
-        return NextResponse.json(
-          { success: false, error: 'Document not found' },
-          { status: 404 }
-        );
-      }
-      
-      updatedDocument = {
-        ...weeklyCheckLists[index],
-        ...data,
-        id,
-        updatedAt: new Date().toISOString()
-      };
-      
-      weeklyCheckLists[index] = updatedDocument;
-    } else if (type === 'chemical-usage-report') {
-      const index = chemicalUsageReports.findIndex(doc => doc.id === id);
-      if (index === -1) {
-        return NextResponse.json(
-          { success: false, error: 'Document not found' },
-          { status: 404 }
-        );
-      }
-      
-      updatedDocument = {
-        ...chemicalUsageReports[index],
-        ...data,
-        id,
-        updatedAt: new Date().toISOString()
-      };
-      
-      chemicalUsageReports[index] = updatedDocument;
-    } else {
-      return NextResponse.json(
-        { success: false, error: 'Invalid document type' },
-        { status: 400 }
-      );
-    }
+    // 임시 사용자 ID (실제로는 인증에서 가져와야 함)
+    const userId = 'temp-user-id';
+
+    // documentService를 통해 문서 수정
+    const updatedDocument = await documentService.updateDocument(updateRequest, userId);
 
     return NextResponse.json({
       success: true,
@@ -214,6 +178,15 @@ export async function PUT(request: Request) {
     });
   } catch (error) {
     console.error('Error updating weekly document:', error);
+    
+    // 404 오류인 경우 별도 처리
+    if (error instanceof Error && error.message.includes('문서를 찾을 수 없습니다')) {
+      return NextResponse.json(
+        { success: false, error: 'Document not found' },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json(
       { success: false, error: 'Failed to update document' },
       { status: 500 }
