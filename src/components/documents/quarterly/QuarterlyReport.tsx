@@ -28,7 +28,7 @@ import {
   BookOpen,
   Shield
 } from 'lucide-react'
-import type { QuarterlyReport as QuarterlyReportType, QuarterlySafetyMetrics, QuarterlyImprovement } from '@/lib/types/documents'
+import type { QuarterlyReport as QuarterlyReportType, QuarterlySafetyMetrics, QuarterlyImprovement } from '@/lib/types'
 
 export function QuarterlyReport() {
   const currentYear = new Date().getFullYear()

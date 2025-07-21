@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import type { AnnualSafetyPlan } from '@/lib/types/documents'
+import type { AnnualSafetyPlan } from '@/lib/types'
 
 // 임시 데이터 저장소 (실제로는 데이터베이스 사용)
 let annualPlans: AnnualSafetyPlan[] = []

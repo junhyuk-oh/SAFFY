@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { ExperimentLog, ChemicalUsage } from '@/lib/types/documents';
+import type { ExperimentLog, ChemicalUsage } from '@/lib/types';
 import { 
   Calendar, 
   User, 

@@ -3,6 +3,13 @@ export interface EducationCategory {
   name: string
   description: string
   isLegalRequirement: boolean
+  code?: string
+  is_mandatory?: boolean
+  required_hours?: number
+  validity_months?: number
+  parent_id?: string | null
+  display_order?: number
+  is_active?: boolean
 }
 
 export interface Training {
@@ -95,4 +102,108 @@ export interface TrainingNotification {
   sentDate: Date
   isRead: boolean
   priority: "low" | "medium" | "high"
+}
+
+// API 관련 타입들
+export interface DailyEducationLog {
+  id: string
+  userId: string
+  date: string
+  trainingId: string
+  duration: number
+  notes?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateDailyEducationLogDTO {
+  userId: string
+  date: string
+  trainingId: string
+  duration: number
+  notes?: string
+}
+
+export enum EducationType {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  BLENDED = 'blended'
+}
+
+export interface PaginationParams {
+  page?: number
+  limit?: number
+  offset?: number
+}
+
+export interface EducationRecord {
+  id: string
+  userId: string
+  trainingId: string
+  status: string
+  enrolledDate: string
+  completionDate?: string
+  score?: number
+  certificateUrl?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateEducationRecordDTO {
+  userId: string
+  trainingId: string
+  status: string
+  enrolledDate: string
+  completionDate?: string
+  score?: number
+}
+
+export interface EducationFilterOptions {
+  userId?: string
+  status?: string
+  startDate?: string
+  endDate?: string
+  trainingId?: string
+}
+
+export enum VerificationStatus {
+  PENDING = 'pending',
+  VERIFIED = 'verified',
+  REJECTED = 'rejected'
+}
+
+export interface UserEducationRequirement {
+  id: string
+  userId: string
+  trainingId: string
+  requiredByDate: string
+  status: string
+  assignedBy: string
+  assignedDate: string
+  completedDate?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateEducationRequirementDTO {
+  userId: string
+  trainingId: string
+  requiredByDate: string
+  assignedBy: string
+  reason?: string
+}
+
+export interface EducationStatistics {
+  totalTrainings: number
+  completedTrainings: number
+  inProgressTrainings: number
+  overdueTrainings: number
+  completionRate: number
+  totalHours: number
+  averageScore?: number
+  upcomingDeadlines: Array<{
+    trainingId: string
+    trainingName: string
+    dueDate: string
+  }>
 }

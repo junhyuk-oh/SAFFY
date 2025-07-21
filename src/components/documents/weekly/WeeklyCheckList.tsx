@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useMemo } from 'react';
-import { WeeklyCheckList, WeeklyCheckSummary } from '@/lib/types/documents';
+import type { WeeklyCheckList, WeeklyCheckSummary } from '@/lib/types';
 import { Calendar, User, Building, AlertCircle, CheckCircle, XCircle, TrendingUp, FileText } from 'lucide-react';
 
 interface WeeklyCheckListProps {

@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { DailyCheckList, ExperimentLog, DocumentMetadata } from '@/lib/types/documents';
+import { 
+  DailyCheckList, 
+  ExperimentLog, 
+  DocumentMetadata,
+  ApiResponse,
+  ApiStatusCode,
+  ApiErrorCode,
+  AppError,
+  ValidationError,
+  ResourceError,
+  toApiResponse,
+  toApiError
+} from '@/lib/types';
 
 // 임시 메모리 저장소 (실제 환경에서는 데이터베이스 사용)
 let checkLists: DailyCheckList[] = [];
@@ -51,17 +63,26 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({
-      success: true,
-      data: metadata,
+    const response: ApiResponse<{ documents: DocumentMetadata[]; count: number }> = toApiResponse({
+      documents: metadata,
       count: metadata.length
     });
+    
+    return NextResponse.json(response, { status: ApiStatusCode.OK });
   } catch (error) {
     console.error('Error fetching daily documents:', error);
-    return NextResponse.json(
-      { success: false, error: '문서를 불러오는 중 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+    
+    const appError = error instanceof AppError ? error : new AppError({
+      message: '문서를 불러오는 중 오류가 발생했습니다.',
+      code: ApiErrorCode.INTERNAL_ERROR
+    });
+    
+    const response: ApiResponse = {
+      success: false,
+      error: toApiError(appError)
+    };
+    
+    return NextResponse.json(response, { status: ApiStatusCode.INTERNAL_SERVER_ERROR });
   }
 }
 
@@ -71,10 +92,17 @@ export async function POST(request: NextRequest) {
     const { type, data } = body;
 
     if (!type || !data) {
-      return NextResponse.json(
-        { success: false, error: '필수 데이터가 누락되었습니다.' },
-        { status: 400 }
-      );
+      const error = new ValidationError('필수 데이터가 누락되었습니다.', [
+        { field: 'type', message: '문서 타입은 필수입니다.' },
+        { field: 'data', message: '문서 데이터는 필수입니다.' }
+      ]);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: toApiError(error)
+      };
+      
+      return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
     let savedDocument;
@@ -98,23 +126,36 @@ export async function POST(request: NextRequest) {
       experimentLogs.push(experimentLog);
       savedDocument = experimentLog;
     } else {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 문서 타입입니다.' },
-        { status: 400 }
-      );
+      const error = new ValidationError('유효하지 않은 문서 타입입니다.', [
+        { field: 'type', message: `문서 타입은 'checklist' 또는 'experiment-log'여야 합니다.`, value: type }
+      ]);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: toApiError(error)
+      };
+      
+      return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
-    return NextResponse.json({
-      success: true,
-      data: savedDocument,
-      message: '문서가 성공적으로 저장되었습니다.'
-    }, { status: 201 });
+    const response: ApiResponse = toApiResponse(savedDocument);
+    response.message = '문서가 성공적으로 저장되었습니다.';
+    
+    return NextResponse.json(response, { status: ApiStatusCode.CREATED });
   } catch (error) {
     console.error('Error saving daily document:', error);
-    return NextResponse.json(
-      { success: false, error: '문서 저장 중 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+    
+    const appError = error instanceof AppError ? error : new AppError({
+      message: '문서 저장 중 오류가 발생했습니다.',
+      code: ApiErrorCode.INTERNAL_ERROR
+    });
+    
+    const response: ApiResponse = {
+      success: false,
+      error: toApiError(appError)
+    };
+    
+    return NextResponse.json(response, { status: ApiStatusCode.INTERNAL_SERVER_ERROR });
   }
 }
 
@@ -124,10 +165,18 @@ export async function PUT(request: NextRequest) {
     const { id, type, data } = body;
 
     if (!id || !type || !data) {
-      return NextResponse.json(
-        { success: false, error: '필수 데이터가 누락되었습니다.' },
-        { status: 400 }
-      );
+      const error = new ValidationError('필수 데이터가 누락되었습니다.', [
+        { field: 'id', message: '문서 ID는 필수입니다.' },
+        { field: 'type', message: '문서 타입은 필수입니다.' },
+        { field: 'data', message: '문서 데이터는 필수입니다.' }
+      ]);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: toApiError(error)
+      };
+      
+      return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
     let updatedDocument;
@@ -135,10 +184,19 @@ export async function PUT(request: NextRequest) {
     if (type === 'checklist') {
       const index = checkLists.findIndex(doc => doc.id === id);
       if (index === -1) {
-        return NextResponse.json(
-          { success: false, error: '문서를 찾을 수 없습니다.' },
-          { status: 404 }
-        );
+        const error = new ResourceError({
+          message: '문서를 찾을 수 없습니다.',
+          code: ApiErrorCode.RESOURCE_NOT_FOUND,
+          resourceType: 'checklist',
+          resourceId: id
+        });
+        
+        const response: ApiResponse = {
+          success: false,
+          error: toApiError(error)
+        };
+        
+        return NextResponse.json(response, { status: ApiStatusCode.NOT_FOUND });
       }
       checkLists[index] = {
         ...checkLists[index],
@@ -149,10 +207,19 @@ export async function PUT(request: NextRequest) {
     } else if (type === 'experiment-log') {
       const index = experimentLogs.findIndex(doc => doc.id === id);
       if (index === -1) {
-        return NextResponse.json(
-          { success: false, error: '문서를 찾을 수 없습니다.' },
-          { status: 404 }
-        );
+        const error = new ResourceError({
+          message: '문서를 찾을 수 없습니다.',
+          code: ApiErrorCode.RESOURCE_NOT_FOUND,
+          resourceType: 'experiment-log',
+          resourceId: id
+        });
+        
+        const response: ApiResponse = {
+          success: false,
+          error: toApiError(error)
+        };
+        
+        return NextResponse.json(response, { status: ApiStatusCode.NOT_FOUND });
       }
       experimentLogs[index] = {
         ...experimentLogs[index],
@@ -161,23 +228,36 @@ export async function PUT(request: NextRequest) {
       };
       updatedDocument = experimentLogs[index];
     } else {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 문서 타입입니다.' },
-        { status: 400 }
-      );
+      const error = new ValidationError('유효하지 않은 문서 타입입니다.', [
+        { field: 'type', message: `문서 타입은 'checklist' 또는 'experiment-log'여야 합니다.`, value: type }
+      ]);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: toApiError(error)
+      };
+      
+      return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
-    return NextResponse.json({
-      success: true,
-      data: updatedDocument,
-      message: '문서가 성공적으로 업데이트되었습니다.'
-    });
+    const response: ApiResponse = toApiResponse(updatedDocument);
+    response.message = '문서가 성공적으로 업데이트되었습니다.';
+    
+    return NextResponse.json(response, { status: ApiStatusCode.OK });
   } catch (error) {
     console.error('Error updating daily document:', error);
-    return NextResponse.json(
-      { success: false, error: '문서 업데이트 중 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+    
+    const appError = error instanceof AppError ? error : new AppError({
+      message: '문서 업데이트 중 오류가 발생했습니다.',
+      code: ApiErrorCode.INTERNAL_ERROR
+    });
+    
+    const response: ApiResponse = {
+      success: false,
+      error: toApiError(appError)
+    };
+    
+    return NextResponse.json(response, { status: ApiStatusCode.INTERNAL_SERVER_ERROR });
   }
 }
 
@@ -188,46 +268,85 @@ export async function DELETE(request: NextRequest) {
     const type = searchParams.get('type');
 
     if (!id || !type) {
-      return NextResponse.json(
-        { success: false, error: '필수 파라미터가 누락되었습니다.' },
-        { status: 400 }
-      );
+      const error = new ValidationError('필수 파라미터가 누락되었습니다.', [
+        { field: 'id', message: '문서 ID는 필수입니다.' },
+        { field: 'type', message: '문서 타입은 필수입니다.' }
+      ]);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: toApiError(error)
+      };
+      
+      return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
     if (type === 'checklist') {
       const index = checkLists.findIndex(doc => doc.id === id);
       if (index === -1) {
-        return NextResponse.json(
-          { success: false, error: '문서를 찾을 수 없습니다.' },
-          { status: 404 }
-        );
+        const error = new ResourceError({
+          message: '문서를 찾을 수 없습니다.',
+          code: ApiErrorCode.RESOURCE_NOT_FOUND,
+          resourceType: 'checklist',
+          resourceId: id
+        });
+        
+        const response: ApiResponse = {
+          success: false,
+          error: toApiError(error)
+        };
+        
+        return NextResponse.json(response, { status: ApiStatusCode.NOT_FOUND });
       }
       checkLists.splice(index, 1);
     } else if (type === 'experiment-log') {
       const index = experimentLogs.findIndex(doc => doc.id === id);
       if (index === -1) {
-        return NextResponse.json(
-          { success: false, error: '문서를 찾을 수 없습니다.' },
-          { status: 404 }
-        );
+        const error = new ResourceError({
+          message: '문서를 찾을 수 없습니다.',
+          code: ApiErrorCode.RESOURCE_NOT_FOUND,
+          resourceType: 'experiment-log',
+          resourceId: id
+        });
+        
+        const response: ApiResponse = {
+          success: false,
+          error: toApiError(error)
+        };
+        
+        return NextResponse.json(response, { status: ApiStatusCode.NOT_FOUND });
       }
       experimentLogs.splice(index, 1);
     } else {
-      return NextResponse.json(
-        { success: false, error: '유효하지 않은 문서 타입입니다.' },
-        { status: 400 }
-      );
+      const error = new ValidationError('유효하지 않은 문서 타입입니다.', [
+        { field: 'type', message: `문서 타입은 'checklist' 또는 'experiment-log'여야 합니다.`, value: type }
+      ]);
+      
+      const response: ApiResponse = {
+        success: false,
+        error: toApiError(error)
+      };
+      
+      return NextResponse.json(response, { status: ApiStatusCode.BAD_REQUEST });
     }
 
-    return NextResponse.json({
-      success: true,
-      message: '문서가 성공적으로 삭제되었습니다.'
-    });
+    const response: ApiResponse = toApiResponse({ deleted: true });
+    response.message = '문서가 성공적으로 삭제되었습니다.';
+    
+    return NextResponse.json(response, { status: ApiStatusCode.OK });
   } catch (error) {
     console.error('Error deleting daily document:', error);
-    return NextResponse.json(
-      { success: false, error: '문서 삭제 중 오류가 발생했습니다.' },
-      { status: 500 }
-    );
+    
+    const appError = error instanceof AppError ? error : new AppError({
+      message: '문서 삭제 중 오류가 발생했습니다.',
+      code: ApiErrorCode.INTERNAL_ERROR
+    });
+    
+    const response: ApiResponse = {
+      success: false,
+      error: toApiError(appError)
+    };
+    
+    return NextResponse.json(response, { status: ApiStatusCode.INTERNAL_SERVER_ERROR });
   }
 }

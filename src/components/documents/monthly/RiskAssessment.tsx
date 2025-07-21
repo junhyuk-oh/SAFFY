@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AlertTriangle, ChevronDown, ChevronUp, FileText, Plus, Shield, Trash2, Upload } from 'lucide-react'
-import type { RiskAssessment, RiskAssessmentItem, RiskMatrix } from '@/lib/types/documents'
+import type { RiskAssessment, RiskAssessmentItem, RiskMatrix } from '@/lib/types'
 
 interface RiskAssessmentProps {
   onSave?: (data: Partial<RiskAssessment>) => void

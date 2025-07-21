@@ -112,3 +112,19 @@ export function useToast() {
     removeToast
   }
 }
+
+// 간단한 toast 함수 (주로 서버 컴포넌트에서 사용)
+export const toast = {
+  success: (title: string, message?: string) => {
+    console.log('[Toast Success]', title, message)
+  },
+  error: (title: string, message?: string) => {
+    console.error('[Toast Error]', title, message)
+  },
+  warning: (title: string, message?: string) => {
+    console.warn('[Toast Warning]', title, message)
+  },
+  info: (title: string, message?: string) => {
+    console.info('[Toast Info]', title, message)
+  }
+}

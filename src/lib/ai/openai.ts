@@ -70,5 +70,5 @@ function generateMockSections(templateType: string): any[] {
     ]
   };
   
-  return sectionsByType[templateType] || [];
+  return sectionsByType[templateType as keyof typeof sectionsByType] || [];
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { DocumentType } from "@/lib/types/ai-documents"
+import { DocumentType } from "@/lib/types"
 
 interface DocumentCardProps {
   icon: string

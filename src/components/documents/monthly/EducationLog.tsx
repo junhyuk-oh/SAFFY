@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BookOpen, Clock, MapPin, Plus, Save, Star, Trash2, Upload, Users } from 'lucide-react'
-import type { EducationLog, EducationParticipant } from '@/lib/types/documents'
+import type { EducationLog, EducationParticipant } from '@/lib/types'
 
 interface EducationLogProps {
   onSave?: (data: Partial<EducationLog>) => void

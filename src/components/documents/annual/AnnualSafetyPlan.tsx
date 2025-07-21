@@ -33,7 +33,7 @@ import type {
   AnnualBudgetItem,
   AnnualEducationPlan,
   AnnualInspectionSchedule 
-} from '@/lib/types/documents'
+} from '@/lib/types'
 
 export function AnnualSafetyPlan() {
   const currentYear = new Date().getFullYear()

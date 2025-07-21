@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { DailyCheckList, DailyCheckItem } from '@/lib/types/documents';
+import type { DailyCheckList, DailyCheckItem } from '@/lib/types';
 import { Calendar, User, Building, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 
 interface DailyCheckListProps {

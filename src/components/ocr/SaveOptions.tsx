@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ExtractedData } from "@/types/ocr";
+interface ExtractedData {
+  text?: string;
+  tables: any[];
+  forms: any[];
+  documentInfo?: {
+    title?: string;
+  };
+}
 
 interface SaveOptionsProps {
   extractedData: ExtractedData;

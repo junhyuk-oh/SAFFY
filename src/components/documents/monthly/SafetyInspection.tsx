@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { AlertCircle, CheckCircle2, FileText, Plus, Trash2, Upload } from 'lucide-react'
-import type { SafetyInspection, InspectionItem } from '@/lib/types/documents'
+import type { SafetyInspection, InspectionItem } from '@/lib/types'
 
 interface SafetyInspectionProps {
   onSave?: (data: Partial<SafetyInspection>) => void
