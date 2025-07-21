@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { WeeklyCheckList, ChemicalUsageReport } from '@/lib/types/documents';
 import { documentService } from '@/lib/services/documentService';
-import { DocumentSearchParams, UnifiedDocumentType } from '@/lib/types';
+import { DocumentSearchParams } from '@/lib/types';
+import { UnifiedDocumentType } from '@/lib/types/document';
 
 // 유니온 타입 정의
 type WeeklyDocument = WeeklyCheckList | ChemicalUsageReport;
@@ -95,12 +96,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // 타입을 언더스코어 형태로 변환
-    let documentType: 'weekly_checklist' | 'chemical_usage_report';
+    // 타입을 enum 값으로 변환
+    let documentType: UnifiedDocumentType;
     if (type === 'weekly-checklist') {
-      documentType = 'weekly_checklist';
+      documentType = UnifiedDocumentType.WEEKLY_CHECKLIST;
     } else if (type === 'chemical-usage-report') {
-      documentType = 'chemical_usage_report';
+      documentType = UnifiedDocumentType.CHEMICAL_USAGE_REPORT;
     } else {
       return NextResponse.json(
         { success: false, error: 'Invalid document type' },
@@ -111,8 +112,8 @@ export async function POST(request: Request) {
     // CreateDocumentRequest 구성
     const createRequest = {
       type: documentType,
-      title: data.title || `${type} - ${new Date().toLocaleDateString()}`,
-      department: data.department || '안전관리팀',
+      title: (data as { title?: string }).title || `${type} - ${new Date().toLocaleDateString()}`,
+      department: (data as { department?: string }).department || '안전관리팀',
       data: data,
       isDraft: false
     };
@@ -159,8 +160,8 @@ export async function PUT(request: Request) {
     const updateRequest = {
       id,
       updates: {
-        title: data.title,
-        status: data.status,
+        title: (data as { title?: string }).title,
+        status: (data as { status?: 'draft' | 'completed' | 'overdue' }).status,
         ...data
       },
       reason: 'Weekly document update'

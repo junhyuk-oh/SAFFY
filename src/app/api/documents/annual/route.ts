@@ -151,20 +151,20 @@ export async function POST(request: NextRequest) {
       id: newDocument.id,
       year: (content.year as number) || body.year,
       department: newDocument.department,
-      preparedBy: content.preparedBy || body.preparedBy,
-      approvedBy: content.approvedBy || body.approvedBy || '',
-      approvalDate: content.approvalDate,
-      previousYearAnalysis: content.previousYearAnalysis,
-      objectives: content.objectives,
-      plans: content.plans,
-      budget: content.budget,
-      timeline: content.timeline,
-      riskAssessment: content.riskAssessment,
-      trainingProgram: content.trainingProgram,
-      emergencyPreparedness: content.emergencyPreparedness,
-      performanceIndicators: content.performanceIndicators,
-      complianceChecklist: content.complianceChecklist,
-      reviewSchedule: content.reviewSchedule,
+      preparedBy: (content.preparedBy as string) || body.preparedBy,
+      approvedBy: (content.approvedBy as string) || body.approvedBy || '',
+      approvalDate: content.approvalDate as string | undefined,
+      previousYearAnalysis: content.previousYearAnalysis as AnnualSafetyPlan['previousYearAnalysis'],
+      objectives: content.objectives as AnnualSafetyPlan['objectives'],
+      plans: content.plans as AnnualSafetyPlan['plans'],
+      budget: content.budget as AnnualSafetyPlan['budget'],
+      timeline: content.timeline as AnnualSafetyPlan['timeline'],
+      riskAssessment: content.riskAssessment as AnnualSafetyPlan['riskAssessment'],
+      trainingProgram: content.trainingProgram as AnnualSafetyPlan['trainingProgram'],
+      emergencyPreparedness: content.emergencyPreparedness as AnnualSafetyPlan['emergencyPreparedness'],
+      performanceIndicators: content.performanceIndicators as AnnualSafetyPlan['performanceIndicators'],
+      complianceChecklist: content.complianceChecklist as AnnualSafetyPlan['complianceChecklist'],
+      reviewSchedule: content.reviewSchedule as AnnualSafetyPlan['reviewSchedule'],
       createdAt: newDocument.createdAt,
       updatedAt: newDocument.updatedAt
     }
@@ -204,8 +204,8 @@ export async function PUT(request: NextRequest) {
     const existingDocument = await documentService.getDocumentById(id)
     
     // 승인된 계획서는 수정 불가 확인
-    const existingContent = existingDocument as any
-    if (existingContent.approvalDate || existingDocument.approval?.date) {
+    const existingContent = existingDocument as unknown as Record<string, unknown>
+    if ((existingContent.approvalDate as string) || existingDocument.approval?.date) {
       return NextResponse.json(
         { success: false, error: '승인된 계획서는 수정할 수 없습니다.' },
         { status: 403 }
@@ -238,25 +238,25 @@ export async function PUT(request: NextRequest) {
     const updatedDocument = await documentService.updateDocument(updateRequest, 'system') // TODO: 실제 사용자 ID로 교체
 
     // BaseDocument를 AnnualSafetyPlan 형태로 변환하여 반환
-    const content = updatedDocument as any
+    const content = updatedDocument as unknown as Record<string, unknown>
     const updatedPlan: AnnualSafetyPlan = {
       id: updatedDocument.id,
-      year: content.year || updateData.year,
+      year: (content.year as number) || updateData.year,
       department: updatedDocument.department,
-      preparedBy: content.preparedBy || updateData.preparedBy,
-      approvedBy: content.approvedBy || updateData.approvedBy || '',
+      preparedBy: (content.preparedBy as string) || updateData.preparedBy,
+      approvedBy: (content.approvedBy as string) || updateData.approvedBy || '',
       approvalDate: content.approvalDate,
-      previousYearAnalysis: content.previousYearAnalysis,
-      objectives: content.objectives,
-      plans: content.plans,
-      budget: content.budget,
-      timeline: content.timeline,
-      riskAssessment: content.riskAssessment,
-      trainingProgram: content.trainingProgram,
-      emergencyPreparedness: content.emergencyPreparedness,
-      performanceIndicators: content.performanceIndicators,
-      complianceChecklist: content.complianceChecklist,
-      reviewSchedule: content.reviewSchedule,
+      previousYearAnalysis: content.previousYearAnalysis as AnnualSafetyPlan['previousYearAnalysis'],
+      objectives: content.objectives as AnnualSafetyPlan['objectives'],
+      plans: content.plans as AnnualSafetyPlan['plans'],
+      budget: content.budget as AnnualSafetyPlan['budget'],
+      timeline: content.timeline as AnnualSafetyPlan['timeline'],
+      riskAssessment: content.riskAssessment as AnnualSafetyPlan['riskAssessment'],
+      trainingProgram: content.trainingProgram as AnnualSafetyPlan['trainingProgram'],
+      emergencyPreparedness: content.emergencyPreparedness as AnnualSafetyPlan['emergencyPreparedness'],
+      performanceIndicators: content.performanceIndicators as AnnualSafetyPlan['performanceIndicators'],
+      complianceChecklist: content.complianceChecklist as AnnualSafetyPlan['complianceChecklist'],
+      reviewSchedule: content.reviewSchedule as AnnualSafetyPlan['reviewSchedule'],
       createdAt: updatedDocument.createdAt,
       updatedAt: updatedDocument.updatedAt
     }
@@ -296,8 +296,8 @@ export async function DELETE(request: NextRequest) {
     const existingDocument = await documentService.getDocumentById(id)
     
     // 승인된 계획서는 삭제 불가 확인
-    const existingContent = existingDocument as any
-    if (existingContent.approvalDate || existingDocument.approval?.date) {
+    const existingContent = existingDocument as unknown as Record<string, unknown>
+    if ((existingContent.approvalDate as string) || existingDocument.approval?.date) {
       return NextResponse.json(
         { success: false, error: '승인된 계획서는 삭제할 수 없습니다.' },
         { status: 403 }
@@ -340,7 +340,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // 기존 문서 조회
-    const existingDocument = await documentService.getDocumentById(id)
+    await documentService.getDocumentById(id)
 
     if (action === 'approve') {
       if (!approvedBy) {
@@ -371,14 +371,14 @@ export async function PATCH(request: NextRequest) {
       const updatedDocument = await documentService.updateDocument(updateRequest, 'system') // TODO: 실제 사용자 ID로 교체
 
       // BaseDocument를 AnnualSafetyPlan 형태로 변환하여 반환
-      const content = updatedDocument as any
+      const content = updatedDocument as unknown as Record<string, unknown>
       const approvedPlan: AnnualSafetyPlan = {
         id: updatedDocument.id,
         year: (content.year as number) || new Date().getFullYear(),
         department: updatedDocument.department,
-        preparedBy: content.preparedBy || updatedDocument.author,
-        approvedBy: content.approvedBy || approvedBy,
-        approvalDate: content.approvalDate || approvalDate,
+        preparedBy: (content.preparedBy as string) || updatedDocument.author,
+        approvedBy: (content.approvedBy as string) || approvedBy,
+        approvalDate: (content.approvalDate as string) || approvalDate,
         previousYearAnalysis: (content.previousYearAnalysis as AnnualSafetyPlan['previousYearAnalysis']) || {
           achievements: [],
           challenges: [],
