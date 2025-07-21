@@ -87,18 +87,22 @@ function generateSectionContent(
   }
 
   // 입력 데이터에서 관련 정보 추가
-  if (section.id === 'risk-assessment' && data.highRisks) {
+  if (section.id === 'risk-assessment' && data.highRisks && Array.isArray(data.highRisks)) {
     content += '### 식별된 위험 요소\n\n';
     content += '**높은 위험**:\n';
     data.highRisks.forEach((risk: string) => content += `- ${risk}\n`);
     content += '\n**중간 위험**:\n';
-    (data.mediumRisks || []).forEach((risk: string) => content += `- ${risk}\n`);
+    if (Array.isArray(data.mediumRisks)) {
+      data.mediumRisks.forEach((risk: string) => content += `- ${risk}\n`);
+    }
     content += '\n**낮은 위험**:\n';
-    (data.lowRisks || []).forEach((risk: string) => content += `- ${risk}\n`);
+    if (Array.isArray(data.lowRisks)) {
+      data.lowRisks.forEach((risk: string) => content += `- ${risk}\n`);
+    }
     content += '\n';
   }
 
-  if (section.id === 'recommendations' && data.recommendations) {
+  if (section.id === 'recommendations' && data.recommendations && Array.isArray(data.recommendations)) {
     content += '### 권장 조치사항\n\n';
     data.recommendations.forEach((rec: string, index: number) => {
       content += `${index + 1}. ${rec}\n`;

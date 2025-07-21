@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       filters: {
         query,
         type: Array.isArray(filters.type) ? filters.type.join(',') : filters.type,
-        status: Array.isArray(filters.status) ? filters.status.join(',') : filters.status,
+        status: Array.isArray(filters.status) && filters.status.length > 0 ? filters.status[0] : undefined,
         department: Array.isArray(filters.department) ? filters.department.join(',') : filters.department,
         author: filters.author,
         startDate: filters.dateRange?.start,

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { type Schedule, ScheduleStatus } from "@/lib/types/schedule"
+import { type Schedule, ScheduleStatus, SchedulePriority } from "@/lib/types/schedule"
 
 interface SidebarSchedule {
   id: string
@@ -65,13 +65,11 @@ export function ScheduleSidebar({ schedules, onStatusUpdate }: ScheduleSidebarPr
     organizerId: 'system',
     participants: [],
     location: undefined,
-    resources: [],
     attachments: [],
     tags: [],
     completedAt: s.status === 'completed' ? new Date().toISOString() : undefined,
     completedBy: s.status === 'completed' ? 'system' : undefined,
     cancellationReason: undefined,
-    metadata: {},
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     createdBy: 'system',

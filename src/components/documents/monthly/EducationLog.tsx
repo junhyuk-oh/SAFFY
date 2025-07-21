@@ -517,7 +517,7 @@ export function EducationLog({ onSave, initialData }: EducationLogProps) {
                             min="0"
                             max="100"
                             value={participant.testScore || ''}
-                            onChange={(e) => updateParticipant(participant.id, 'testScore', e.target.value ? parseInt(e.target.value) : undefined)}
+                            onChange={(e) => updateParticipant(participant.id, 'testScore', e.target.value ? parseInt(e.target.value) : 0)}
                             placeholder="-"
                             className="w-20 mx-auto"
                             disabled={!participant.attended}

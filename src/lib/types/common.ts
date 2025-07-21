@@ -84,34 +84,9 @@ export interface FilterOptions {
   [key: string]: string | number | boolean | Status | undefined;
 }
 
-// API 응답 기본 구조
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: ApiError;
-  message?: string;
-  metadata?: {
-    timestamp: string;
-    version?: string;
-    requestId?: string;
-    duration?: number;
-    [key: string]: string | number | boolean | undefined;
-  };
-}
+// API 응답 타입은 api.ts에서 import하여 사용
 
-// API 에러 구조
-export interface ApiError {
-  code: string;
-  message: string;
-  details?: Array<{
-    field?: string;
-    value?: unknown;
-    issue: string;
-    suggestion?: string;
-  }>;
-  timestamp?: string;
-  path?: string;
-}
+// API 에러 타입은 api.ts에서 import하여 사용
 
 // 리스트 응답 구조
 export interface ListResponse<T> {

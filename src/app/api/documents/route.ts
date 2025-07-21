@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
         : undefined,
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '20'),
-      sortBy: (searchParams.get('sortBy') || 'createdAt') as 'createdAt' | 'updatedAt' | 'title' | 'author',
+      sortBy: (searchParams.get('sortBy') || 'createdAt') as 'createdAt' | 'updatedAt' | 'title' | 'status',
       sortOrder: (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc'
     };
 
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       filters: {
         query: params.query,
         type: Array.isArray(params.type) ? params.type.join(',') : params.type,
-        status: Array.isArray(params.status) ? params.status.join(',') : params.status,
+        status: Array.isArray(params.status) && params.status.length > 0 ? params.status[0] : undefined,
         department: Array.isArray(params.department) ? params.department.join(',') : params.department,
         startDate: params.dateRange?.start,
         endDate: params.dateRange?.end,

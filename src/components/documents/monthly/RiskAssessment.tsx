@@ -479,7 +479,7 @@ export function RiskAssessment({ onSave, initialData }: RiskAssessmentProps) {
                             <Label>위험 유형</Label>
                             <Select
                               value={item.hazardType}
-                              onValueChange={(value) => updateRiskItem(item.id, { hazardType: value as 'chemical' | 'physical' | 'biological' | 'electrical' | 'mechanical' | 'fire' | 'environmental' })}
+                              onValueChange={(value) => updateRiskItem(item.id, { hazardType: value as 'physical' | 'chemical' | 'biological' | 'ergonomic' | 'psychological' })}
                             >
                               <SelectTrigger>
                                 <SelectValue />
@@ -789,7 +789,7 @@ export function RiskAssessment({ onSave, initialData }: RiskAssessmentProps) {
                             <Label>이행 상태</Label>
                             <Select
                               value={item.status}
-                              onValueChange={(value) => updateRiskItem(item.id, { status: value as 'identified' | 'evaluating' | 'controlled' | 'monitoring' })}
+                              onValueChange={(value) => updateRiskItem(item.id, { status: value as 'planned' | 'in-progress' | 'completed' })}
                             >
                               <SelectTrigger>
                                 <SelectValue />

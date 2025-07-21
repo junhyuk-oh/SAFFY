@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     // 부서별 필터링
     if (department) {
-      results = results.filter(doc => doc.department === department)
+      results = results.filter(doc => 'department' in doc && doc.department === department)
     }
 
     // 최신 문서가 먼저 오도록 정렬
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
           createdAt: timestamp,
           updatedAt: timestamp
         } as SafetyInspection
-        safetyInspections.push(savedDocument)
+        safetyInspections.push(savedDocument as SafetyInspection)
         break
 
       case 'education-log':
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
           createdAt: timestamp,
           updatedAt: timestamp
         } as EducationLog
-        educationLogs.push(savedDocument)
+        educationLogs.push(savedDocument as EducationLog)
         break
 
       case 'risk-assessment':
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
           createdAt: timestamp,
           updatedAt: timestamp
         } as RiskAssessment
-        riskAssessments.push(savedDocument)
+        riskAssessments.push(savedDocument as RiskAssessment)
         break
 
       default:
@@ -177,8 +177,8 @@ export async function PUT(request: NextRequest) {
           ...data,
           id,
           updatedAt: timestamp
-        }
-        safetyInspections[inspectionIndex] = updatedDocument
+        } as SafetyInspection
+        safetyInspections[inspectionIndex] = updatedDocument as SafetyInspection
         break
 
       case 'education-log':
@@ -194,8 +194,8 @@ export async function PUT(request: NextRequest) {
           ...data,
           id,
           updatedAt: timestamp
-        }
-        educationLogs[educationIndex] = updatedDocument
+        } as EducationLog
+        educationLogs[educationIndex] = updatedDocument as EducationLog
         break
 
       case 'risk-assessment':
@@ -211,8 +211,8 @@ export async function PUT(request: NextRequest) {
           ...data,
           id,
           updatedAt: timestamp
-        }
-        riskAssessments[riskIndex] = updatedDocument
+        } as RiskAssessment
+        riskAssessments[riskIndex] = updatedDocument as RiskAssessment
         break
 
       default:

@@ -3,9 +3,26 @@
  * 프로젝트 전반에서 사용되는 모든 타입을 중앙에서 관리합니다.
  */
 
-// 공통 타입
-export type * from './common';
-export type { DocumentMetadata } from './common';
+// 공통 타입 (ApiResponse, ApiError는 api.ts에서 export)
+export type {
+  Timestamps,
+  Signature,
+  Attachment,
+  Status,
+  Priority,
+  RiskLevel,
+  SafetyStatus,
+  PeriodType,
+  Quarter,
+  User,
+  Department,
+  Notification,
+  NotificationType,
+  Pagination,
+  SortOptions,
+  FilterOptions,
+  DocumentMetadata
+} from './common';
 
 // 문서 관련 타입 (중복 export 제외)
 export type {
@@ -29,6 +46,9 @@ export { DOCUMENT_CATEGORIES, DOCUMENT_TYPE_CATEGORY_MAP } from './document';
 export { 
   ApiErrorCode,
   ApiStatusCode,
+  type ApiResponse,
+  type ApiError,
+  type ApiMetadata,
   type PaginatedResponse,
   type ApiResponseTransformer,
   type ApiErrorHandler,

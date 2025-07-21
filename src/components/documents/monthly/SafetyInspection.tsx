@@ -98,7 +98,7 @@ export function SafetyInspection({ onSave, initialData }: SafetyInspectionProps)
     }))
   }
 
-  const updateInspectionItem = (itemId: string, field: keyof InspectionItem, value: string | boolean) => {
+  const updateInspectionItem = (itemId: string, field: keyof InspectionItem, value: string | boolean | number) => {
     setFormData(prev => ({
       ...prev,
       sections: {

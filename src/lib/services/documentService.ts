@@ -14,7 +14,8 @@ import {
   DocumentTemplate,
   DocumentVersion,
   DOCUMENT_CATEGORIES,
-  DOCUMENT_TYPE_CATEGORY_MAP
+  DOCUMENT_TYPE_CATEGORY_MAP,
+  PeriodType
 } from '@/lib/types';
 import { AppError, ValidationError } from '@/lib/types/error';
 import { ApiErrorCode } from '@/lib/types/api';
@@ -497,7 +498,7 @@ export class DocumentService {
         parentDocumentId: metadata?.parentDocumentId as string | undefined,
         tags: (metadata?.tags as string[]) || [],
         category: metadata?.category as string | undefined,
-        period: metadata?.period as string | undefined,
+        period: metadata?.period as PeriodType | undefined,
         periodDate: metadata?.periodDate as string | undefined
       },
       review: content?.review as BaseDocument['review'],

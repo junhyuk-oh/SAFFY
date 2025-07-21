@@ -3,10 +3,9 @@ import {
   ApiResponse,
   ApiStatusCode,
   ApiErrorCode,
+  ApiError,
   BaseDocument,
   UpdateDocumentRequest,
-  toApiResponse,
-  toApiError,
   AppError,
   ValidationError,
   ResourceError
@@ -44,7 +43,15 @@ export async function GET(
     //   });
     // }
 
-    const response: ApiResponse = toApiResponse(document);
+    const response: ApiResponse<BaseDocument> = {
+      success: true,
+      data: document,
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: crypto.randomUUID?.() || Math.random().toString(36).substring(7),
+        version: '1.0.0'
+      }
+    };
     
     return NextResponse.json(response, { status: ApiStatusCode.OK });
   } catch (error) {
@@ -55,9 +62,16 @@ export async function GET(
       code: ApiErrorCode.INTERNAL_ERROR
     });
     
+    const apiError: ApiError = {
+      code: appError.code as ApiErrorCode,
+      message: appError.message,
+      timestamp: appError.timestamp,
+      details: appError.context ? [{ issue: JSON.stringify(appError.context) }] : undefined
+    };
+    
     const response: ApiResponse = {
       success: false,
-      error: toApiError(appError)
+      error: apiError
     };
     
     const statusCode = error instanceof ValidationError 
@@ -104,8 +118,16 @@ export async function PUT(
     // DocumentService를 통해 문서 수정
     const updatedDocument = await documentService.updateDocument(updateRequest, userId);
 
-    const response: ApiResponse<BaseDocument> = toApiResponse(updatedDocument);
-    response.message = '문서가 성공적으로 수정되었습니다.';
+    const response: ApiResponse<BaseDocument> = {
+      success: true,
+      data: updatedDocument,
+      message: '문서가 성공적으로 수정되었습니다.',
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: crypto.randomUUID?.() || Math.random().toString(36).substring(7),
+        version: '1.0.0'
+      }
+    };
     
     return NextResponse.json(response, { status: ApiStatusCode.OK });
   } catch (error) {
@@ -116,9 +138,16 @@ export async function PUT(
       code: ApiErrorCode.INTERNAL_ERROR
     });
     
+    const apiError: ApiError = {
+      code: appError.code as ApiErrorCode,
+      message: appError.message,
+      timestamp: appError.timestamp,
+      details: appError.context ? [{ issue: JSON.stringify(appError.context) }] : undefined
+    };
+    
     const response: ApiResponse = {
       success: false,
-      error: toApiError(appError)
+      error: apiError
     };
     
     const statusCode = error instanceof ValidationError 
@@ -152,10 +181,18 @@ export async function DELETE(
     // DocumentService를 통해 문서 삭제
     await documentService.deleteDocument(id);
 
-    const response: ApiResponse = toApiResponse({ 
-      id,
-      message: '문서가 성공적으로 삭제되었습니다.' 
-    });
+    const response: ApiResponse<{ id: string; message: string }> = {
+      success: true,
+      data: { 
+        id,
+        message: '문서가 성공적으로 삭제되었습니다.' 
+      },
+      metadata: {
+        timestamp: new Date().toISOString(),
+        requestId: crypto.randomUUID?.() || Math.random().toString(36).substring(7),
+        version: '1.0.0'
+      }
+    };
     
     return NextResponse.json(response, { status: ApiStatusCode.OK });
   } catch (error) {
@@ -166,9 +203,16 @@ export async function DELETE(
       code: ApiErrorCode.INTERNAL_ERROR
     });
     
+    const apiError: ApiError = {
+      code: appError.code as ApiErrorCode,
+      message: appError.message,
+      timestamp: appError.timestamp,
+      details: appError.context ? [{ issue: JSON.stringify(appError.context) }] : undefined
+    };
+    
     const response: ApiResponse = {
       success: false,
-      error: toApiError(appError)
+      error: apiError
     };
     
     const statusCode = error instanceof ValidationError 
