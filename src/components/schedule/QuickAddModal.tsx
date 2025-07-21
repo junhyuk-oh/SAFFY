@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { X, Calendar, Clock, Repeat } from "lucide-react";
 
 interface QuickAddModalProps {
@@ -36,9 +36,9 @@ export function QuickAddModal({ isOpen, onClose, onSave }: QuickAddModalProps) {
 
   useEffect(() => {
     parseInput(input);
-  }, [input]);
+  }, [input, parseInput]);
 
-  const parseInput = (text: string) => {
+  const parseInput = useCallback((text: string) => {
     // 기본값 설정
     const parsed: ParsedSchedule = {
       title: text,
@@ -99,7 +99,7 @@ export function QuickAddModal({ isOpen, onClose, onSave }: QuickAddModalProps) {
 
     parsed.title = cleanTitle || text;
     setParsedData(parsed);
-  };
+  }, [setParsedData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

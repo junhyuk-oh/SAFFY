@@ -82,8 +82,7 @@ export function DocumentCard({
   description,
   metadata,
   isFavorite = false,
-  onFavoriteToggle,
-  ...props
+  onFavoriteToggle
 }: DocumentCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const statusInfo = statusConfig[status]

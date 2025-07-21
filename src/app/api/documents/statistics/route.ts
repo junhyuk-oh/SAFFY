@@ -16,7 +16,7 @@ import { documentService } from '@/lib/services/documentService';
  */
 
 // GET: 문서 통계 조회
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // DocumentService를 통해 통계 조회
     const statistics = await documentService.getDocumentStatistics();

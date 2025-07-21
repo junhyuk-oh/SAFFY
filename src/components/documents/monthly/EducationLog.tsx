@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -46,7 +46,7 @@ export function EducationLog({ onSave, initialData }: EducationLogProps) {
   const [progress, setProgress] = useState(0)
   const [activeTab, setActiveTab] = useState<'basic' | 'content' | 'participants' | 'evaluation'>('basic')
 
-  const calculateProgress = () => {
+  const calculateProgress = useCallback(() => {
     const fields = [
       formData.title,
       formData.instructor,
@@ -58,7 +58,7 @@ export function EducationLog({ onSave, initialData }: EducationLogProps) {
     ]
     const filled = fields.filter(Boolean).length
     return (filled / fields.length) * 100
-  }
+  }, [formData.title, formData.instructor, formData.location, formData.objectives?.length, formData.content?.length, formData.participants?.length, formData.evaluation?.understanding])
 
   const addObjective = () => {
     setFormData(prev => ({
@@ -118,7 +118,7 @@ export function EducationLog({ onSave, initialData }: EducationLogProps) {
 
   React.useEffect(() => {
     setProgress(calculateProgress())
-  }, [formData])
+  }, [calculateProgress])
 
   const educationTypes = {
     regular: '정기교육',

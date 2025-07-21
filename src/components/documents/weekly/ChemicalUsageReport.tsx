@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import type { ChemicalUsageReport, ChemicalInventory, ChemicalUsageTrend } from '@/lib/types';
-import { Calendar, User, Building, Beaker, TrendingUp, Trash2, AlertCircle, BarChart3, Package } from 'lucide-react';
+import { Calendar, User, Building, Beaker, Trash2, AlertCircle, BarChart3, Package } from 'lucide-react';
 
 interface ChemicalUsageReportProps {
   initialData?: Partial<ChemicalUsageReport>;

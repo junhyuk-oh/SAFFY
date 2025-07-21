@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AlertTriangle, ChevronDown, ChevronUp, FileText, Plus, Shield, Trash2, Upload } from 'lucide-react'
 import type { RiskAssessment, RiskAssessmentItem, RiskMatrix } from '@/lib/types'
 
@@ -46,7 +45,7 @@ export function RiskAssessment({ onSave, initialData }: RiskAssessmentProps) {
   const [progress, setProgress] = useState(0)
   const [expandedItems, setExpandedItems] = useState<string[]>([])
 
-  const calculateProgress = () => {
+  const calculateProgress = useCallback(() => {
     const fields = [
       formData.department,
       formData.assessor,
@@ -58,7 +57,7 @@ export function RiskAssessment({ onSave, initialData }: RiskAssessmentProps) {
     ]
     const filled = fields.filter(Boolean).length
     return (filled / fields.length) * 100
-  }
+  }, [formData.department, formData.assessor, formData.scope, formData.participants?.length, formData.riskItems?.length, formData.reviewDate, formData.approver])
 
   const calculateRiskGrade = (frequency: number, severity: number): RiskMatrix['riskGrade'] => {
     const riskLevel = frequency * severity
@@ -149,7 +148,7 @@ export function RiskAssessment({ onSave, initialData }: RiskAssessmentProps) {
     })
   }
 
-  const updateSummary = () => {
+  const updateSummary = useCallback(() => {
     const items = formData.riskItems || []
     const summary = {
       totalHazards: items.length,
@@ -160,7 +159,7 @@ export function RiskAssessment({ onSave, initialData }: RiskAssessmentProps) {
       completedMeasures: items.filter(item => item.status === 'completed').length
     }
     setFormData(prev => ({ ...prev, summary }))
-  }
+  }, [formData.riskItems])
 
   const toggleItemExpansion = (itemId: string) => {
     setExpandedItems(prev =>
@@ -181,7 +180,7 @@ export function RiskAssessment({ onSave, initialData }: RiskAssessmentProps) {
   React.useEffect(() => {
     setProgress(calculateProgress())
     updateSummary()
-  }, [formData])
+  }, [calculateProgress, updateSummary])
 
   const riskGradeColors = {
     critical: 'bg-red-100 text-red-800 border-red-300',

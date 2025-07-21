@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { cn } from "@/lib/utils"
 
 export type ToastType = "success" | "error" | "warning" | "info"
@@ -40,20 +40,20 @@ function ToastItem({ id, type, title, message, duration = 5000, onClose }: Toast
   const [isExiting, setIsExiting] = useState(false)
   const config = toastConfig[type]
 
+  const handleClose = useCallback(() => {
+    setIsExiting(true)
+    setTimeout(() => {
+      onClose(id)
+    }, 200)
+  }, [id, onClose])
+
   useEffect(() => {
     const timer = setTimeout(() => {
       handleClose()
     }, duration)
 
     return () => clearTimeout(timer)
-  }, [duration])
-
-  const handleClose = () => {
-    setIsExiting(true)
-    setTimeout(() => {
-      onClose(id)
-    }, 200)
-  }
+  }, [duration, handleClose])
 
   return (
     <div

@@ -41,7 +41,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         title: "저장 완료",
         message: "문서가 성공적으로 저장되었습니다."
       })
-    } catch (error) {
+    } catch {
       showToast({
         type: "error",
         title: "저장 실패",
@@ -63,7 +63,7 @@ export const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         title: "다운로드 시작",
         message: "문서 다운로드가 시작되었습니다."
       })
-    } catch (error) {
+    } catch {
       showToast({
         type: "error",
         title: "다운로드 실패",

@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Table } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
 import { 
   FileText, 
@@ -20,15 +19,13 @@ import {
   CheckCircle,
   DollarSign,
   Calendar,
-  Users,
   Target,
   BarChart,
-  PieChart,
   Activity,
   BookOpen,
   Shield
 } from 'lucide-react'
-import type { QuarterlyReport as QuarterlyReportType, QuarterlySafetyMetrics, QuarterlyImprovement } from '@/lib/types'
+import type { QuarterlyReport as QuarterlyReportType, QuarterlySafetyMetrics } from '@/lib/types'
 
 export function QuarterlyReport() {
   const currentYear = new Date().getFullYear()

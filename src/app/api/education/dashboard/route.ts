@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { supabase } from "@/lib/db/supabase"
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     
     // 전체 통계 조회

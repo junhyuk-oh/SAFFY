@@ -4,46 +4,8 @@ import { useState } from "react"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { BackButton } from "@/components/ui/back-button"
 import { useParams, useRouter } from "next/navigation"
+import { useDocument } from "@/lib/hooks/use-documents"
 
-// Mock data - 실제로는 API에서 가져올 데이터
-const mockDocument = {
-  id: "1",
-  title: "2024년 4분기 화학물질 위험성평가",
-  type: "위험성평가",
-  status: "completed" as const,
-  createdDate: "2024.12.15",
-  author: "김연구원",
-  department: "안전관리팀",
-  description: "유기용매 및 산/염기 시약 사용에 대한 종합적인 위험성 평가",
-  lastModified: "2024.12.16",
-  tags: ["화학물질", "4분기", "완료"],
-  content: {
-    summary: "본 평가서는 2024년 4분기 동안 사용된 화학물질에 대한 종합적인 위험성 평가를 포함합니다.",
-    sections: [
-      {
-        title: "1. 평가 대상 화학물질",
-        content: "• 아세톤 (Acetone)\n• 메탄올 (Methanol)\n• 염산 (HCl)\n• 수산화나트륨 (NaOH)"
-      },
-      {
-        title: "2. 위험성 분석",
-        content: "각 화학물질의 물리·화학적 특성, 건강 위험성, 환경 영향을 분석하였습니다."
-      },
-      {
-        title: "3. 안전 대책",
-        content: "• 개인보호구 착용 의무화\n• 환기 시스템 강화\n• 비상 세척 시설 설치\n• 정기 안전교육 실시"
-      }
-    ],
-    attachments: [
-      { name: "MSDS_모음.pdf", size: "2.3MB" },
-      { name: "위험성평가_체크리스트.xlsx", size: "156KB" }
-    ]
-  },
-  history: [
-    { date: "2024.12.16 14:30", user: "김연구원", action: "문서 수정" },
-    { date: "2024.12.15 16:45", user: "박팀장", action: "검토 완료" },
-    { date: "2024.12.15 10:20", user: "김연구원", action: "초안 생성" }
-  ]
-}
 
 const statusConfig = {
   draft: {
@@ -70,19 +32,74 @@ const statusConfig = {
 
 export default function DocumentDetailPage() {
   const router = useRouter()
+  const params = useParams()
+  const documentId = params.id as string
   const [activeTab, setActiveTab] = useState<"content" | "history" | "comments">("content")
+  
+  const { document, loading, error, deleteDocument } = useDocument(documentId)
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-text-secondary">문서를 불러오는 중...</p>
+        </div>
+      </div>
+    )
+  }
+  
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <span className="text-4xl mb-4 block">⚠️</span>
+          <h2 className="text-xl font-semibold text-text-primary mb-2">문서를 불러올 수 없습니다</h2>
+          <p className="text-text-secondary mb-4">{error}</p>
+          <button
+            onClick={() => router.push('/documents')}
+            className="px-4 py-2 bg-primary text-text-inverse rounded-notion-sm hover:bg-primary-hover transition-colors"
+          >
+            문서 목록으로 돌아가기
+          </button>
+        </div>
+      </div>
+    )
+  }
+  
+  if (!document) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <span className="text-4xl mb-4 block">📄</span>
+          <h2 className="text-xl font-semibold text-text-primary mb-2">문서를 찾을 수 없습니다</h2>
+          <p className="text-text-secondary mb-4">요청한 문서가 존재하지 않거나 삭제되었습니다.</p>
+          <button
+            onClick={() => router.push('/documents')}
+            className="px-4 py-2 bg-primary text-text-inverse rounded-notion-sm hover:bg-primary-hover transition-colors"
+          >
+            문서 목록으로 돌아가기
+          </button>
+        </div>
+      </div>
+    )
+  }
 
-  const statusInfo = statusConfig[mockDocument.status]
+  const statusInfo = statusConfig[document.status as keyof typeof statusConfig]
 
   const handleEdit = () => {
     // 편집 모드로 전환
-    router.push(`/documents/${mockDocument.id}/edit`)
+    router.push(`/documents/${document.id}/edit`)
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (confirm("정말로 이 문서를 삭제하시겠습니까?")) {
-      // API 호출로 문서 삭제
-      router.push("/documents")
+      try {
+        await deleteDocument()
+        router.push("/documents")
+      } catch {
+        alert("문서 삭제에 실패했습니다.")
+      }
     }
   }
 
@@ -90,6 +107,12 @@ export default function DocumentDetailPage() {
     // 문서 다운로드 로직
     alert("문서를 다운로드합니다.")
   }
+  
+  // 문서 내용 파싱
+  const content = document.content ? (typeof document.content === 'string' ? JSON.parse(document.content) : document.content) : null
+  const tags = document.tags || []
+  const createdDate = new Date(document.created_at).toLocaleDateString('ko-KR')
+  const lastModified = document.updated_at ? new Date(document.updated_at).toLocaleDateString('ko-KR') : createdDate
 
   return (
     <>
@@ -98,7 +121,7 @@ export default function DocumentDetailPage() {
               items={[
                 { label: '홈', href: '/' },
                 { label: '문서 관리', href: '/documents' },
-                { label: mockDocument.title }
+                { label: document.title }
               ]}
               className="mb-4"
             />
@@ -110,29 +133,29 @@ export default function DocumentDetailPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <h1 className="text-2xl font-bold text-text-primary">
-                      {mockDocument.title}
+                      {document.title}
                     </h1>
                     <span className={`px-3 py-1 rounded-md text-sm font-medium ${statusInfo.bg} ${statusInfo.color}`}>
                       {statusInfo.label}
                     </span>
                   </div>
-                  <p className="text-text-secondary mb-4">{mockDocument.description}</p>
+                  <p className="text-text-secondary mb-4">{document.description || '문서 설명이 없습니다.'}</p>
                   <div className="flex flex-wrap gap-4 text-sm">
                     <div className="flex items-center gap-2">
                       <span className="text-text-tertiary">작성자:</span>
-                      <span className="text-text-primary">{mockDocument.author}</span>
+                      <span className="text-text-primary">{document.user_id || '알 수 없음'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-text-tertiary">부서:</span>
-                      <span className="text-text-primary">{mockDocument.department}</span>
+                      <span className="text-text-primary">{document.department || '미지정'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-text-tertiary">생성일:</span>
-                      <span className="text-text-primary">{mockDocument.createdDate}</span>
+                      <span className="text-text-primary">{createdDate}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-text-tertiary">수정일:</span>
-                      <span className="text-text-primary">{mockDocument.lastModified}</span>
+                      <span className="text-text-primary">{lastModified}</span>
                     </div>
                   </div>
                 </div>
@@ -165,7 +188,7 @@ export default function DocumentDetailPage() {
 
               {/* Tags */}
               <div className="flex flex-wrap gap-2">
-                {mockDocument.tags.map((tag, index) => (
+                {tags.map((tag: string, index: number) => (
                   <span
                     key={index}
                     className="px-3 py-1 bg-background text-text-secondary text-sm rounded-full"
@@ -224,61 +247,85 @@ export default function DocumentDetailPage() {
             {/* Tab Content */}
             {activeTab === "content" && (
               <div className="space-y-6">
-                {/* Summary */}
-                <div className="bg-primary-light rounded-notion-md p-4 border border-primary">
-                  <h3 className="font-semibold text-primary mb-2">요약</h3>
-                  <p className="text-sm text-text-primary">{mockDocument.content.summary}</p>
-                </div>
+                {content ? (
+                  <>
+                    {/* Summary */}
+                    {content.summary && (
+                      <div className="bg-primary-light rounded-notion-md p-4 border border-primary">
+                        <h3 className="font-semibold text-primary mb-2">요약</h3>
+                        <p className="text-sm text-text-primary">{content.summary}</p>
+                      </div>
+                    )}
 
-                {/* Sections */}
-                {mockDocument.content.sections.map((section, index) => (
-                  <div key={index} className="bg-background-secondary rounded-notion-md p-5 border border-border">
-                    <h3 className="font-semibold text-text-primary mb-3">{section.title}</h3>
-                    <div className="text-text-secondary whitespace-pre-line">{section.content}</div>
-                  </div>
-                ))}
-
-                {/* Attachments */}
-                <div className="bg-background-secondary rounded-notion-md p-5 border border-border">
-                  <h3 className="font-semibold text-text-primary mb-3">📎 첨부파일</h3>
-                  <div className="space-y-2">
-                    {mockDocument.content.attachments.map((file, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-3 bg-background rounded-notion-sm border border-border hover:border-border-hover transition-colors cursor-pointer"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span>📄</span>
-                          <span className="text-sm text-text-primary">{file.name}</span>
-                          <span className="text-xs text-text-tertiary">{file.size}</span>
-                        </div>
-                        <button className="text-primary hover:text-primary-hover transition-colors">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                          </svg>
-                        </button>
+                    {/* Sections */}
+                    {content.sections && content.sections.map((section: any, index: number) => (
+                      <div key={index} className="bg-background-secondary rounded-notion-md p-5 border border-border">
+                        <h3 className="font-semibold text-text-primary mb-3">{section.title}</h3>
+                        <div className="text-text-secondary whitespace-pre-line">{section.content}</div>
                       </div>
                     ))}
+
+                    {/* Attachments */}
+                    {content.attachments && content.attachments.length > 0 && (
+                      <div className="bg-background-secondary rounded-notion-md p-5 border border-border">
+                        <h3 className="font-semibold text-text-primary mb-3">📎 첨부파일</h3>
+                        <div className="space-y-2">
+                          {content.attachments.map((file: any, index: number) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between p-3 bg-background rounded-notion-sm border border-border hover:border-border-hover transition-colors cursor-pointer"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span>📄</span>
+                                <span className="text-sm text-text-primary">{file.name}</span>
+                                <span className="text-xs text-text-tertiary">{file.size}</span>
+                              </div>
+                              <button className="text-primary hover:text-primary-hover transition-colors">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="bg-background-secondary rounded-notion-md p-8 border border-border text-center">
+                    <span className="text-4xl mb-4 block">📝</span>
+                    <h3 className="font-semibold text-text-primary mb-2">문서 내용이 없습니다</h3>
+                    <p className="text-text-secondary">이 문서에는 아직 내용이 작성되지 않았습니다.</p>
                   </div>
-                </div>
+                )}
               </div>
             )}
 
             {activeTab === "history" && (
               <div className="bg-background-secondary rounded-notion-md p-5 border border-border">
                 <div className="space-y-4">
-                  {mockDocument.history.map((item, index) => (
-                    <div key={index} className="flex items-start gap-3 pb-4 border-b border-border last:border-0 last:pb-0">
+                  <div className="flex items-start gap-3 pb-4 border-b border-border last:border-0 last:pb-0">
+                    <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium text-text-primary">{document.user_id || '알 수 없음'}</span>
+                        <span className="text-sm text-text-tertiary">{createdDate}</span>
+                      </div>
+                      <p className="text-sm text-text-secondary">문서 생성</p>
+                    </div>
+                  </div>
+                  {document.updated_at && document.updated_at !== document.created_at && (
+                    <div className="flex items-start gap-3 pb-4 border-b border-border last:border-0 last:pb-0">
                       <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-text-primary">{item.user}</span>
-                          <span className="text-sm text-text-tertiary">{item.date}</span>
+                          <span className="font-medium text-text-primary">{document.user_id || '알 수 없음'}</span>
+                          <span className="text-sm text-text-tertiary">{lastModified}</span>
                         </div>
-                        <p className="text-sm text-text-secondary">{item.action}</p>
+                        <p className="text-sm text-text-secondary">문서 수정</p>
                       </div>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             )}

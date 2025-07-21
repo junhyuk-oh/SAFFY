@@ -5,8 +5,6 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { 
@@ -23,16 +21,11 @@ import {
   Users,
   TrendingUp,
   Award,
-  Briefcase,
   Clock,
   BarChart
 } from 'lucide-react'
 import type { 
-  AnnualSafetyPlan as AnnualSafetyPlanType, 
-  AnnualGoal, 
-  AnnualBudgetItem,
-  AnnualEducationPlan,
-  AnnualInspectionSchedule 
+  AnnualSafetyPlan as AnnualSafetyPlanType
 } from '@/lib/types'
 
 export function AnnualSafetyPlan() {
@@ -123,13 +116,6 @@ export function AnnualSafetyPlan() {
     { id: 'implementation', label: '이행 계획', icon: Calendar }
   ]
 
-  const goalCategories = [
-    { value: 'incident-reduction', label: '사고 감소' },
-    { value: 'education', label: '교육 훈련' },
-    { value: 'compliance', label: '법규 준수' },
-    { value: 'culture', label: '안전 문화' },
-    { value: 'system-improvement', label: '시스템 개선' }
-  ]
 
   const handleSave = async () => {
     // API 호출 로직

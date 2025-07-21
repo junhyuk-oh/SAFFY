@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
@@ -8,9 +8,7 @@ import {
   AlertCircle, 
   Clock, 
   CheckCircle, 
-  Users, 
   BookOpen,
-  Award,
   AlertTriangle
 } from 'lucide-react'
 
@@ -32,7 +30,7 @@ interface UpcomingEducation {
 }
 
 export default function EducationDashboard() {
-  const [stats, setStats] = useState<EducationStat[]>([
+  const [stats] = useState<EducationStat[]>([
     {
       category: '정기안전교육',
       total: 24,
@@ -56,7 +54,7 @@ export default function EducationDashboard() {
     }
   ])
 
-  const [upcomingEducations, setUpcomingEducations] = useState<UpcomingEducation[]>([
+  const [upcomingEducations] = useState<UpcomingEducation[]>([
     {
       id: '1',
       name: '2024년 1분기 정기안전교육',

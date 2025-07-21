@@ -3,8 +3,7 @@ import { generateDocument, GeneratedDocument } from '@/lib/ai-documents/generato
 import { 
   ApiResponse,
   ApiStatusCode,
-  ApiErrorCode,
-  ApiError
+  ApiErrorCode
 } from '@/lib/types/api';
 import {
   AppError,

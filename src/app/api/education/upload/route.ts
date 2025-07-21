@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       await writeFile(filePath, buffer);
       
       // 데이터베이스 업데이트
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('education_records')
         .update({
           certificate_file_path: publicPath,

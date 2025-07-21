@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { documentService } from '@/lib/services/documentService'
 import type { SafetyInspection, EducationLog, RiskAssessment } from '@/lib/types/documents'
+import { DocumentSearchParams } from '@/lib/types'
 
 // 유니온 타입 정의
 type MonthlyDocument = SafetyInspection | EducationLog | RiskAssessment;
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // 문서 조회 파라미터 구성
-    const searchFilters: any = {
+    const searchFilters: Partial<DocumentSearchParams> = {
       page: 1,
       limit: 1000, // 월별 문서는 보통 많지 않으므로 큰 제한
       sortBy: 'createdAt',
@@ -53,11 +54,11 @@ export async function GET(request: NextRequest) {
 
     // Supabase에서 문서 조회
     const result = await documentService.getDocuments(searchFilters)
-    let documents = result.documents
+    const documents = result.documents
 
     // BaseDocument를 월별 문서 형식으로 변환
     let results: MonthlyDocument[] | DocumentWithType[] = documents.map(doc => {
-      const monthlyDoc: any = {
+      const monthlyDoc: Partial<MonthlyDocument & { documentType: DocumentType }> = {
         id: doc.id,
         title: doc.title,
         status: doc.status,
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
       }
 
       // 문서 타입별 특정 필드 추가 (content에서 추출)
-      const docContent = doc as any
+      const docContent = doc as Record<string, unknown>
       if (docContent.description) monthlyDoc.description = docContent.description
       if (docContent.location) monthlyDoc.location = docContent.location
       if (docContent.inspector) monthlyDoc.inspector = docContent.inspector
@@ -247,7 +248,7 @@ export async function PUT(request: NextRequest) {
         success: true,
         data: monthlyDoc
       })
-    } catch (docError: any) {
+    } catch (docError: unknown) {
       if (docError.code === 'RESOURCE_NOT_FOUND') {
         return NextResponse.json(
           { success: false, error: '문서를 찾을 수 없습니다.' },
@@ -293,7 +294,7 @@ export async function DELETE(request: NextRequest) {
         success: true,
         message: '문서가 삭제되었습니다.'
       })
-    } catch (docError: any) {
+    } catch (docError: unknown) {
       if (docError.code === 'RESOURCE_NOT_FOUND') {
         return NextResponse.json(
           { success: false, error: '문서를 찾을 수 없습니다.' },

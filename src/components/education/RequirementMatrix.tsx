@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +10,6 @@ import {
   Clock, 
   AlertCircle,
   Search,
-  Filter,
   Download,
   User
 } from 'lucide-react'
@@ -79,18 +78,6 @@ export default function RequirementMatrix() {
     }
   }
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <Badge className="bg-green-500">이수완료</Badge>
-      case 'pending':
-        return <Badge className="bg-yellow-500">예정</Badge>
-      case 'overdue':
-        return <Badge className="bg-red-500">기한초과</Badge>
-      default:
-        return null
-    }
-  }
 
   const calculateDDay = (dueDate: string) => {
     const today = new Date()

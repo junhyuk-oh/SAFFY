@@ -4,7 +4,6 @@ import { supabase } from "@/lib/db/supabase"
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const department = searchParams.get("department")
     const status = searchParams.get("status")
     const search = searchParams.get("search")
     

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { AlertCircle, CheckCircle2, FileText, Plus, Trash2, Upload } from 'lucide-react'
+import { FileText, Plus, Trash2, Upload } from 'lucide-react'
 import type { SafetyInspection, InspectionItem } from '@/lib/types'
 
 interface SafetyInspectionProps {
@@ -41,7 +41,7 @@ export function SafetyInspection({ onSave, initialData }: SafetyInspectionProps)
   const [currentSection, setCurrentSection] = useState<'equipment' | 'environment' | 'process' | 'emergency'>('equipment')
   const [progress, setProgress] = useState(0)
 
-  const calculateProgress = () => {
+  const calculateProgress = useCallback(() => {
     const fields = [
       formData.department,
       formData.inspector,
@@ -52,7 +52,7 @@ export function SafetyInspection({ onSave, initialData }: SafetyInspectionProps)
     ]
     const filled = fields.filter(Boolean).length
     return (filled / fields.length) * 100
-  }
+  }, [formData.department, formData.inspector, formData.sections?.equipment?.length, formData.sections?.environment?.length, formData.sections?.process?.length, formData.sections?.emergency?.length])
 
   const calculateTotalScore = () => {
     const sections = formData.sections
@@ -151,7 +151,7 @@ export function SafetyInspection({ onSave, initialData }: SafetyInspectionProps)
 
   React.useEffect(() => {
     setProgress(calculateProgress())
-  }, [formData])
+  }, [calculateProgress])
 
   const sectionTitles = {
     equipment: '장비 안전',
@@ -247,7 +247,7 @@ export function SafetyInspection({ onSave, initialData }: SafetyInspectionProps)
 
             {/* 점검 항목 */}
             <div className="space-y-4">
-              {formData.sections?.[currentSection]?.map((item, index) => (
+              {formData.sections?.[currentSection]?.map((item) => (
                 <Card key={item.id} className="p-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BaseDocument, ApiResponse } from '@/lib/types';
 
 interface UseDocumentsOptions {
@@ -21,7 +21,7 @@ export function useDocuments(options: UseDocumentsOptions = {}): UseDocumentsRet
 
   const { limit = 50, department } = options;
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -60,11 +60,11 @@ export function useDocuments(options: UseDocumentsOptions = {}): UseDocumentsRet
     } finally {
       setLoading(false);
     }
-  };
+  }, [limit, department]);
 
   useEffect(() => {
     fetchDocuments();
-  }, [limit, department, options.refresh]);
+  }, [fetchDocuments, options.refresh]);
 
   return {
     documents,

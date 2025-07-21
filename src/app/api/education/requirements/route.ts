@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 import { 
   UserEducationRequirement, 
   CreateEducationRequirementDTO,
-  EducationFilterOptions,
   PaginationParams 
 } from '@/lib/types/education';
 

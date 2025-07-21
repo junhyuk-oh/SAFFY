@@ -26,7 +26,6 @@ export type {
 
 // 문서 관련 타입 (중복 export 제외)
 export type {
-  UnifiedDocumentType,
   BaseDocument,
   DocumentSearchParams,
   CreateDocumentRequest,
@@ -40,7 +39,7 @@ export type {
   DocumentNotificationSettings
 } from './document';
 
-export { DOCUMENT_CATEGORIES, DOCUMENT_TYPE_CATEGORY_MAP } from './document';
+export { UnifiedDocumentType, DOCUMENT_CATEGORIES, DOCUMENT_TYPE_CATEGORY_MAP } from './document';
 
 // API 관련 타입 (common과 중복 제외)
 export { 
@@ -139,3 +138,4 @@ export const toApiError = (
   };
 };
 
+// Enum exports are already handled above

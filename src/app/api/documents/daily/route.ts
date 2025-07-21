@@ -8,7 +8,8 @@ import {
   ValidationError,
   toApiResponse,
   toApiError,
-  BaseDocument
+  BaseDocument,
+  UnifiedDocumentType
 } from '@/lib/types';
 import { documentService } from '@/lib/services/documentService';
 
@@ -22,10 +23,10 @@ export async function GET(request: NextRequest) {
     // documentService를 사용하여 문서 조회
     const searchParams_obj = {
       type: type ? (
-        type === 'checklist' ? ['daily-checklist'] :
-        type === 'experiment-log' ? ['experiment-log'] :
-        ['daily-checklist', 'experiment-log']
-      ) : ['daily-checklist', 'experiment-log'],
+        type === 'checklist' ? [UnifiedDocumentType.DAILY_CHECKLIST] :
+        type === 'experiment-log' ? [UnifiedDocumentType.EXPERIMENT_LOG] :
+        [UnifiedDocumentType.DAILY_CHECKLIST, UnifiedDocumentType.EXPERIMENT_LOG]
+      ) : [UnifiedDocumentType.DAILY_CHECKLIST, UnifiedDocumentType.EXPERIMENT_LOG],
       department: department ? [department] : undefined,
       dateRange: date ? {
         start: `${date}T00:00:00.000Z`,
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
 
     // documentService를 사용하여 문서 생성
     const createRequest = {
-      type: documentType as 'daily-checklist' | 'experiment-log',
+      type: documentType === 'checklist' ? UnifiedDocumentType.DAILY_CHECKLIST : UnifiedDocumentType.EXPERIMENT_LOG,
       title: title,
       department: data.department || '안전관리팀',
       data: {
