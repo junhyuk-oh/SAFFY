@@ -74,7 +74,7 @@ export enum ApiErrorCode {
 }
 
 // 기본 API 응답 구조
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: ApiError;
@@ -96,7 +96,7 @@ export interface ApiError {
 // API 에러 상세
 export interface ApiErrorDetail {
   field?: string;
-  value?: any;
+  value?: unknown;
   issue: string;
   suggestion?: string;
 }
@@ -137,7 +137,7 @@ export interface BatchResponse {
   results: Array<{
     id: string;
     status: ApiStatusCode;
-    response?: any;
+    response?: unknown;
     error?: ApiError;
   }>;
   summary: {
@@ -171,7 +171,7 @@ export interface FileUploadResponse {
   mimeType: string;
   url: string;
   thumbnailUrl?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   uploadedAt: string;
 }
 
@@ -186,8 +186,8 @@ export interface ApiRequestOptions {
     key?: string;
   };
   transform?: {
-    request?: (data: any) => any;
-    response?: (data: any) => any;
+    request?: (data: unknown) => unknown;
+    response?: (data: unknown) => unknown;
   };
 }
 
@@ -223,7 +223,7 @@ export interface ApiHealthResponse {
 }
 
 // 웹소켓 메시지 타입
-export interface WebSocketMessage<T = any> {
+export interface WebSocketMessage<T = unknown> {
   id: string;
   type: string;
   payload: T;
@@ -266,9 +266,9 @@ export interface ApiClientConfig {
     backoff?: 'linear' | 'exponential';
   };
   interceptors?: {
-    request?: (config: any) => any;
-    response?: (response: any) => any;
-    error?: (error: any) => any;
+    request?: (config: Record<string, unknown>) => Record<string, unknown>;
+    response?: (response: Record<string, unknown>) => Record<string, unknown>;
+    error?: (error: Error | Record<string, unknown>) => Error | Record<string, unknown>;
   };
 }
 
@@ -280,7 +280,7 @@ export type ApiErrorHandler = (error: ApiError) => void | Promise<void>;
 
 // API 미들웨어 타입
 export interface ApiMiddleware {
-  pre?: (request: any) => any | Promise<any>;
-  post?: (response: any) => any | Promise<any>;
-  error?: (error: any) => any | Promise<any>;
+  pre?: (request: Record<string, unknown>) => Record<string, unknown> | Promise<Record<string, unknown>>;
+  post?: (response: Record<string, unknown>) => Record<string, unknown> | Promise<Record<string, unknown>>;
+  error?: (error: Error | Record<string, unknown>) => Error | Record<string, unknown> | Promise<Error | Record<string, unknown>>;
 }

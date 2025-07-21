@@ -209,7 +209,7 @@ export async function PUT(request: NextRequest) {
       );
     }
     
-    const updateData: any = {};
+    const updateData: Partial<UserEducationRequirement> = {};
     
     // 수정 가능한 필드만 업데이트
     if (body.due_date) updateData.due_date = body.due_date;

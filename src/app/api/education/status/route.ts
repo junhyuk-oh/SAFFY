@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     
     // 상태 필터
     if (status && status !== "전체") {
-      const statusMap: { [key: string]: string } = {
+      const statusMap: Record<string, 'completed' | 'in-progress' | 'not-started' | 'overdue'> = {
         "완료": "completed",
         "진행중": "in-progress",
         "미시작": "not-started",

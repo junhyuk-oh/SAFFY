@@ -196,7 +196,7 @@ export async function PUT(request: NextRequest) {
     
     const body: Partial<EducationRecord> = await request.json();
     
-    const updateData: any = {};
+    const updateData: Partial<EducationRecord> = {};
     
     // 수정 가능한 필드만 업데이트
     if (body.education_date) updateData.education_date = body.education_date;

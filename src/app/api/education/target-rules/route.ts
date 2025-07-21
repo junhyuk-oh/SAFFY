@@ -123,7 +123,7 @@ export async function PUT(request: NextRequest) {
     
     const body: Partial<TargetRule> = await request.json();
     
-    const updateData: any = {};
+    const updateData: Partial<TargetRule> = {};
     
     if (body.rule_value) updateData.rule_value = body.rule_value;
     if (body.priority !== undefined) updateData.priority = body.priority;

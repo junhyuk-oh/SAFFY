@@ -199,7 +199,16 @@ export async function PUT(request: NextRequest) {
     
     const body: Partial<DailyEducationLog> = await request.json();
     
-    const updateData: any = {};
+    interface UpdateData {
+      topic?: string;
+      duration_minutes?: number;
+      instructor_id?: string;
+      location?: string;
+      attendance_status?: 'present' | 'absent' | 'excused';
+      notes?: string;
+    }
+    
+    const updateData: UpdateData = {};
     
     // 수정 가능한 필드만 업데이트
     if (body.topic) updateData.topic = body.topic;
