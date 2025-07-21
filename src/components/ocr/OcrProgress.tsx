@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 interface OcrProgressProps {
   progress: number
@@ -17,7 +17,6 @@ const steps = {
 
 export function OcrProgress({ progress, currentStep, startTime }: OcrProgressProps) {
   const currentStepInfo = steps[currentStep]
-  const [estimatedTime, setEstimatedTime] = useState<string>('')
 
   useEffect(() => {
     if (startTime && progress > 0 && progress < 100) {

@@ -18,7 +18,6 @@ import {
   AlertCircle,
   CheckCircle,
   DollarSign,
-  Calendar,
   Target,
   BarChart,
   Activity,

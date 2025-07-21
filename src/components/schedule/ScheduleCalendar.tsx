@@ -194,24 +194,19 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
 }
 
 // Props 인터페이스 추가
-interface ScheduleCalendarProps {
-  schedules?: Schedule[]
-  onDateClick?: (date: Date) => void
-  onEventClick?: (event: Schedule) => void
-  isEditMode?: boolean
-}
+// interface ScheduleCalendarProps {
+//   schedules?: Schedule[]
+//   onDateClick?: (date: Date) => void
+//   onEventClick?: (event: Schedule) => void
+//   isEditMode?: boolean
+// }
 
 // 메인 캘린더 컴포넌트
-export function ScheduleCalendar({ 
-  schedules = [], 
-  onDateClick, 
-  onEventClick,
-  isEditMode = false 
-}: ScheduleCalendarProps) {
+export function ScheduleCalendar(): JSX.Element {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('month')
-  const [events, setEvents] = useState<CalendarEvent[]>([
+  const [events] = useState<CalendarEvent[]>([
     // 샘플 이벤트 데이터
     {
       id: '1',
@@ -242,7 +237,6 @@ export function ScheduleCalendar({
     }
   ])
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null)
-  const [isAddingEvent, setIsAddingEvent] = useState(false)
 
   // 네비게이션 함수
   const navigatePrevious = () => {

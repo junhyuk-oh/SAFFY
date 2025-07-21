@@ -36,7 +36,7 @@ export default function DocumentDetailPage() {
   const documentId = params.id as string
   const [activeTab, setActiveTab] = useState<"content" | "history" | "comments">("content")
   
-  const { document, loading, error, deleteDocument } = useDocument(documentId)
+  const { document, loading, error } = useDocument(documentId)
   
   if (loading) {
     return (
@@ -109,10 +109,10 @@ export default function DocumentDetailPage() {
   }
   
   // 문서 내용 파싱
-  const content = document.content ? (typeof document.content === 'string' ? JSON.parse(document.content) : document.content) : null
-  const tags = document.tags || []
-  const createdDate = new Date(document.created_at).toLocaleDateString('ko-KR')
-  const lastModified = document.updated_at ? new Date(document.updated_at).toLocaleDateString('ko-KR') : createdDate
+  const content = document.data ? (typeof document.data === 'string' ? JSON.parse(document.data) : document.data) : null
+  const tags: string[] = []
+  const createdDate = new Date(document.createdAt).toLocaleDateString('ko-KR')
+  const lastModified = document.updatedAt ? new Date(document.updatedAt).toLocaleDateString('ko-KR') : createdDate
 
   return (
     <>
@@ -139,11 +139,11 @@ export default function DocumentDetailPage() {
                       {statusInfo.label}
                     </span>
                   </div>
-                  <p className="text-text-secondary mb-4">{document.description || '문서 설명이 없습니다.'}</p>
+                  <p className="text-text-secondary mb-4">{'문서 설명이 없습니다.'}</p>
                   <div className="flex flex-wrap gap-4 text-sm">
                     <div className="flex items-center gap-2">
                       <span className="text-text-tertiary">작성자:</span>
-                      <span className="text-text-primary">{document.user_id || '알 수 없음'}</span>
+                      <span className="text-text-primary">{document.author || '알 수 없음'}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-text-tertiary">부서:</span>
@@ -308,18 +308,18 @@ export default function DocumentDetailPage() {
                     <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-text-primary">{document.user_id || '알 수 없음'}</span>
+                        <span className="font-medium text-text-primary">{document.author || '알 수 없음'}</span>
                         <span className="text-sm text-text-tertiary">{createdDate}</span>
                       </div>
                       <p className="text-sm text-text-secondary">문서 생성</p>
                     </div>
                   </div>
-                  {document.updated_at && document.updated_at !== document.created_at && (
+                  {document.updatedAt && document.updatedAt !== document.createdAt && (
                     <div className="flex items-start gap-3 pb-4 border-b border-border last:border-0 last:pb-0">
                       <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-text-primary">{document.user_id || '알 수 없음'}</span>
+                          <span className="font-medium text-text-primary">{document.author || '알 수 없음'}</span>
                           <span className="text-sm text-text-tertiary">{lastModified}</span>
                         </div>
                         <p className="text-sm text-text-secondary">문서 수정</p>

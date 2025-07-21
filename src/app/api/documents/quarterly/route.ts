@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { QuarterlyReport } from '@/lib/types/documents'
 import { documentService } from '@/lib/services/documentService'
+import { UnifiedDocumentType } from '@/lib/types'
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     // documentService를 사용하여 quarterly_report 타입 문서 조회
     const result = await documentService.getDocuments({
-      type: 'quarterly-report',
+      type: UnifiedDocumentType.QUARTERLY_REPORT,
       department: department || undefined,
       page: 1,
       limit: 100 // 충분한 수의 문서를 가져오기
@@ -19,9 +20,9 @@ export async function GET(request: NextRequest) {
 
     // QuarterlyReport 형태로 변환하고 필터링
     let filteredReports = result.documents
-      .filter(doc => doc.type === 'quarterly-report')
+      .filter(doc => doc.type === UnifiedDocumentType.QUARTERLY_REPORT)
       .map(doc => {
-        const content = doc as unknown as { [key: string]: unknown }
+        const content = (doc.data as Record<string, unknown>) || {}
         return {
           id: doc.id,
           year: content.year as number || new Date().getFullYear(),
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     // documentService를 사용하여 문서 생성
     const newDocument = await documentService.createDocument({
-      type: 'quarterly-report',
+      type: UnifiedDocumentType.QUARTERLY_REPORT,
       title: `${body.year}년 ${body.quarter}분기 보고서 - ${body.department}`,
       department: body.department,
       data: {

@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 
 interface ScheduleToolbarProps {
   currentView: "today" | "week" | "month"

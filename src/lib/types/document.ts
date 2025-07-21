@@ -7,12 +7,8 @@ import {
   Timestamps, 
   Signature, 
   Attachment, 
-  Status, 
-  Priority, 
-  RiskLevel, 
-  SafetyStatus,
-  PeriodType,
-  Quarter
+  Status,
+  PeriodType
 } from './common';
 
 // 문서 타입 열거형 (통합)

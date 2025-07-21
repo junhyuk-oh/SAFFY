@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { documentService } from '@/lib/services/documentService'
 import type { SafetyInspection, EducationLog, RiskAssessment } from '@/lib/types/documents'
-import { DocumentSearchParams } from '@/lib/types'
+import { DocumentSearchParams, UnifiedDocumentType } from '@/lib/types'
 
 // 유니온 타입 정의
 type MonthlyDocument = SafetyInspection | EducationLog | RiskAssessment;
@@ -10,11 +10,11 @@ type DocumentType = 'safety-inspection' | 'education-log' | 'risk-assessment';
 // 문서 타입 확장 (문서 타입 정보 포함)
 type DocumentWithType = MonthlyDocument & { documentType: DocumentType };
 
-// 월별 문서 타입을 Supabase 문서 타입으로 매핑
-const MONTHLY_TYPE_MAP: Record<DocumentType, string> = {
-  'safety-inspection': 'safety_inspection',
-  'education-log': 'education_log',
-  'risk-assessment': 'risk_assessment'
+// 월별 문서 타입을 UnifiedDocumentType으로 매핑
+const MONTHLY_TYPE_MAP: Record<DocumentType, UnifiedDocumentType> = {
+  'safety-inspection': UnifiedDocumentType.SAFETY_INSPECTION,
+  'education-log': UnifiedDocumentType.EDUCATION_LOG,
+  'risk-assessment': UnifiedDocumentType.RISK_ASSESSMENT
 };
 
 // 역매핑
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     const documents = result.documents
 
     // BaseDocument를 월별 문서 형식으로 변환
-    let results: MonthlyDocument[] | DocumentWithType[] = documents.map(doc => {
+    const results: MonthlyDocument[] | DocumentWithType[] = documents.map(doc => {
       const monthlyDoc: Partial<MonthlyDocument & { documentType: DocumentType }> = {
         id: doc.id,
         title: doc.title,
@@ -122,7 +122,11 @@ export async function GET(request: NextRequest) {
 
 interface PostRequestBody {
   type: DocumentType;
-  data: Partial<MonthlyDocument>;
+  data: Partial<MonthlyDocument> & {
+    title?: string;
+    department?: string;
+    month?: string;
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -161,10 +165,9 @@ export async function POST(request: NextRequest) {
     const savedDocument = await documentService.createDocument(createRequest, 'current-user-id') // TODO: 실제 사용자 ID 사용
 
     // BaseDocument를 월별 문서 형식으로 변환하여 반환
-    const monthlyDoc: MonthlyDocument = {
+    const monthlyDoc = {
       id: savedDocument.id,
       title: savedDocument.title,
-      status: savedDocument.status,
       author: savedDocument.author,
       department: savedDocument.department,
       createdAt: savedDocument.createdAt,
@@ -189,7 +192,11 @@ export async function POST(request: NextRequest) {
 interface PutRequestBody {
   type: DocumentType;
   id: string;
-  data: Partial<MonthlyDocument>;
+  data: Partial<MonthlyDocument> & {
+    title?: string;
+    department?: string;
+    month?: string;
+  };
 }
 
 export async function PUT(request: NextRequest) {

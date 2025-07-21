@@ -117,8 +117,7 @@ export const toApiResponse = <T>(data: T, success = true): import('./api').ApiRe
 });
 
 export const toApiError = (
-  error: Error | import('./error').BaseError,
-  statusCode?: import('./api').ApiStatusCode
+  error: Error | import('./error').BaseError
 ): import('./api').ApiError => {
   if ('code' in error && 'severity' in error) {
     // BaseError 타입

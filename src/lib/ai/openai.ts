@@ -22,7 +22,7 @@ export async function generateDocument(options: AIGenerateOptions) {
   }
 
   // 문서 타입별 프롬프트 생성
-  const prompt = createPromptForDocument(options);
+  createPromptForDocument(options);
   
   // Mock response for now
   return {

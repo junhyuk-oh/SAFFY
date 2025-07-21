@@ -11,8 +11,6 @@ import {
   CreateDocumentRequest,
   UpdateDocumentRequest,
   DocumentStatistics,
-  DocumentTemplate,
-  DocumentVersion,
   DOCUMENT_CATEGORIES,
   DOCUMENT_TYPE_CATEGORY_MAP,
   PeriodType
@@ -21,8 +19,6 @@ import { AppError, ValidationError } from '@/lib/types/error';
 import { ApiErrorCode } from '@/lib/types/api';
 
 type DocumentRow = Database['public']['Tables']['documents']['Row'];
-type DocumentInsert = Database['public']['Tables']['documents']['Insert'];
-type DocumentUpdate = Database['public']['Tables']['documents']['Update'];
 
 export class DocumentService {
   
@@ -266,7 +262,7 @@ export class DocumentService {
       }
 
       // 변경 이력 저장
-      await this.saveDocumentHistory(request.id, existingDocument, updatedContent, userId, request.reason);
+      await this.saveDocumentHistory(request.id, existingDocument, updatedContent, userId);
 
       return this.mapToBaseDocument(data);
     } catch (error) {
@@ -574,8 +570,7 @@ export class DocumentService {
     documentId: string, 
     oldData: Partial<BaseDocument>, 
     newData: Partial<BaseDocument>, 
-    changedBy: string, 
-    reason?: string
+    changedBy: string
   ): Promise<void> {
     try {
       const changes = this.calculateChanges(oldData, newData);
