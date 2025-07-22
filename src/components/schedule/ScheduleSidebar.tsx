@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Badge } from '@/components/ui/display'
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/forms/button"
 import { type Schedule, ScheduleStatus, SchedulePriority } from "@/lib/types/schedule"
 
 interface SidebarSchedule {

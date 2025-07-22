@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/display'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/forms/button'
 import { Input } from '@/components/ui/forms'
 import { 
   CheckCircle, 

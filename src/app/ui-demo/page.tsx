@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/forms/button"
 import { Input } from '@/components/ui/forms'
 import { Label } from '@/components/ui/forms'
 import { Select } from '@/components/ui/forms'

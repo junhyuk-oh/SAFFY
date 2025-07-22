@@ -6,6 +6,7 @@ import { StatsCard } from "@/components/dashboard/StatsCard"
 import { QuickActions } from "@/components/dashboard/QuickActions"
 import { RecentDocuments } from "@/components/dashboard/RecentDocuments"
 import { AiDocumentModal } from "@/components/modals/AiDocumentModal"
+import { ComplianceIndicator } from "@/components/laws/ComplianceIndicator"
 
 const statsData = [
   {
@@ -14,13 +15,6 @@ const statsData = [
     change: { value: "12% 향상", type: "positive" as const },
     icon: "📄",
     progress: 87
-  },
-  {
-    title: "법적 준수율",
-    value: "100%",
-    change: { value: "모든 요건 충족", type: "positive" as const },
-    icon: "⚖️",
-    progress: 100
   },
   {
     title: "다음 점검일",
@@ -158,10 +152,12 @@ export default function Home() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5 mb-8">
           {statsData.map((stat, index) => (
             <StatsCard key={index} {...stat} />
           ))}
+          {/* 법률 준수 현황 */}
+          <ComplianceIndicator variant="card" />
         </div>
 
         {/* Quick Actions */}

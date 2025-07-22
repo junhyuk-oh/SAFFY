@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useAppStore } from "@/stores"
 import { X } from "lucide-react"
+import { LawSearchWidget } from "@/components/laws/LawSearchWidget"
 
 interface SidebarItem {
   title: string
@@ -156,6 +157,12 @@ export function Sidebar() {
           </div>
         )}
         <div className="p-4">
+          {/* 법률 검색 위젯 */}
+          <div className="mb-6">
+            <div className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">법률 검색</div>
+            <LawSearchWidget />
+          </div>
+          
       {sidebarSections.map((section) => (
         <div key={section.title} className="mb-6">
           <div className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{section.title}</div>

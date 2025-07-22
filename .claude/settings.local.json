@@ -34,7 +34,10 @@
       "Bash(powershell:*)",
       "Bash(git checkout:*)",
       "Bash(node fix-imports.js)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(npx next dev:*)",
+      "Bash(timeout 3 npx next dev -p 3002)",
+      "Bash(wc:*)"
     ],
     "deny": []
   }

@@ -2,7 +2,7 @@
 
 import { useState, useRef, DragEvent } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/forms/button'
 import { Input } from '@/components/ui/forms'
 import { Label } from '@/components/ui/forms'
 import { Badge } from '@/components/ui/display'

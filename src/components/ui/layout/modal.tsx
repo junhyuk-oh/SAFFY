@@ -3,7 +3,7 @@
 import { ReactNode, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/forms/button"
 
 interface ModalProps {
   isOpen: boolean

@@ -3,7 +3,7 @@
  */
 
 // 버튼은 최상위에 유지 (자주 사용되므로)
-export * from './button';
+export * from './forms/button';
 
 // 카테고리별 re-export
 export * from './forms';
