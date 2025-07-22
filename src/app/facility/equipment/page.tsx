@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { EquipmentGrid } from '@/components/facility';
 import { Equipment } from '@/lib/types/facility';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Breadcrumb } from '@/components/ui/display';
 
 export default function EquipmentPage() {
   const router = useRouter();

@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { MaintenanceTask } from "@/lib/types/facility"
-import { Badge } from "@/components/ui/display"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/display/badge"
+import { Button } from "@/components/ui/forms/button"
 import { MAINTENANCE_STATUS, PRIORITY_CONFIG } from "@/lib/constants/status"
 import { formatDateTimeTime } from "@/lib/utils/date"
 
@@ -20,19 +20,19 @@ interface MaintenanceDetailProps {
 
 const categoryIcons: Record<string, string> = {
   "Electrical": "??,
-  "HVAC": "?Œ¡ï¸?,
-  "Plumbing": "?”§",
-  "Fire Safety": "?”¥", 
-  "Security": "?›¡ï¸?,
-  "Structural": "?—ï¸?,
-  "Equipment": "?™ï¸",
-  "Cleaning": "?§¹",
-  "Preventive": "?”„",
-  "Corrective": "?”§",
-  "Emergency": "?š¨",
-  "Inspection": "?”",
-  "Calibration": "?“",
-  "Software Update": "?’»",
+  "HVAC": "?ï¿½ï¿½ï¿½?,
+  "Plumbing": "?ï¿½ï¿½",
+  "Fire Safety": "?ï¿½ï¿½", 
+  "Security": "?ï¿½ï¿½ï¿½?,
+  "Structural": "?ï¿½ï¿½ï¿½?,
+  "Equipment": "?ï¿½ï¸",
+  "Cleaning": "?ï¿½ï¿½",
+  "Preventive": "?ï¿½ï¿½",
+  "Corrective": "?ï¿½ï¿½",
+  "Emergency": "?ï¿½ï¿½",
+  "Inspection": "?ï¿½ï¿½",
+  "Calibration": "?ï¿½ï¿½",
+  "Software Update": "?ï¿½ï¿½",
   "Safety Check": "??
 }
 
@@ -51,10 +51,10 @@ export function MaintenanceDetail({
 
   const statusInfo = MAINTENANCE_STATUS[task.status]
   const priorityInfo = PRIORITY_CONFIG[task.priority]
-  const categoryIcon = categoryIcons[task.category] || "?”§"
+  const categoryIcon = categoryIcons[task.category] || "?ï¿½ï¿½"
 
 
-  // ê¸°í•œê¹Œì? ?¨ì? ?œê°„ ê³„ì‚°
+  // ê¸°í•œê¹Œï¿½? ?ï¿½ï¿½? ?ï¿½ê°„ ê³„ì‚°
   const getTimeUntilDue = () => {
     const now = new Date()
     const dueDate = new Date(task.dueDate)
@@ -62,13 +62,13 @@ export function MaintenanceDetail({
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
     
     if (diffDays < 0) return { text: `${Math.abs(diffDays)}??ì§€??, urgent: true, type: 'overdue' }
-    if (diffDays === 0) return { text: "?¤ëŠ˜ ë§ˆê°", urgent: true, type: 'today' }
-    if (diffDays === 1) return { text: "?´ì¼ ë§ˆê°", urgent: true, type: 'tomorrow' }
-    if (diffDays <= 3) return { text: `${diffDays}???¨ìŒ`, urgent: true, type: 'soon' }
-    return { text: `${diffDays}???¨ìŒ`, urgent: false, type: 'normal' }
+    if (diffDays === 0) return { text: "?ï¿½ëŠ˜ ë§ˆê°", urgent: true, type: 'today' }
+    if (diffDays === 1) return { text: "?ï¿½ì¼ ë§ˆê°", urgent: true, type: 'tomorrow' }
+    if (diffDays <= 3) return { text: `${diffDays}???ï¿½ìŒ`, urgent: true, type: 'soon' }
+    return { text: `${diffDays}???ï¿½ìŒ`, urgent: false, type: 'normal' }
   }
 
-  // ì§„í–‰ë¥?ê³„ì‚°
+  // ì§„í–‰ï¿½?ê³„ì‚°
   const getProgress = () => {
     if (!task.checklist || task.checklist.length === 0) return 0
     return Math.round((task.checklist.filter(item => item.completed).length / task.checklist.length) * 100)
@@ -80,7 +80,7 @@ export function MaintenanceDetail({
   const handleComplete = () => {
     if (onComplete) {
       onComplete({
-        actualDuration: task.estimatedDuration, // ?¤ì œë¡œëŠ” ?¬ìš©???…ë ¥ ë°›ì•„????
+        actualDuration: task.estimatedDuration, // ?ï¿½ì œë¡œëŠ” ?ï¿½ìš©???ï¿½ë ¥ ë°›ì•„????
         notes: completionNotes,
         completedDate: new Date().toISOString()
       })
@@ -90,16 +90,16 @@ export function MaintenanceDetail({
   }
 
   const tabs = [
-    { id: 'overview', label: 'ê°œìš”', icon: '?“‹' },
-    { id: 'safety', label: '?ˆì „?•ë³´', icon: '?›¡ï¸? },
+    { id: 'overview', label: 'ê°œìš”', icon: '?ï¿½ï¿½' },
+    { id: 'safety', label: '?ï¿½ì „?ï¿½ë³´', icon: '?ï¿½ï¿½ï¿½? },
     { id: 'checklist', label: 'ì²´í¬ë¦¬ìŠ¤??, icon: '?? },
-    { id: 'materials', label: '?ì¬/?„êµ¬', icon: '?“¦' },
-    { id: 'history', label: '?´ë ¥', icon: '?“' }
+    { id: 'materials', label: '?ï¿½ì¬/?ï¿½êµ¬', icon: '?ï¿½ï¿½' },
+    { id: 'history', label: '?ï¿½ë ¥', icon: '?ï¿½ï¿½' }
   ] as const
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* ?¤ë” */}
+      {/* ?ï¿½ë” */}
       <div className="bg-background-secondary rounded-notion-md p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-4 flex-1">
@@ -147,7 +147,7 @@ export function MaintenanceDetail({
                 className="bg-success hover:bg-success/90"
               >
                 <span className="mr-1">??/span>
-                ?‘ì—… ?„ë£Œ
+                ?ï¿½ì—… ?ï¿½ë£Œ
               </Button>
             )}
             {canEdit && (
@@ -156,8 +156,8 @@ export function MaintenanceDetail({
                 size="sm"
                 onClick={onEdit}
               >
-                <span className="mr-1">?ï¸</span>
-                ?˜ì •
+                <span className="mr-1">?ï¿½ï¸</span>
+                ?ï¿½ì •
               </Button>
             )}
             {onStatusChange && (
@@ -166,10 +166,10 @@ export function MaintenanceDetail({
                 onChange={(e) => onStatusChange(e.target.value as MaintenanceTask['status'])}
                 className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
               >
-                <option value="scheduled">?ˆì •??/option>
-                <option value="in_progress">ì§„í–‰ì¤?/option>
+                <option value="scheduled">?ï¿½ì •??/option>
+                <option value="in_progress">ì§„í–‰ï¿½?/option>
                 <option value="on_hold">ë³´ë¥˜</option>
-                <option value="completed">?„ë£Œ</option>
+                <option value="completed">?ï¿½ë£Œ</option>
                 <option value="cancelled">ì·¨ì†Œ</option>
               </select>
             )}
@@ -180,11 +180,11 @@ export function MaintenanceDetail({
           <p className="text-text-secondary mb-4">{task.description}</p>
         )}
 
-        {/* ì§„í–‰ë¥??œì‹œ */}
+        {/* ì§„í–‰ï¿½??ï¿½ì‹œ */}
         {task.checklist && task.checklist.length > 0 && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-text-primary">ì§„í–‰ë¥?/span>
+              <span className="text-sm font-medium text-text-primary">ì§„í–‰ï¿½?/span>
               <span className="text-sm font-medium text-text-primary">{progress}%</span>
             </div>
             <div className="w-full h-3 bg-background-hover rounded-full overflow-hidden">
@@ -196,10 +196,10 @@ export function MaintenanceDetail({
           </div>
         )}
 
-        {/* ê¸°ë³¸ ?•ë³´ ê·¸ë¦¬??*/}
+        {/* ê¸°ë³¸ ?ï¿½ë³´ ê·¸ë¦¬??*/}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <div className="text-text-secondary">?´ë‹¹??/div>
+            <div className="text-text-secondary">?ï¿½ë‹¹??/div>
             <div className="font-medium text-text-primary flex items-center gap-2 mt-1">
               <div className="w-6 h-6 bg-primary-light rounded-full flex items-center justify-center text-primary text-xs font-semibold">
                 {task.assignedTo.name.charAt(0)}
@@ -208,11 +208,11 @@ export function MaintenanceDetail({
             </div>
           </div>
           <div>
-            <div className="text-text-secondary">? ì²­??/div>
+            <div className="text-text-secondary">?ï¿½ì²­??/div>
             <div className="font-medium text-text-primary mt-1">{task.reportedBy.name}</div>
           </div>
           <div>
-            <div className="text-text-secondary">?ˆì •??/div>
+            <div className="text-text-secondary">?ï¿½ì •??/div>
             <div className="font-medium text-text-primary mt-1">{formatDateTime(task.scheduledDate)}</div>
           </div>
           <div>
@@ -224,7 +224,7 @@ export function MaintenanceDetail({
         </div>
       </div>
 
-      {/* ???¤ë¹„ê²Œì´??*/}
+      {/* ???ï¿½ë¹„ê²Œì´??*/}
       <div className="bg-background-secondary rounded-notion-md">
         <div className="flex border-b border-border">
           {tabs.map((tab) => (
@@ -249,25 +249,25 @@ export function MaintenanceDetail({
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-text-primary">?‘ì—… ?•ë³´</h3>
+                  <h3 className="text-lg font-semibold text-text-primary">?ï¿½ì—… ?ï¿½ë³´</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-text-secondary">?ˆìƒ ?Œìš”?œê°„</span>
-                      <span className="text-text-primary">{task.estimatedDuration}ë¶?/span>
+                      <span className="text-text-secondary">?ï¿½ìƒ ?ï¿½ìš”?ï¿½ê°„</span>
+                      <span className="text-text-primary">{task.estimatedDuration}ï¿½?/span>
                     </div>
                     {task.actualDuration && (
                       <div className="flex justify-between">
-                        <span className="text-text-secondary">?¤ì œ ?Œìš”?œê°„</span>
-                        <span className="text-text-primary">{task.actualDuration}ë¶?/span>
+                        <span className="text-text-secondary">?ï¿½ì œ ?ï¿½ìš”?ï¿½ê°„</span>
+                        <span className="text-text-primary">{task.actualDuration}ï¿½?/span>
                       </div>
                     )}
                     <div className="flex justify-between">
-                      <span className="text-text-secondary">?ì„±??/span>
+                      <span className="text-text-secondary">?ï¿½ì„±??/span>
                       <span className="text-text-primary">{formatDateTime(task.createdAt)}</span>
                     </div>
                     {task.completedDate && (
                       <div className="flex justify-between">
-                        <span className="text-text-secondary">?„ë£Œ??/span>
+                        <span className="text-text-secondary">?ï¿½ë£Œ??/span>
                         <span className="text-text-primary">{formatDateTime(task.completedDate)}</span>
                       </div>
                     )}
@@ -276,13 +276,13 @@ export function MaintenanceDetail({
 
                 {task.equipmentName && (
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-text-primary">ê´€???¥ë¹„</h3>
+                    <h3 className="text-lg font-semibold text-text-primary">ê´€???ï¿½ë¹„</h3>
                     <div className="p-4 bg-background rounded-notion-sm">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">?™ï¸</span>
+                        <span className="text-2xl">?ï¿½ï¸</span>
                         <div>
                           <div className="font-medium text-text-primary">{task.equipmentName}</div>
-                          <div className="text-sm text-text-secondary">?¥ë¹„ ID: {task.equipmentId}</div>
+                          <div className="text-sm text-text-secondary">?ï¿½ë¹„ ID: {task.equipmentId}</div>
                         </div>
                       </div>
                     </div>
@@ -292,23 +292,23 @@ export function MaintenanceDetail({
 
               {task.cost && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-text-primary">ë¹„ìš© ?•ë³´</h3>
+                  <h3 className="text-lg font-semibold text-text-primary">ë¹„ìš© ?ï¿½ë³´</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="p-4 bg-background rounded-notion-sm text-center">
                       <div className="text-lg font-bold text-text-primary">{task.cost.labor.toLocaleString()}</div>
-                      <div className="text-sm text-text-secondary">?¸ê±´ë¹?/div>
+                      <div className="text-sm text-text-secondary">?ï¿½ê±´ï¿½?/div>
                     </div>
                     <div className="p-4 bg-background rounded-notion-sm text-center">
                       <div className="text-lg font-bold text-text-primary">{task.cost.materials.toLocaleString()}</div>
-                      <div className="text-sm text-text-secondary">?ì¬ë¹?/div>
+                      <div className="text-sm text-text-secondary">?ï¿½ì¬ï¿½?/div>
                     </div>
                     <div className="p-4 bg-background rounded-notion-sm text-center">
                       <div className="text-lg font-bold text-text-primary">{task.cost.external.toLocaleString()}</div>
-                      <div className="text-sm text-text-secondary">?¸ì£¼ë¹?/div>
+                      <div className="text-sm text-text-secondary">?ï¿½ì£¼ï¿½?/div>
                     </div>
                     <div className="p-4 bg-background rounded-notion-sm text-center">
                       <div className="text-lg font-bold text-primary">{task.cost.total.toLocaleString()}</div>
-                      <div className="text-sm text-text-secondary">ì´?ë¹„ìš©</div>
+                      <div className="text-sm text-text-secondary">ï¿½?ë¹„ìš©</div>
                     </div>
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export function MaintenanceDetail({
 
               {task.notes && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-text-primary">ì¶”ê? ë©”ëª¨</h3>
+                  <h3 className="text-lg font-semibold text-text-primary">ì¶”ï¿½? ë©”ëª¨</h3>
                   <div className="p-4 bg-background rounded-notion-sm">
                     <p className="text-text-primary whitespace-pre-wrap">{task.notes}</p>
                   </div>
@@ -325,34 +325,34 @@ export function MaintenanceDetail({
             </div>
           )}
 
-          {/* ?ˆì „?•ë³´ ??*/}
+          {/* ?ï¿½ì „?ï¿½ë³´ ??*/}
           {activeTab === 'safety' && (
             <div className="space-y-6">
-              {/* ?ˆì „ ?Œë¦¼ */}
+              {/* ?ï¿½ì „ ?ï¿½ë¦¼ */}
               <div className="flex items-center gap-3 p-4 bg-warning-bg text-warning-text rounded-notion-md">
-                <span className="text-2xl">? ï¸</span>
+                <span className="text-2xl">?ï¿½ï¸</span>
                 <div>
-                  <div className="font-semibold">?ˆì „ ì£¼ì˜?¬í•­</div>
-                  <div className="text-sm">?‘ì—… ?œì‘ ??ëª¨ë“  ?ˆì „ ?”êµ¬?¬í•­???•ì¸?˜ì„¸??/div>
+                  <div className="font-semibold">?ï¿½ì „ ì£¼ì˜?ï¿½í•­</div>
+                  <div className="text-sm">?ï¿½ì—… ?ï¿½ì‘ ??ëª¨ë“  ?ï¿½ì „ ?ï¿½êµ¬?ï¿½í•­???ï¿½ì¸?ï¿½ì„¸??/div>
                 </div>
               </div>
 
-              {/* ?ˆì „ ?µì…˜ */}
+              {/* ?ï¿½ì „ ?ï¿½ì…˜ */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-text-primary">?ˆì „ ?”êµ¬?¬í•­</h3>
+                  <h3 className="text-lg font-semibold text-text-primary">?ï¿½ì „ ?ï¿½êµ¬?ï¿½í•­</h3>
                   <div className="space-y-2">
                     <div className={`flex items-center gap-3 p-3 rounded-notion-sm ${
                       task.safety.lockoutTagout ? 'bg-error-bg text-error-text' : 'bg-background'
                     }`}>
                       <span>{task.safety.lockoutTagout ? '?? : '??}</span>
-                      <span>LOTO (? ê¸ˆ?œì‹œ) ?„ìš”</span>
+                      <span>LOTO (?ï¿½ê¸ˆ?ï¿½ì‹œ) ?ï¿½ìš”</span>
                     </div>
                     <div className={`flex items-center gap-3 p-3 rounded-notion-sm ${
                       task.safety.permitRequired ? 'bg-warning-bg text-warning-text' : 'bg-background'
                     }`}>
                       <span>{task.safety.permitRequired ? '?? : '??}</span>
-                      <span>?‘ì—…?ˆê????„ìš”</span>
+                      <span>?ï¿½ì—…?ï¿½ï¿½????ï¿½ìš”</span>
                       {task.safety.permitId && (
                         <span className="text-sm">({task.safety.permitId})</span>
                       )}
@@ -361,14 +361,14 @@ export function MaintenanceDetail({
                 </div>
               </div>
 
-              {/* ?„í—˜?”ì†Œ */}
+              {/* ?ï¿½í—˜?ï¿½ì†Œ */}
               {task.safety.hazards.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-text-primary">?ë³„???„í—˜?”ì†Œ</h3>
+                  <h3 className="text-lg font-semibold text-text-primary">?ï¿½ë³„???ï¿½í—˜?ï¿½ì†Œ</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {task.safety.hazards.map((hazard, index) => (
                       <div key={index} className="p-3 bg-error-bg text-error-text rounded-notion-sm text-sm">
-                        <span className="mr-2">? ï¸</span>
+                        <span className="mr-2">?ï¿½ï¸</span>
                         {hazard}
                       </div>
                     ))}
@@ -376,10 +376,10 @@ export function MaintenanceDetail({
                 </div>
               )}
 
-              {/* ?ˆë°©ì¡°ì¹˜ */}
+              {/* ?ï¿½ë°©ì¡°ì¹˜ */}
               {task.safety.precautions.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-text-primary">?ˆë°©ì¡°ì¹˜</h3>
+                  <h3 className="text-lg font-semibold text-text-primary">?ï¿½ë°©ì¡°ì¹˜</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {task.safety.precautions.map((precaution, index) => (
                       <div key={index} className="p-3 bg-success-bg text-success-text rounded-notion-sm text-sm">
@@ -391,14 +391,14 @@ export function MaintenanceDetail({
                 </div>
               )}
 
-              {/* ?„ìš”??PPE */}
+              {/* ?ï¿½ìš”??PPE */}
               {task.safety.requiredPPE.length > 0 && (
                 <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-text-primary">?„ìš”??ë³´í˜¸êµ?(PPE)</h3>
+                  <h3 className="text-lg font-semibold text-text-primary">?ï¿½ìš”??ë³´í˜¸ï¿½?(PPE)</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {task.safety.requiredPPE.map((ppe, index) => (
                       <div key={index} className="p-3 bg-primary-light text-primary rounded-notion-sm text-sm text-center">
-                        <span className="mr-2">?›¡ï¸?/span>
+                        <span className="mr-2">?ï¿½ï¿½ï¿½?/span>
                         {ppe}
                       </div>
                     ))}
@@ -412,10 +412,10 @@ export function MaintenanceDetail({
           {activeTab === 'checklist' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-text-primary">?‘ì—… ì²´í¬ë¦¬ìŠ¤??/h3>
+                <h3 className="text-lg font-semibold text-text-primary">?ï¿½ì—… ì²´í¬ë¦¬ìŠ¤??/h3>
                 {task.checklist && (
                   <div className="text-sm text-text-secondary">
-                    {task.checklist.filter(item => item.completed).length} / {task.checklist.length} ?„ë£Œ
+                    {task.checklist.filter(item => item.completed).length} / {task.checklist.length} ?ï¿½ë£Œ
                   </div>
                 )}
               </div>
@@ -455,28 +455,28 @@ export function MaintenanceDetail({
                 </div>
               ) : (
                 <div className="text-center py-8 text-text-secondary">
-                  <div className="text-4xl mb-2">?“‹</div>
-                  <p>ì²´í¬ë¦¬ìŠ¤?¸ê? ?†ìŠµ?ˆë‹¤</p>
+                  <div className="text-4xl mb-2">?ï¿½ï¿½</div>
+                  <p>ì²´í¬ë¦¬ìŠ¤?ï¿½ï¿½? ?ï¿½ìŠµ?ï¿½ë‹¤</p>
                 </div>
               )}
             </div>
           )}
 
-          {/* ?ì¬/?„êµ¬ ??*/}
+          {/* ?ï¿½ì¬/?ï¿½êµ¬ ??*/}
           {activeTab === 'materials' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-text-primary">?„ìš”???ì¬ ë°??„êµ¬</h3>
+              <h3 className="text-lg font-semibold text-text-primary">?ï¿½ìš”???ï¿½ì¬ ï¿½??ï¿½êµ¬</h3>
 
               {task.materials && task.materials.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-border">
-                        <th className="text-left py-3 text-sm font-semibold text-text-primary">?ì¬ëª?/th>
-                        <th className="text-right py-3 text-sm font-semibold text-text-primary">?˜ëŸ‰</th>
-                        <th className="text-right py-3 text-sm font-semibold text-text-primary">?¨ìœ„</th>
-                        <th className="text-right py-3 text-sm font-semibold text-text-primary">?¨ê?</th>
-                        <th className="text-right py-3 text-sm font-semibold text-text-primary">?©ê³„</th>
+                        <th className="text-left py-3 text-sm font-semibold text-text-primary">?ï¿½ì¬ï¿½?/th>
+                        <th className="text-right py-3 text-sm font-semibold text-text-primary">?ï¿½ëŸ‰</th>
+                        <th className="text-right py-3 text-sm font-semibold text-text-primary">?ï¿½ìœ„</th>
+                        <th className="text-right py-3 text-sm font-semibold text-text-primary">?ï¿½ï¿½?</th>
+                        <th className="text-right py-3 text-sm font-semibold text-text-primary">?ï¿½ê³„</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -499,7 +499,7 @@ export function MaintenanceDetail({
                   {task.materials.some(m => m.cost) && (
                     <div className="mt-4 p-4 bg-background rounded-notion-sm">
                       <div className="flex justify-between text-lg font-semibold">
-                        <span>?ì¬ë¹?ì´ê³„</span>
+                        <span>?ï¿½ì¬ï¿½?ì´ê³„</span>
                         <span className="text-primary">
                           ??task.materials.reduce((sum, m) => sum + (m.cost || 0) * m.quantity, 0).toLocaleString()}
                         </span>
@@ -509,75 +509,75 @@ export function MaintenanceDetail({
                 </div>
               ) : (
                 <div className="text-center py-8 text-text-secondary">
-                  <div className="text-4xl mb-2">?“¦</div>
-                  <p>?±ë¡???ì¬ê°€ ?†ìŠµ?ˆë‹¤</p>
+                  <div className="text-4xl mb-2">?ï¿½ï¿½</div>
+                  <p>?ï¿½ë¡???ï¿½ì¬ê°€ ?ï¿½ìŠµ?ï¿½ë‹¤</p>
                 </div>
               )}
             </div>
           )}
 
-          {/* ?´ë ¥ ??*/}
+          {/* ?ï¿½ë ¥ ??*/}
           {activeTab === 'history' && (
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-text-primary">?‘ì—… ?´ë ¥</h3>
+              <h3 className="text-lg font-semibold text-text-primary">?ï¿½ì—… ?ï¿½ë ¥</h3>
               
               <div className="space-y-4">
-                {/* ?ì„± ?´ë²¤??*/}
+                {/* ?ï¿½ì„± ?ï¿½ë²¤??*/}
                 <div className="flex gap-4">
                   <div className="w-10 h-10 bg-background-hover rounded-full flex items-center justify-center">
-                    <span className="text-sm">?“</span>
+                    <span className="text-sm">?ï¿½ï¿½</span>
                   </div>
                   <div className="flex-1">
-                    <div className="font-medium text-text-primary">?‘ì—… ?ì„±</div>
+                    <div className="font-medium text-text-primary">?ï¿½ì—… ?ï¿½ì„±</div>
                     <div className="text-sm text-text-secondary">
-                      {task.reportedBy.name}??ê°€) ?‘ì—…???ì„±?ˆìŠµ?ˆë‹¤
+                      {task.reportedBy.name}??ê°€) ?ï¿½ì—…???ï¿½ì„±?ï¿½ìŠµ?ï¿½ë‹¤
                     </div>
                     <div className="text-xs text-text-tertiary">{formatDateTime(task.createdAt)}</div>
                   </div>
                 </div>
 
-                {/* ?¹ì¸ ?´ë²¤??*/}
+                {/* ?ï¿½ì¸ ?ï¿½ë²¤??*/}
                 {task.approvedBy && (
                   <div className="flex gap-4">
                     <div className="w-10 h-10 bg-success-bg rounded-full flex items-center justify-center">
                       <span className="text-sm text-success-text">??/span>
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium text-text-primary">?‘ì—… ?¹ì¸</div>
+                      <div className="font-medium text-text-primary">?ï¿½ì—… ?ï¿½ì¸</div>
                       <div className="text-sm text-text-secondary">
-                        {task.approvedBy.name}??ê°€) ?‘ì—…???¹ì¸?ˆìŠµ?ˆë‹¤
+                        {task.approvedBy.name}??ê°€) ?ï¿½ì—…???ï¿½ì¸?ï¿½ìŠµ?ï¿½ë‹¤
                       </div>
                       <div className="text-xs text-text-tertiary">{formatDateTime(task.approvedBy.date)}</div>
                     </div>
                   </div>
                 )}
 
-                {/* ?„ë£Œ ?´ë²¤??*/}
+                {/* ?ï¿½ë£Œ ?ï¿½ë²¤??*/}
                 {task.status === 'completed' && task.completedDate && (
                   <div className="flex gap-4">
                     <div className="w-10 h-10 bg-success-bg rounded-full flex items-center justify-center">
-                      <span className="text-sm text-success-text">?‰</span>
+                      <span className="text-sm text-success-text">?ï¿½ï¿½</span>
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium text-text-primary">?‘ì—… ?„ë£Œ</div>
+                      <div className="font-medium text-text-primary">?ï¿½ì—… ?ï¿½ë£Œ</div>
                       <div className="text-sm text-text-secondary">
-                        {task.assignedTo.name}??ê°€) ?‘ì—…???„ë£Œ?ˆìŠµ?ˆë‹¤
+                        {task.assignedTo.name}??ê°€) ?ï¿½ì—…???ï¿½ë£Œ?ï¿½ìŠµ?ï¿½ë‹¤
                       </div>
                       <div className="text-xs text-text-tertiary">{formatDateTime(task.completedDate)}</div>
                     </div>
                   </div>
                 )}
 
-                {/* ?¼ë“œë°?*/}
+                {/* ?ï¿½ë“œï¿½?*/}
                 {task.feedback && (
                   <div className="flex gap-4">
                     <div className="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center">
-                      <span className="text-sm text-primary">â­?/span>
+                      <span className="text-sm text-primary">ï¿½?/span>
                     </div>
                     <div className="flex-1">
-                      <div className="font-medium text-text-primary">?‘ì—… ?‰ê?</div>
+                      <div className="font-medium text-text-primary">?ï¿½ì—… ?ï¿½ï¿½?</div>
                       <div className="text-sm text-text-secondary">
-                        ?‰ì : {task.feedback.rating}/5 â­?
+                        ?ï¿½ì : {task.feedback.rating}/5 ï¿½?
                       </div>
                       <div className="text-sm text-text-primary mt-1">{task.feedback.comment}</div>
                       <div className="text-xs text-text-tertiary">{formatDateTime(task.feedback.submittedDate)}</div>
@@ -590,21 +590,21 @@ export function MaintenanceDetail({
         </div>
       </div>
 
-      {/* ?„ë£Œ ëª¨ë‹¬ */}
+      {/* ?ï¿½ë£Œ ëª¨ë‹¬ */}
       {showCompleteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-background rounded-notion-lg p-6 w-full max-w-md mx-4">
-            <h3 className="text-lg font-semibold text-text-primary mb-4">?‘ì—… ?„ë£Œ</h3>
+            <h3 className="text-lg font-semibold text-text-primary mb-4">?ï¿½ì—… ?ï¿½ë£Œ</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
-                  ?„ë£Œ ë©”ëª¨
+                  ?ï¿½ë£Œ ë©”ëª¨
                 </label>
                 <textarea
                   value={completionNotes}
                   onChange={(e) => setCompletionNotes(e.target.value)}
                   className="w-full px-3 py-2 rounded-notion-sm border border-border bg-background-secondary focus:border-border-focus focus:outline-none h-24 resize-none"
-                  placeholder="?‘ì—… ?„ë£Œ???€??ë©”ëª¨ë¥??…ë ¥?˜ì„¸??.."
+                  placeholder="?ï¿½ì—… ?ï¿½ë£Œ???ï¿½??ë©”ëª¨ï¿½??ï¿½ë ¥?ï¿½ì„¸??.."
                 />
               </div>
             </div>
@@ -620,7 +620,7 @@ export function MaintenanceDetail({
                 onClick={handleComplete}
                 className="flex-1 bg-success hover:bg-success/90"
               >
-                ?„ë£Œ ì²˜ë¦¬
+                ?ï¿½ë£Œ ì²˜ë¦¬
               </Button>
             </div>
           </div>

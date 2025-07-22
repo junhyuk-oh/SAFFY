@@ -4,8 +4,6 @@ import { useState } from "react"
 import { MaintenanceTask } from "@/lib/types/facility"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MAINTENANCE_STATUS, PRIORITY_CONFIG } from "@/lib/constants/status"
-import { formatDateTimeTime } from "@/lib/utils/date"
 
 interface MaintenanceDetailProps {
   task: MaintenanceTask
@@ -17,6 +15,67 @@ interface MaintenanceDetailProps {
   canComplete?: boolean
 }
 
+const statusConfig = {
+  scheduled: {
+    label: "예정됨",
+    color: "text-primary",
+    bg: "bg-blue-50",
+    icon: "📅"
+  },
+  in_progress: {
+    label: "진행중",
+    color: "text-warning-text",
+    bg: "bg-warning-bg",
+    icon: "⚡"
+  },
+  completed: {
+    label: "완료",
+    color: "text-success-text", 
+    bg: "bg-success-bg",
+    icon: "✅"
+  },
+  overdue: {
+    label: "지연",
+    color: "text-error-text",
+    bg: "bg-error-bg",
+    icon: "⏰"
+  },
+  cancelled: {
+    label: "취소",
+    color: "text-text-tertiary",
+    bg: "bg-gray-100",
+    icon: "❌"
+  },
+  on_hold: {
+    label: "보류",
+    color: "text-text-secondary",
+    bg: "bg-background-hover",
+    icon: "⏸️"
+  }
+}
+
+const priorityConfig = {
+  low: {
+    label: "낮음",
+    color: "text-success-text",
+    bg: "bg-success-bg"
+  },
+  medium: {
+    label: "보통", 
+    color: "text-warning-text",
+    bg: "bg-warning-bg"
+  },
+  high: {
+    label: "높음",
+    color: "text-error-text",
+    bg: "bg-error-bg"
+  },
+  critical: {
+    label: "긴급",
+    color: "text-white",
+    bg: "bg-red-600"
+  }
+}
 
 const categoryIcons: Record<string, string> = {
   "Electrical": "⚡",
@@ -49,10 +108,21 @@ export function MaintenanceDetail({
   const [completionNotes, setCompletionNotes] = useState('')
   const [showCompleteModal, setShowCompleteModal] = useState(false)
 
-  const statusInfo = MAINTENANCE_STATUS[task.status]
-  const priorityInfo = PRIORITY_CONFIG[task.priority]
+  const statusInfo = statusConfig[task.status]
+  const priorityInfo = priorityConfig[task.priority]
   const categoryIcon = categoryIcons[task.category] || "🔧"
 
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
   // 기한까지 남은 시간 계산
   const getTimeUntilDue = () => {
@@ -213,12 +283,12 @@ export function MaintenanceDetail({
           </div>
           <div>
             <div className="text-text-secondary">예정일</div>
-            <div className="font-medium text-text-primary mt-1">{formatDateTime(task.scheduledDate)}</div>
+            <div className="font-medium text-text-primary mt-1">{formatDate(task.scheduledDate)}</div>
           </div>
           <div>
             <div className="text-text-secondary">마감일</div>
             <div className={`font-medium mt-1 ${timeInfo.urgent ? 'text-error-text' : 'text-text-primary'}`}>
-              {formatDateTime(task.dueDate)}
+              {formatDate(task.dueDate)}
             </div>
           </div>
         </div>
@@ -263,12 +333,12 @@ export function MaintenanceDetail({
                     )}
                     <div className="flex justify-between">
                       <span className="text-text-secondary">생성일</span>
-                      <span className="text-text-primary">{formatDateTime(task.createdAt)}</span>
+                      <span className="text-text-primary">{formatDate(task.createdAt)}</span>
                     </div>
                     {task.completedDate && (
                       <div className="flex justify-between">
                         <span className="text-text-secondary">완료일</span>
-                        <span className="text-text-primary">{formatDateTime(task.completedDate)}</span>
+                        <span className="text-text-primary">{formatDate(task.completedDate)}</span>
                       </div>
                     )}
                   </div>
@@ -445,7 +515,7 @@ export function MaintenanceDetail({
                           )}
                           {item.completed && item.completedBy && (
                             <div className="text-xs text-text-tertiary mt-1">
-                              {item.completedBy} • {item.completedDate && formatDateTime(item.completedDate)}
+                              {item.completedBy} • {item.completedDate && formatDate(item.completedDate)}
                             </div>
                           )}
                         </div>
@@ -532,7 +602,7 @@ export function MaintenanceDetail({
                     <div className="text-sm text-text-secondary">
                       {task.reportedBy.name}이(가) 작업을 생성했습니다
                     </div>
-                    <div className="text-xs text-text-tertiary">{formatDateTime(task.createdAt)}</div>
+                    <div className="text-xs text-text-tertiary">{formatDate(task.createdAt)}</div>
                   </div>
                 </div>
 
@@ -547,7 +617,7 @@ export function MaintenanceDetail({
                       <div className="text-sm text-text-secondary">
                         {task.approvedBy.name}이(가) 작업을 승인했습니다
                       </div>
-                      <div className="text-xs text-text-tertiary">{formatDateTime(task.approvedBy.date)}</div>
+                      <div className="text-xs text-text-tertiary">{formatDate(task.approvedBy.date)}</div>
                     </div>
                   </div>
                 )}
@@ -563,7 +633,7 @@ export function MaintenanceDetail({
                       <div className="text-sm text-text-secondary">
                         {task.assignedTo.name}이(가) 작업을 완료했습니다
                       </div>
-                      <div className="text-xs text-text-tertiary">{formatDateTime(task.completedDate)}</div>
+                      <div className="text-xs text-text-tertiary">{formatDate(task.completedDate)}</div>
                     </div>
                   </div>
                 )}
@@ -580,7 +650,7 @@ export function MaintenanceDetail({
                         평점: {task.feedback.rating}/5 ⭐
                       </div>
                       <div className="text-sm text-text-primary mt-1">{task.feedback.comment}</div>
-                      <div className="text-xs text-text-tertiary">{formatDateTime(task.feedback.submittedDate)}</div>
+                      <div className="text-xs text-text-tertiary">{formatDate(task.feedback.submittedDate)}</div>
                     </div>
                   </div>
                 )}

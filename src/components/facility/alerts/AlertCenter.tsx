@@ -1,24 +1,16 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { FacilityAlert, FacilitySearchParams, AlertSeverity } from "@/lib/types/facility"
+import { FacilityAlert, FacilitySearchParams } from "@/lib/types/facility"
 import { AlertItem } from "./AlertItem"
-import { Badge } from "@/components/ui/display"
-import { Button } from "@/components/ui/button"
-
-// ?�림 ?�터???�렬 ?�드 ?�??
-type AlertSortField = 'detectedDate' | 'severity' | 'status' | 'category'
-
-// ?�림 검???�라미터 (FacilitySearchParams�??�장)
-interface AlertSearchParams extends Omit<FacilitySearchParams, 'sortBy'> {
-  sortBy?: AlertSortField
-}
+import { Badge } from "@/components/ui/display/badge"
+import { Button } from "@/components/ui/forms/button"
 
 interface AlertCenterProps {
   alerts: FacilityAlert[]
   loading?: boolean
-  searchParams?: AlertSearchParams
-  onSearch?: (params: AlertSearchParams) => void
+  searchParams?: FacilitySearchParams
+  onSearch?: (params: FacilitySearchParams) => void
   onAcknowledge?: (id: string, notes?: string) => void
   onResolve?: (id: string, resolution: string, actionsTaken: string[]) => void
   onEscalate?: (id: string) => void
@@ -30,41 +22,41 @@ interface AlertCenterProps {
 }
 
 const severityOptions = [
-  { value: 'all', label: '?�체 ?�각?? },
+  { value: 'all', label: '전체 심각도' },
   { value: 'emergency', label: '비상' },
   { value: 'critical', label: '긴급' },
-  { value: 'high', label: '?�음' },
+  { value: 'high', label: '높음' },
   { value: 'medium', label: '보통' },
-  { value: 'low', label: '??��' }
+  { value: 'low', label: '낮음' }
 ]
 
 const statusOptions = [
-  { value: 'all', label: '?�체 ?�태' },
-  { value: 'active', label: '?�성' },
-  { value: 'acknowledged', label: '?�인?? },
-  { value: 'resolved', label: '?�결?? },
-  { value: 'escalated', label: '?�급보고' },
-  { value: 'false_positive', label: '?�탐지' }
+  { value: 'all', label: '전체 상태' },
+  { value: 'active', label: '활성' },
+  { value: 'acknowledged', label: '확인됨' },
+  { value: 'resolved', label: '해결됨' },
+  { value: 'escalated', label: '상급보고' },
+  { value: 'false_positive', label: '오탐지' }
 ]
 
 const categoryOptions = [
-  { value: 'all', label: '?�체 카테고리' },
-  { value: 'safety', label: '?�전' },
-  { value: 'equipment', label: '?�비' },
-  { value: 'environmental', label: '?�경' },
+  { value: 'all', label: '전체 카테고리' },
+  { value: 'safety', label: '안전' },
+  { value: 'equipment', label: '장비' },
+  { value: 'environmental', label: '환경' },
   { value: 'security', label: '보안' },
-  { value: 'operational', label: '?�영' },
-  { value: 'compliance', label: '규정준?? }
+  { value: 'operational', label: '운영' },
+  { value: 'compliance', label: '규정준수' }
 ]
 
 const sourceOptions = [
-  { value: 'all', label: '?�체 ?�스' },
-  { value: 'ai_system', label: 'AI ?�스?? },
-  { value: 'sensor', label: '?�서' },
-  { value: 'manual', label: '?�동' },
-  { value: 'inspection', label: '?��?' },
-  { value: 'maintenance', label: '?�비' },
-  { value: 'external', label: '?��?' }
+  { value: 'all', label: '전체 소스' },
+  { value: 'ai_system', label: 'AI 시스템' },
+  { value: 'sensor', label: '센서' },
+  { value: 'manual', label: '수동' },
+  { value: 'inspection', label: '점검' },
+  { value: 'maintenance', label: '정비' },
+  { value: 'external', label: '외부' }
 ]
 
 export function AlertCenter({
@@ -86,22 +78,22 @@ export function AlertCenter({
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedSource, setSelectedSource] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [sortBy, setSortBy] = useState<AlertSortField>('detectedDate')
+  const [sortBy, setSortBy] = useState<'detectedDate' | 'severity' | 'status' | 'category'>('detectedDate')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [showOnlyActive, setShowOnlyActive] = useState(true)
   const [selectedAlerts, setSelectedAlerts] = useState<Set<string>>(new Set())
   const [viewMode, setViewMode] = useState<'detailed' | 'compact'>('detailed')
 
-  // ?�터�?�??�렬???�림 목록
+  // 필터링 및 정렬된 알림 목록
   const filteredAndSortedAlerts = useMemo(() => {
     let filtered = alerts
 
-    // ?�성 ?�림�??�시 ?�션
+    // 활성 알림만 표시 옵션
     if (showOnlyActive) {
       filtered = filtered.filter(alert => alert.status === 'active' || alert.status === 'acknowledged')
     }
 
-    // 검??쿼리 ?�터�?
+    // 검색 쿼리 필터링
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(alert => 
@@ -114,30 +106,29 @@ export function AlertCenter({
       )
     }
 
-    // ?�각???�터�?
+    // 심각도 필터링
     if (selectedSeverity !== 'all') {
       filtered = filtered.filter(alert => alert.severity === selectedSeverity)
     }
 
-    // ?�태 ?�터�?
+    // 상태 필터링
     if (selectedStatus !== 'all') {
       filtered = filtered.filter(alert => alert.status === selectedStatus)
     }
 
-    // 카테고리 ?�터�?
+    // 카테고리 필터링
     if (selectedCategory !== 'all') {
       filtered = filtered.filter(alert => alert.category === selectedCategory)
     }
 
-    // ?�스 ?�터�?
+    // 소스 필터링
     if (selectedSource !== 'all') {
       filtered = filtered.filter(alert => alert.source === selectedSource)
     }
 
-    // ?�렬
+    // 정렬
     filtered.sort((a, b) => {
-      let aValue: string | number
-      let bValue: string | number
+      let aValue: any, bValue: any
 
       switch (sortBy) {
         case 'detectedDate':
@@ -145,24 +136,12 @@ export function AlertCenter({
           bValue = new Date(b.detectedDate).getTime()
           break
         case 'severity':
-          const severityOrder: Record<FacilityAlert['severity'], number> = { 
-            emergency: 5, 
-            critical: 4, 
-            high: 3, 
-            medium: 2, 
-            low: 1 
-          }
+          const severityOrder = { emergency: 5, critical: 4, high: 3, medium: 2, low: 1 }
           aValue = severityOrder[a.severity]
           bValue = severityOrder[b.severity]
           break
         case 'status':
-          const statusOrder: Record<FacilityAlert['status'], number> = { 
-            active: 4, 
-            acknowledged: 3, 
-            escalated: 2, 
-            resolved: 1, 
-            false_positive: 0 
-          }
+          const statusOrder = { active: 4, acknowledged: 3, escalated: 2, resolved: 1, false_positive: 0 }
           aValue = statusOrder[a.status]
           bValue = statusOrder[b.status]
           break
@@ -184,7 +163,7 @@ export function AlertCenter({
     return filtered
   }, [alerts, searchQuery, selectedSeverity, selectedStatus, selectedCategory, selectedSource, showOnlyActive, sortBy, sortOrder])
 
-  // ?�계 계산
+  // 통계 계산
   const stats = useMemo(() => {
     const total = alerts.length
     const active = alerts.filter(alert => alert.status === 'active').length
@@ -202,7 +181,7 @@ export function AlertCenter({
       return acc
     }, {} as Record<string, number>)
 
-    // 최근 24?�간 ???�림
+    // 최근 24시간 내 알림
     const last24Hours = alerts.filter(alert => {
       const alertTime = new Date(alert.detectedDate)
       const now = new Date()
@@ -211,10 +190,10 @@ export function AlertCenter({
       return diffHours <= 24
     }).length
 
-    // AI ?�성 ?�림
+    // AI 생성 알림
     const aiGenerated = alerts.filter(alert => alert.source === 'ai_system').length
 
-    // ?�균 ?�결 ?�간 계산 (?�결???�림�?
+    // 평균 해결 시간 계산 (해결된 알림만)
     const resolvedAlerts = alerts.filter(alert => alert.status === 'resolved' && alert.resolvedDate)
     const avgResolutionTime = resolvedAlerts.length > 0 
       ? Math.round(resolvedAlerts.reduce((sum, alert) => {
@@ -247,10 +226,10 @@ export function AlertCenter({
     if (onSearch) {
       onSearch({
         query: searchQuery,
-        severity: selectedSeverity !== 'all' ? [selectedSeverity as AlertSeverity] : undefined,
+        severity: selectedSeverity !== 'all' ? [selectedSeverity as any] : undefined,
         status: selectedStatus !== 'all' ? [selectedStatus] : undefined,
         category: selectedCategory !== 'all' ? [selectedCategory] : undefined,
-        sortBy,
+        sortBy: sortBy as any,
         sortOrder
       })
     }
@@ -299,20 +278,20 @@ export function AlertCenter({
 
   return (
     <div className="space-y-6">
-      {/* ?�더 �??�계 */}
+      {/* 헤더 및 통계 */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-text-primary mb-2">?�림 ?�터</h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">알림 센터</h2>
           <div className="flex items-center gap-4 text-sm text-text-secondary">
-            <span>?�체 {stats.total}�?/span>
-            <span>??/span>
-            <span className="text-error-text">?�성 {stats.active}�?/span>
-            <span>??/span>
-            <span className="text-warning-text">?�인 {stats.acknowledged}�?/span>
-            <span>??/span>
-            <span className="text-red-600">긴급 {stats.criticalActive}�?/span>
-            <span>??/span>
-            <span className="text-success-text">?�결 {stats.resolved}�?/span>
+            <span>전체 {stats.total}개</span>
+            <span>•</span>
+            <span className="text-error-text">활성 {stats.active}개</span>
+            <span>•</span>
+            <span className="text-warning-text">확인 {stats.acknowledged}개</span>
+            <span>•</span>
+            <span className="text-red-600">긴급 {stats.criticalActive}개</span>
+            <span>•</span>
+            <span className="text-success-text">해결 {stats.resolved}개</span>
           </div>
         </div>
         
@@ -322,35 +301,35 @@ export function AlertCenter({
             size="sm"
             onClick={() => setViewMode(viewMode === 'detailed' ? 'compact' : 'detailed')}
           >
-            {viewMode === 'detailed' ? '?�� 간략?? : '?�� ?�세??}
+            {viewMode === 'detailed' ? '📋 간략히' : '📄 상세히'}
           </Button>
           {stats.active > 0 && (
             <Badge variant="destructive" className="animate-pulse">
-              {stats.active}�??�림
+              {stats.active}개 알림
             </Badge>
           )}
         </div>
       </div>
 
-      {/* 검??�??�터 */}
+      {/* 검색 및 필터 */}
       <div className="bg-background-secondary rounded-notion-md p-4 space-y-4">
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="flex-1">
             <input
               type="text"
-              placeholder="?�림 ?�목, 메시지, ?�치, ?�비�?검??.."
+              placeholder="알림 제목, 메시지, 위치, 장비명 검색..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none"
             />
           </div>
           <Button type="submit" size="sm">
-            ?�� 검??
+            🔍 검색
           </Button>
         </form>
 
         <div className="flex flex-wrap gap-3 items-center">
-          {/* ?�각???�터 */}
+          {/* 심각도 필터 */}
           <select
             value={selectedSeverity}
             onChange={(e) => setSelectedSeverity(e.target.value)}
@@ -363,7 +342,7 @@ export function AlertCenter({
             ))}
           </select>
 
-          {/* ?�태 ?�터 */}
+          {/* 상태 필터 */}
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -376,7 +355,7 @@ export function AlertCenter({
             ))}
           </select>
 
-          {/* 카테고리 ?�터 */}
+          {/* 카테고리 필터 */}
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -389,7 +368,7 @@ export function AlertCenter({
             ))}
           </select>
 
-          {/* ?�스 ?�터 */}
+          {/* 소스 필터 */}
           <select
             value={selectedSource}
             onChange={(e) => setSelectedSource(e.target.value)}
@@ -402,25 +381,25 @@ export function AlertCenter({
             ))}
           </select>
 
-          {/* ?�렬 */}
+          {/* 정렬 */}
           <select
             value={`${sortBy}-${sortOrder}`}
             onChange={(e) => {
               const [field, order] = e.target.value.split('-')
-              setSortBy(field as AlertSortField)
-              setSortOrder(order as 'asc' | 'desc')
+              setSortBy(field as any)
+              setSortOrder(order as any)
             }}
             className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
           >
-            <option value="detectedDate-desc">최신??/option>
-            <option value="detectedDate-asc">?�래?�순</option>
-            <option value="severity-desc">?�각???��???/option>
-            <option value="severity-asc">?�각???????/option>
-            <option value="status-desc">?�태??/option>
-            <option value="category-asc">카테고리??/option>
+            <option value="detectedDate-desc">최신순</option>
+            <option value="detectedDate-asc">오래된순</option>
+            <option value="severity-desc">심각도 높은순</option>
+            <option value="severity-asc">심각도 낮은순</option>
+            <option value="status-desc">상태순</option>
+            <option value="category-asc">카테고리순</option>
           </select>
 
-          {/* ?�성 ?�림�??��? */}
+          {/* 활성 알림만 토글 */}
           <label className="flex items-center space-x-2 px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm cursor-pointer">
             <input
               type="checkbox"
@@ -428,16 +407,16 @@ export function AlertCenter({
               onChange={(e) => setShowOnlyActive(e.target.checked)}
               className="rounded border-border"
             />
-            <span>?�성 ?�림�?/span>
+            <span>활성 알림만</span>
           </label>
         </div>
       </div>
 
-      {/* 빠른 ?�계 카드 */}
+      {/* 빠른 통계 카드 */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-error-text">{stats.active}</div>
-          <div className="text-sm text-text-secondary">?�성</div>
+          <div className="text-sm text-text-secondary">활성</div>
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-red-600">{stats.criticalActive}</div>
@@ -445,28 +424,28 @@ export function AlertCenter({
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-warning-text">{stats.acknowledged}</div>
-          <div className="text-sm text-text-secondary">?�인</div>
+          <div className="text-sm text-text-secondary">확인</div>
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-primary">{stats.escalated}</div>
-          <div className="text-sm text-text-secondary">?�급보고</div>
+          <div className="text-sm text-text-secondary">상급보고</div>
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-primary">{stats.aiGenerated}</div>
-          <div className="text-sm text-text-secondary">AI ?�성</div>
+          <div className="text-sm text-text-secondary">AI 생성</div>
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
-          <div className="text-2xl font-bold text-text-primary">{stats.avgResolutionTime}�?/div>
-          <div className="text-sm text-text-secondary">?�균 ?�결</div>
+          <div className="text-2xl font-bold text-text-primary">{stats.avgResolutionTime}분</div>
+          <div className="text-sm text-text-secondary">평균 해결</div>
         </div>
       </div>
 
-      {/* ?�???�업 버튼 */}
+      {/* 대량 작업 버튼 */}
       {showBulkActions && selectedAlerts.size > 0 && (
         <div className="bg-primary-light border border-primary rounded-notion-md p-4">
           <div className="flex items-center justify-between">
             <span className="text-primary font-medium">
-              {selectedAlerts.size}�??�림???�택?�었?�니??
+              {selectedAlerts.size}개 알림이 선택되었습니다
             </span>
             <div className="flex items-center gap-2">
               {canAcknowledge && (
@@ -475,7 +454,7 @@ export function AlertCenter({
                   variant="outline"
                   onClick={() => handleBulkAction('acknowledge')}
                 >
-                  ?�괄 ?�인
+                  일괄 확인
                 </Button>
               )}
               {canResolve && (
@@ -484,7 +463,7 @@ export function AlertCenter({
                   onClick={() => handleBulkAction('resolve')}
                   className="bg-success hover:bg-success/90"
                 >
-                  ?�괄 ?�결
+                  일괄 해결
                 </Button>
               )}
               {canEscalate && (
@@ -493,7 +472,7 @@ export function AlertCenter({
                   variant="destructive"
                   onClick={() => handleBulkAction('escalate')}
                 >
-                  ?�괄 ?�급보고
+                  일괄 상급보고
                 </Button>
               )}
               <Button
@@ -501,29 +480,29 @@ export function AlertCenter({
                 variant="outline"
                 onClick={() => setSelectedAlerts(new Set())}
               >
-                ?�택 ?�제
+                선택 해제
               </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ?�림 목록 */}
+      {/* 알림 목록 */}
       {filteredAndSortedAlerts.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">?��</div>
+          <div className="text-6xl mb-4">🔔</div>
           <h3 className="text-lg font-semibold text-text-primary mb-2">
             {searchQuery || selectedSeverity !== 'all' || selectedStatus !== 'all' || selectedCategory !== 'all' || selectedSource !== 'all'
-              ? '검??결과가 ?�습?�다'
+              ? '검색 결과가 없습니다'
               : showOnlyActive
-                ? '?�성 ?�림???�습?�다'
-                : '?�림???�습?�다'
+                ? '활성 알림이 없습니다'
+                : '알림이 없습니다'
             }
           </h3>
           <p className="text-text-secondary">
             {searchQuery || selectedSeverity !== 'all' || selectedStatus !== 'all' || selectedCategory !== 'all' || selectedSource !== 'all'
-              ? '?�른 조건?�로 검?�해보세??
-              : '모든 ?�스?�이 ?�상?�으�??�동?�고 ?�습?�다'
+              ? '다른 조건으로 검색해보세요'
+              : '모든 시스템이 정상적으로 작동하고 있습니다'
             }
           </p>
         </div>
@@ -532,20 +511,20 @@ export function AlertCenter({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <p className="text-sm text-text-secondary">
-                {filteredAndSortedAlerts.length}개의 ?�림???�습?�다
-                {showOnlyActive && ' (?�성�?'}
+                {filteredAndSortedAlerts.length}개의 알림이 있습니다
+                {showOnlyActive && ' (활성만)'}
               </p>
               {showBulkActions && (
                 <button
                   onClick={handleSelectAll}
                   className="text-sm text-primary hover:underline"
                 >
-                  {selectedAlerts.size === filteredAndSortedAlerts.length ? '?�체 ?�제' : '?�체 ?�택'}
+                  {selectedAlerts.size === filteredAndSortedAlerts.length ? '전체 해제' : '전체 선택'}
                 </button>
               )}
             </div>
             <div className="text-xs text-text-tertiary">
-              마�?�??�데?�트: {new Date().toLocaleString('ko-KR')}
+              마지막 업데이트: {new Date().toLocaleString('ko-KR')}
             </div>
           </div>
 

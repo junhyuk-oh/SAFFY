@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Breadcrumb } from "@/components/ui/breadcrumb"
-import { BackButton } from "@/components/ui/back-button"
+import { Breadcrumb } from "@/components/ui/display"
+import { BackButton } from "@/components/ui/layout"
 import { DocumentWizard } from "@/components/documents/shared"
 import { useRouter } from "next/navigation"
 

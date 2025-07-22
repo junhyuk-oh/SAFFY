@@ -196,7 +196,7 @@ export function PermitApproval({
           <div>
             <div className="text-text-secondary">작업기간</div>
             <div className="font-medium text-text-primary mt-1">
-              {formatDateTime(permit.startDate)} ~ {formatDateTime(permit.endDate)}
+              {formatDate(permit.startDate)} ~ {formatDate(permit.endDate)}
             </div>
           </div>
           <div>

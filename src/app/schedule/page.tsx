@@ -9,7 +9,7 @@ import {
   QuickAddModal
 } from '@/components/schedule'
 import type { ScheduleEvent } from '@/components/schedule/ScheduleEventModal'
-import { Card } from '@/components/ui/card'
+import { Card } from '@/components/ui/display'
 import { Calendar, Clock, MapPin, Users, CheckCircle, XCircle } from 'lucide-react'
 import { type Schedule, ScheduleStatus, SchedulePriority } from '@/lib/types/schedule'
 

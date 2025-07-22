@@ -1,14 +1,14 @@
 "use client"
 
 import React, { useState, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/forms'
+import { Label } from '@/components/ui/forms'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/forms'
+import { Textarea } from '@/components/ui/forms'
+import { Progress } from '@/components/ui/feedback'
+import { Badge } from '@/components/ui/display'
 import { AlertTriangle, ChevronDown, ChevronUp, FileText, Plus, Shield, Trash2, Upload } from 'lucide-react'
 import type { RiskAssessment, RiskAssessmentItem, RiskMatrix } from '@/lib/types'
 

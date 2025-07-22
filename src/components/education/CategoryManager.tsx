@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/forms'
+import { Label } from '@/components/ui/forms'
+import { Badge } from '@/components/ui/display'
 import { 
   Plus, 
   Edit2, 

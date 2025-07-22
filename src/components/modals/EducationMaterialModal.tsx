@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { BaseModal } from "@/components/ui/BaseModal"
+import { BaseModal } from "@/components/ui/layout"
 
 interface EducationMaterialModalProps {
   isOpen: boolean

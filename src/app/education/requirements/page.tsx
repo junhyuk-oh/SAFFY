@@ -1,6 +1,6 @@
 import RequirementMatrix from '@/components/education/RequirementMatrix'
-import { Breadcrumb } from '@/components/ui/breadcrumb'
-import { BackButton } from '@/components/ui/back-button'
+import { Breadcrumb } from '@/components/ui/display'
+import { BackButton } from '@/components/ui/layout'
 
 export default function RequirementsPage() {
   return (

@@ -1,5 +1,5 @@
 import EducationDashboard from '@/components/education/EducationDashboard'
-import { Breadcrumb } from '@/components/ui/breadcrumb'
+import { Breadcrumb } from '@/components/ui/display'
 
 export default function EducationPage() {
   return (

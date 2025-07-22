@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MaintenanceList } from '@/components/facility';
 import { MaintenanceTask } from '@/lib/types/facility';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Breadcrumb } from '@/components/ui/display';
 
 export default function MaintenancePage() {
   const router = useRouter();

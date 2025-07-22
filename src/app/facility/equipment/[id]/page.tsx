@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { EquipmentDetail } from '@/components/facility';
 import { Equipment } from '@/lib/types/facility';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Breadcrumb } from '@/components/ui/display';
 import { AlertTriangle } from 'lucide-react';
 
 export default function EquipmentDetailPage() {

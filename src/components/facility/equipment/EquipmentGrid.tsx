@@ -1,25 +1,16 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Equipment, FacilitySearchParams, Priority, FacilityArea } from "@/lib/types/facility"
+import { Equipment, FacilitySearchParams } from "@/lib/types/facility"
 import { EquipmentCard } from "./EquipmentCard"
-import { Badge } from "@/components/ui/display"
-import { Button } from "@/components/ui/button"
-import { EQUIPMENT_STATUS } from "@/lib/constants/status"
-
-// ?�비 그리?�용 ?�렬 ?�드 ?�??
-type EquipmentSortField = 'name' | 'installDate' | 'lastMaintenanceDate' | 'nextMaintenanceDate' | 'criticality'
-
-// ?�비 검???�라미터 (FacilitySearchParams�??�장)
-interface EquipmentSearchParams extends Omit<FacilitySearchParams, 'sortBy'> {
-  sortBy?: EquipmentSortField
-}
+import { Badge } from "@/components/ui/display/badge"
+import { Button } from "@/components/ui/forms/button"
 
 interface EquipmentGridProps {
   equipment: Equipment[]
   loading?: boolean
-  searchParams?: EquipmentSearchParams
-  onSearch?: (params: EquipmentSearchParams) => void
+  searchParams?: FacilitySearchParams
+  onSearch?: (params: FacilitySearchParams) => void
   onAddEquipment?: () => void
   viewMode?: 'grid' | 'list' | 'map'
   onViewModeChange?: (mode: 'grid' | 'list' | 'map') => void
@@ -28,51 +19,51 @@ interface EquipmentGridProps {
 }
 
 const statusOptions = [
-  { value: 'all', label: '?�체 ?�태' },
-  { value: 'operational', label: '?�상' },
-  { value: 'maintenance', label: '?�비�? },
-  { value: 'repair', label: '?�리�? },
-  { value: 'out_of_service', label: '가?�중지' },
-  { value: 'decommissioned', label: '?�기' }
+  { value: 'all', label: '전체 상태' },
+  { value: 'operational', label: '정상' },
+  { value: 'maintenance', label: '정비중' },
+  { value: 'repair', label: '수리중' },
+  { value: 'out_of_service', label: '가동중지' },
+  { value: 'decommissioned', label: '폐기' }
 ]
 
 const criticalityOptions = [
-  { value: 'all', label: '?�체 중요?? },
+  { value: 'all', label: '전체 중요도' },
   { value: 'critical', label: '긴급' },
-  { value: 'high', label: '?�음' },
+  { value: 'high', label: '높음' },
   { value: 'medium', label: '보통' },
-  { value: 'low', label: '??��' }
+  { value: 'low', label: '낮음' }
 ]
 
 const typeOptions = [
-  { value: 'all', label: '?�체 ?�형' },
-  { value: 'Pump', label: '?�프' },
+  { value: 'all', label: '전체 유형' },
+  { value: 'Pump', label: '펌프' },
   { value: 'Valve', label: '밸브' },
   { value: 'Motor', label: '모터' },
-  { value: 'Sensor', label: '?�서' },
-  { value: 'Tank', label: '?�크' },
-  { value: 'Compressor', label: '?�축�? },
-  { value: 'Heat Exchanger', label: '?�교?�기' },
-  { value: 'Filter', label: '?�터' },
-  { value: 'Conveyor', label: '컨베?�어' },
-  { value: 'Reactor', label: '반응�? },
-  { value: 'Boiler', label: '보일?? },
-  { value: 'Fan', label: '?? },
-  { value: 'Transformer', label: '변?�기' },
-  { value: 'Generator', label: '발전�? },
-  { value: 'Chiller', label: '?�각�? }
+  { value: 'Sensor', label: '센서' },
+  { value: 'Tank', label: '탱크' },
+  { value: 'Compressor', label: '압축기' },
+  { value: 'Heat Exchanger', label: '열교환기' },
+  { value: 'Filter', label: '필터' },
+  { value: 'Conveyor', label: '컨베이어' },
+  { value: 'Reactor', label: '반응기' },
+  { value: 'Boiler', label: '보일러' },
+  { value: 'Fan', label: '팬' },
+  { value: 'Transformer', label: '변압기' },
+  { value: 'Generator', label: '발전기' },
+  { value: 'Chiller', label: '냉각기' }
 ]
 
 const locationOptions = [
-  { value: 'all', label: '?�체 ?�치' },
-  { value: 'Production Floor', label: '?�산�? },
-  { value: 'Lab Building', label: '?�험?? },
+  { value: 'all', label: '전체 위치' },
+  { value: 'Production Floor', label: '생산층' },
+  { value: 'Lab Building', label: '실험동' },
   { value: 'Warehouse', label: '창고' },
-  { value: 'Utility Room', label: '?�틸리티�? },
-  { value: 'Chemical Storage', label: '?�학물질 ?�?�소' },
-  { value: 'Electrical Room', label: '?�기?? },
-  { value: 'HVAC Room', label: 'HVAC?? },
-  { value: 'Server Room', label: '?�버?? }
+  { value: 'Utility Room', label: '유틸리티룸' },
+  { value: 'Chemical Storage', label: '화학물질 저장소' },
+  { value: 'Electrical Room', label: '전기실' },
+  { value: 'HVAC Room', label: 'HVAC실' },
+  { value: 'Server Room', label: '서버실' }
 ]
 
 export function EquipmentGrid({
@@ -91,20 +82,20 @@ export function EquipmentGrid({
   const [selectedType, setSelectedType] = useState<string>('all')
   const [selectedLocation, setSelectedLocation] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [sortBy, setSortBy] = useState<EquipmentSortField>('name')
+  const [sortBy, setSortBy] = useState<'name' | 'installDate' | 'lastMaintenanceDate' | 'nextMaintenanceDate' | 'criticality'>('name')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [showMaintenanceDue, setShowMaintenanceDue] = useState(false)
 
-  // ?�터�?�??�렬???�비 목록
+  // 필터링 및 정렬된 장비 목록
   const filteredAndSortedEquipment = useMemo(() => {
-    // equipment가 undefined?�거??배열???�닌 경우 �?배열 반환
+    // equipment가 undefined이거나 배열이 아닌 경우 빈 배열 반환
     if (!equipment || !Array.isArray(equipment)) {
       return []
     }
 
-    let filtered = [...equipment] // ?�본 배열???�정?��? ?�기 ?�해 복사
+    let filtered = [...equipment] // 원본 배열을 수정하지 않기 위해 복사
 
-    // 검??쿼리 ?�터�?
+    // 검색 쿼리 필터링
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter(eq => 
@@ -118,27 +109,27 @@ export function EquipmentGrid({
       )
     }
 
-    // ?�태 ?�터�?
+    // 상태 필터링
     if (selectedStatus !== 'all') {
       filtered = filtered.filter(eq => eq.status === selectedStatus)
     }
 
-    // 중요???�터�?
+    // 중요도 필터링
     if (selectedCriticality !== 'all') {
       filtered = filtered.filter(eq => eq.criticality === selectedCriticality)
     }
 
-    // ?�형 ?�터�?
+    // 유형 필터링
     if (selectedType !== 'all') {
       filtered = filtered.filter(eq => eq.type === selectedType)
     }
 
-    // ?�치 ?�터�?
+    // 위치 필터링
     if (selectedLocation !== 'all') {
       filtered = filtered.filter(eq => eq.location === selectedLocation)
     }
 
-    // ?�비 ?�정 ?�터�?
+    // 정비 예정 필터링
     if (showMaintenanceDue) {
       const now = new Date()
       const thirtyDaysFromNow = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
@@ -149,10 +140,9 @@ export function EquipmentGrid({
       })
     }
 
-    // ?�렬
+    // 정렬
     filtered.sort((a, b) => {
-      let aValue: string | number
-      let bValue: string | number
+      let aValue: any, bValue: any
 
       switch (sortBy) {
         case 'name':
@@ -172,12 +162,7 @@ export function EquipmentGrid({
           bValue = b.nextMaintenanceDate ? new Date(b.nextMaintenanceDate).getTime() : Infinity
           break
         case 'criticality':
-          const criticalityOrder: Record<Equipment['criticality'], number> = { 
-            critical: 4, 
-            high: 3, 
-            medium: 2, 
-            low: 1 
-          }
+          const criticalityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
           aValue = criticalityOrder[a.criticality]
           bValue = criticalityOrder[b.criticality]
           break
@@ -195,9 +180,9 @@ export function EquipmentGrid({
     return filtered
   }, [equipment, searchQuery, selectedStatus, selectedCriticality, selectedType, selectedLocation, showMaintenanceDue, sortBy, sortOrder])
 
-  // ?�계 계산
+  // 통계 계산
   const stats = useMemo(() => {
-    // equipment가 undefined?�거??배열???�닌 경우 기본�?반환
+    // equipment가 undefined이거나 배열이 아닌 경우 기본값 반환
     if (!equipment || !Array.isArray(equipment)) {
       return {
         total: 0,
@@ -217,7 +202,7 @@ export function EquipmentGrid({
       return acc
     }, {} as Record<string, number>)
 
-    // ?�비 ?�정 (30???�내)
+    // 정비 예정 (30일 이내)
     const now = new Date()
     const thirtyDaysFromNow = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000))
     const maintenanceDue = equipment.filter(eq => {
@@ -226,21 +211,21 @@ export function EquipmentGrid({
       return nextMaintenance <= thirtyDaysFromNow
     }).length
 
-    // ?�비 지??
+    // 정비 지연
     const maintenanceOverdue = equipment.filter(eq => {
       if (!eq.nextMaintenanceDate) return false
       const nextMaintenance = new Date(eq.nextMaintenanceDate)
       return nextMaintenance < now
     }).length
 
-    // 보증 만료 ?�정 (30???�내)
+    // 보증 만료 예정 (30일 이내)
     const warrantyExpiring = equipment.filter(eq => {
       if (!eq.warrantyExpiry) return false
       const warrantyExpiry = new Date(eq.warrantyExpiry)
       return warrantyExpiry <= thirtyDaysFromNow && warrantyExpiry > now
     }).length
 
-    // 긴급 ?�비
+    // 긴급 장비
     const critical = equipment.filter(eq => eq.criticality === 'critical').length
 
     return {
@@ -261,10 +246,10 @@ export function EquipmentGrid({
       onSearch({
         query: searchQuery,
         status: selectedStatus !== 'all' ? [selectedStatus] : undefined,
-        priority: selectedCriticality !== 'all' ? [selectedCriticality as Priority] : undefined,
+        priority: selectedCriticality !== 'all' ? [selectedCriticality as any] : undefined,
         type: selectedType !== 'all' ? [selectedType] : undefined,
-        location: selectedLocation !== 'all' ? [selectedLocation as FacilityArea] : undefined,
-        sortBy,
+        location: selectedLocation !== 'all' ? [selectedLocation as any] : undefined,
+        sortBy: sortBy as any,
         sortOrder
       })
     }
@@ -288,20 +273,20 @@ export function EquipmentGrid({
 
   return (
     <div className="space-y-6">
-      {/* ?�더 �??�계 */}
+      {/* 헤더 및 통계 */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-text-primary mb-2">?�비 관�?/h2>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">장비 관리</h2>
           <div className="flex items-center gap-4 text-sm text-text-secondary">
-            <span>?�체 {stats.total}?�</span>
-            <span>??/span>
-            <span className="text-success-text">?�상 {stats.operational}?�</span>
-            <span>??/span>
-            <span className="text-error-text">비�???{stats.nonOperational}?�</span>
-            <span>??/span>
-            <span className="text-warning-text">?�비?�정 {stats.maintenanceDue}?�</span>
-            <span>??/span>
-            <span className="text-red-600">긴급 {stats.critical}?�</span>
+            <span>전체 {stats.total}대</span>
+            <span>•</span>
+            <span className="text-success-text">정상 {stats.operational}대</span>
+            <span>•</span>
+            <span className="text-error-text">비가동 {stats.nonOperational}대</span>
+            <span>•</span>
+            <span className="text-warning-text">정비예정 {stats.maintenanceDue}대</span>
+            <span>•</span>
+            <span className="text-red-600">긴급 {stats.critical}대</span>
           </div>
         </div>
         
@@ -314,35 +299,35 @@ export function EquipmentGrid({
               viewMode === 'list' ? 'map' : 'grid'
             )}
           >
-            {viewMode === 'grid' ? '?�� 목록' : 
-             viewMode === 'list' ? '?���?지?? : '??그리??}
+            {viewMode === 'grid' ? '📋 목록' : 
+             viewMode === 'list' ? '🗺️ 지도' : '⚏ 그리드'}
           </Button>
           <Button onClick={onAddEquipment}>
-            <span className="mr-2">??/span>
-            ?�비 ?�록
+            <span className="mr-2">➕</span>
+            장비 등록
           </Button>
         </div>
       </div>
 
-      {/* 검??�??�터 */}
+      {/* 검색 및 필터 */}
       <div className="bg-background-secondary rounded-notion-md p-4 space-y-4">
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="flex-1">
             <input
               type="text"
-              placeholder="?�비�? 코드, 모델, ?�조?? ?�리?�넘�?검??.."
+              placeholder="장비명, 코드, 모델, 제조사, 시리얼넘버 검색..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none"
             />
           </div>
           <Button type="submit" size="sm">
-            ?�� 검??
+            🔍 검색
           </Button>
         </form>
 
         <div className="flex flex-wrap gap-3">
-          {/* ?�태 ?�터 */}
+          {/* 상태 필터 */}
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -355,7 +340,7 @@ export function EquipmentGrid({
             ))}
           </select>
 
-          {/* 중요???�터 */}
+          {/* 중요도 필터 */}
           <select
             value={selectedCriticality}
             onChange={(e) => setSelectedCriticality(e.target.value)}
@@ -368,7 +353,7 @@ export function EquipmentGrid({
             ))}
           </select>
 
-          {/* ?�형 ?�터 */}
+          {/* 유형 필터 */}
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
@@ -381,7 +366,7 @@ export function EquipmentGrid({
             ))}
           </select>
 
-          {/* ?�치 ?�터 */}
+          {/* 위치 필터 */}
           <select
             value={selectedLocation}
             onChange={(e) => setSelectedLocation(e.target.value)}
@@ -394,27 +379,27 @@ export function EquipmentGrid({
             ))}
           </select>
 
-          {/* ?�렬 */}
+          {/* 정렬 */}
           <select
             value={`${sortBy}-${sortOrder}`}
             onChange={(e) => {
               const [field, order] = e.target.value.split('-')
-              setSortBy(field as EquipmentSortField)
-              setSortOrder(order as 'asc' | 'desc')
+              setSortBy(field as any)
+              setSortOrder(order as any)
             }}
             className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
           >
-            <option value="name-asc">?�름??(A-Z)</option>
-            <option value="name-desc">?�름??(Z-A)</option>
-            <option value="criticality-desc">중요???��???/option>
-            <option value="criticality-asc">중요???????/option>
-            <option value="nextMaintenanceDate-asc">?�비??빠른??/option>
-            <option value="nextMaintenanceDate-desc">?�비???????/option>
-            <option value="installDate-desc">?�치??최신??/option>
-            <option value="installDate-asc">?�치???�래?�순</option>
+            <option value="name-asc">이름순 (A-Z)</option>
+            <option value="name-desc">이름순 (Z-A)</option>
+            <option value="criticality-desc">중요도 높은순</option>
+            <option value="criticality-asc">중요도 낮은순</option>
+            <option value="nextMaintenanceDate-asc">정비일 빠른순</option>
+            <option value="nextMaintenanceDate-desc">정비일 늦은순</option>
+            <option value="installDate-desc">설치일 최신순</option>
+            <option value="installDate-asc">설치일 오래된순</option>
           </select>
 
-          {/* ?�비 ?�정 ?��? */}
+          {/* 정비 예정 토글 */}
           <label className="flex items-center space-x-2 px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm cursor-pointer">
             <input
               type="checkbox"
@@ -422,28 +407,28 @@ export function EquipmentGrid({
               onChange={(e) => setShowMaintenanceDue(e.target.checked)}
               className="rounded border-border"
             />
-            <span>?�비 ?�정�?/span>
+            <span>정비 예정만</span>
           </label>
         </div>
       </div>
 
-      {/* 빠른 ?�계 카드 */}
+      {/* 빠른 통계 카드 */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-success-text">{stats.operational}</div>
-          <div className="text-sm text-text-secondary">?�상</div>
+          <div className="text-sm text-text-secondary">정상</div>
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-error-text">{stats.nonOperational}</div>
-          <div className="text-sm text-text-secondary">비�???/div>
+          <div className="text-sm text-text-secondary">비가동</div>
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-warning-text">{stats.maintenanceDue}</div>
-          <div className="text-sm text-text-secondary">?�비?�정</div>
+          <div className="text-sm text-text-secondary">정비예정</div>
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-error-text">{stats.maintenanceOverdue}</div>
-          <div className="text-sm text-text-secondary">?�비지??/div>
+          <div className="text-sm text-text-secondary">정비지연</div>
         </div>
         <div className="bg-background-secondary rounded-notion-md p-4 text-center">
           <div className="text-2xl font-bold text-warning-text">{stats.warrantyExpiring}</div>
@@ -455,26 +440,26 @@ export function EquipmentGrid({
         </div>
       </div>
 
-      {/* ?�비 목록 */}
+      {/* 장비 목록 */}
       {filteredAndSortedEquipment.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">?�️</div>
+          <div className="text-6xl mb-4">⚙️</div>
           <h3 className="text-lg font-semibold text-text-primary mb-2">
             {searchQuery || selectedStatus !== 'all' || selectedCriticality !== 'all' || selectedType !== 'all' || selectedLocation !== 'all' || showMaintenanceDue
-              ? '검??결과가 ?�습?�다'
-              : '?�록???�비가 ?�습?�다'
+              ? '검색 결과가 없습니다'
+              : '등록된 장비가 없습니다'
             }
           </h3>
           <p className="text-text-secondary mb-4">
             {searchQuery || selectedStatus !== 'all' || selectedCriticality !== 'all' || selectedType !== 'all' || selectedLocation !== 'all' || showMaintenanceDue
-              ? '?�른 조건?�로 검?�해보세??
-              : '?�로???�비�??�록?�보?�요'
+              ? '다른 조건으로 검색해보세요'
+              : '새로운 장비를 등록해보세요'
             }
           </p>
           {onAddEquipment && (
             <Button onClick={onAddEquipment}>
-              <span className="mr-2">??/span>
-              ?�비 ?�록
+              <span className="mr-2">➕</span>
+              장비 등록
             </Button>
           )}
         </div>
@@ -482,11 +467,11 @@ export function EquipmentGrid({
         <>
           <div className="flex items-center justify-between">
             <p className="text-sm text-text-secondary">
-              {filteredAndSortedEquipment.length}개의 ?�비가 ?�습?�다
-              {showMaintenanceDue && ' (?�비 ?�정)'}
+              {filteredAndSortedEquipment.length}개의 장비가 있습니다
+              {showMaintenanceDue && ' (정비 예정)'}
             </p>
             <div className="text-xs text-text-tertiary">
-              마�?�??�데?�트: {new Date().toLocaleDateString('ko-KR')}
+              마지막 업데이트: {new Date().toLocaleDateString('ko-KR')}
             </div>
           </div>
 
@@ -506,13 +491,13 @@ export function EquipmentGrid({
               <table className="w-full">
                 <thead className="bg-background-hover">
                   <tr>
-                    <th className="text-left p-4 text-sm font-semibold text-text-primary">?�비</th>
-                    <th className="text-left p-4 text-sm font-semibold text-text-primary">?�형</th>
-                    <th className="text-left p-4 text-sm font-semibold text-text-primary">?�치</th>
-                    <th className="text-left p-4 text-sm font-semibold text-text-primary">?�태</th>
-                    <th className="text-left p-4 text-sm font-semibold text-text-primary">중요??/th>
-                    <th className="text-left p-4 text-sm font-semibold text-text-primary">?�음 ?�비</th>
-                    <th className="text-center p-4 text-sm font-semibold text-text-primary">?�업</th>
+                    <th className="text-left p-4 text-sm font-semibold text-text-primary">장비</th>
+                    <th className="text-left p-4 text-sm font-semibold text-text-primary">유형</th>
+                    <th className="text-left p-4 text-sm font-semibold text-text-primary">위치</th>
+                    <th className="text-left p-4 text-sm font-semibold text-text-primary">상태</th>
+                    <th className="text-left p-4 text-sm font-semibold text-text-primary">중요도</th>
+                    <th className="text-left p-4 text-sm font-semibold text-text-primary">다음 정비</th>
+                    <th className="text-center p-4 text-sm font-semibold text-text-primary">작업</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -520,7 +505,7 @@ export function EquipmentGrid({
                     <tr key={eq.id} className={`border-t border-border ${index % 2 === 0 ? 'bg-background' : 'bg-background-secondary'}`}>
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <span className="text-lg">{equipmentTypeIcons[eq.type] || '?�️'}</span>
+                          <span className="text-lg">{equipmentTypeIcons[eq.type] || '⚙️'}</span>
                           <div>
                             <div className="font-medium text-text-primary">{eq.name}</div>
                             <div className="text-sm text-text-secondary">#{eq.code}</div>
@@ -542,7 +527,7 @@ export function EquipmentGrid({
                                  eq.status === 'repair' || eq.status === 'out_of_service' ? 'destructive' :
                                  eq.status === 'maintenance' ? 'warning' : 'secondary'}
                         >
-                          {EQUIPMENT_STATUS[eq.status]?.label || eq.status}
+                          {statusConfig[eq.status]?.label || eq.status}
                         </Badge>
                       </td>
                       <td className="p-4">
@@ -570,7 +555,7 @@ export function EquipmentGrid({
                             onClick={() => onMaintenanceRequest?.(eq.id)}
                             className="text-xs"
                           >
-                            ?�비?�청
+                            정비요청
                           </Button>
                         </div>
                       </td>
@@ -582,10 +567,10 @@ export function EquipmentGrid({
           ) : (
             // Map view placeholder
             <div className="bg-background-secondary rounded-notion-md p-12 text-center">
-              <div className="text-4xl mb-4">?���?/div>
-              <h3 className="text-lg font-semibold text-text-primary mb-2">지??�?/h3>
+              <div className="text-4xl mb-4">🗺️</div>
+              <h3 className="text-lg font-semibold text-text-primary mb-2">지도 뷰</h3>
               <p className="text-text-secondary">
-                ?�비 ?�치�?지?�에???�인?????�는 기능??�??�공???�정?�니??
+                장비 위치를 지도에서 확인할 수 있는 기능이 곧 제공될 예정입니다.
               </p>
             </div>
           )}
@@ -595,30 +580,38 @@ export function EquipmentGrid({
   )
 }
 
+// 상태 설정
+const statusConfig = {
+  operational: { label: "정상" },
+  maintenance: { label: "정비중" },
+  repair: { label: "수리중" },
+  out_of_service: { label: "가동중지" },
+  decommissioned: { label: "폐기" }
+}
 
-// 중요???�정
+// 중요도 설정
 const criticalityConfig = {
-  low: { label: "??��" },
+  low: { label: "낮음" },
   medium: { label: "보통" },
-  high: { label: "?�음" },
+  high: { label: "높음" },
   critical: { label: "긴급" }
 }
 
-// ?�비 ?�형 ?�이�?
+// 장비 유형 아이콘
 const equipmentTypeIcons: Record<string, string> = {
-  "Pump": "??,
-  "Valve": "?��",
-  "Motor": "?��",
-  "Sensor": "?��",
-  "Tank": "?��",
-  "Compressor": "??",
-  "Heat Exchanger": "?��",
-  "Filter": "?���?,
-  "Conveyor": "?�️",
-  "Reactor": "?�️",
-  "Boiler": "?��",
-  "Fan": "?���?,
-  "Transformer": "??,
-  "Generator": "?��",
-  "Chiller": "?�️"
+  "Pump": "⚪",
+  "Valve": "🔘",
+  "Motor": "🔋",
+  "Sensor": "📡",
+  "Tank": "🏺",
+  "Compressor": "🌀",
+  "Heat Exchanger": "🔥",
+  "Filter": "🗂️",
+  "Conveyor": "➡️",
+  "Reactor": "⚗️",
+  "Boiler": "🔥",
+  "Fan": "🌪️",
+  "Transformer": "⚡",
+  "Generator": "🔌",
+  "Chiller": "❄️"
 }

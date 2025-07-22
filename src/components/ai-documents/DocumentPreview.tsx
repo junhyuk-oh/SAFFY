@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { useToast } from '@/components/ui/toast'
+import { useToast } from '@/components/ui/feedback'
 
 export interface DocumentPreviewProps {
   title: string

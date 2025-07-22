@@ -30,7 +30,11 @@
       "Bash(git clean:*)",
       "Bash(tree:*)",
       "Bash(rg:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(powershell:*)",
+      "Bash(git checkout:*)",
+      "Bash(node fix-imports.js)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }

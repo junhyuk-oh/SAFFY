@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/display'
-import { Progress } from '@/components/ui/feedback'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display/card'
+import { Button } from '@/components/ui/forms/button'
+import { Badge } from '@/components/ui/display/badge'
+import { Progress } from '@/components/ui/display/progress'
 import { cn } from '@/lib/utils'
 import { 
   Calendar, 
@@ -29,59 +29,59 @@ import {
   FacilityArea
 } from '@/lib/types/facility'
 
-// ?�터 ?�션
+// ?�터 ?�션
 interface FilterOptions {
   priority?: Priority
   status?: MaintenanceStatus
   category?: MaintenanceCategory
 }
 
-// Mock ?�이??const mockTasks: MaintenanceTask[] = [
+// Mock ?�이??const mockTasks: MaintenanceTask[] = [
   {
     id: '1',
-    title: '?�각???�프 ?��?',
-    description: '?�험??A???�각?�스???�프 ?�기?��? �?교체 검??,
+    title: '?�각???�프 ?��?',
+    description: '?�험??A???�각?�스???�프 ?�기?��? �?교체 검??,
     priority: 'urgent',
     status: 'pending',
-    assignee: '김?�비',
-    location: '?�험??A??지??,
+    assignee: '김?�비',
+    location: '?�험??A??지??,
     estimatedDuration: 120,
     scheduledDate: new Date().toISOString(),
-    category: '기계?�비'
+    category: '기계?�비'
   },
   {
     id: '2',
-    title: '?�기 ?�널 ?�기 ?��?',
-    description: 'B??�??�기 ?�널 ?�전?��? �??�도 모니?�링',
+    title: '?�기 ?�널 ?�기 ?��?',
+    description: 'B??�??�기 ?�널 ?�전?��? �??�도 모니?�링',
     priority: 'normal',
     status: 'in-progress',
-    assignee: '?�전�?,
-    location: '?�험??B??1�?,
+    assignee: '?�전�?,
+    location: '?�험??B??1�?,
     estimatedDuration: 90,
-    scheduledDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2?�간 ??    category: '?�기?�비'
+    scheduledDate: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2?�간 ??    category: '?�기?�비'
   },
   {
     id: '3',
-    title: '?�어�??�터 교체',
-    description: 'C???�구??HVAC ?�스???�터 ?�기 교체',
+    title: '?�어�??�터 교체',
+    description: 'C???�구??HVAC ?�스???�터 ?�기 교체',
     priority: 'preventive',
     status: 'completed',
     assignee: '박시??,
-    location: '?�험??C???�층',
+    location: '?�험??C???�층',
     estimatedDuration: 60,
     scheduledDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1????    completedDate: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString(),
-    category: '공조?�비'
+    category: '공조?�비'
   },
   {
     id: '4',
-    title: '?�학물질 ?�드 ?��?',
-    description: '?�학?�험???�드 배기?�스???�능 ?��?',
+    title: '?�학물질 ?�드 ?��?',
+    description: '?�학?�험???�드 배기?�스???�능 ?��?',
     priority: 'urgent',
     status: 'overdue',
     assignee: '최안??,
-    location: '?�학?�험??201??,
+    location: '?�학?�험??201??,
     estimatedDuration: 150,
-    scheduledDate: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(), // 2????    category: '?�전?�비'
+    scheduledDate: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(), // 2????    category: '?�전?�비'
   }
 ]
 
@@ -93,7 +93,7 @@ const mockStats = {
   todayTasks: 3
 }
 
-// ?�선?�위�??�상 매핑
+// ?�선?�위�??�상 매핑
 const getPriorityColor = (priority: Priority) => {
   switch (priority) {
     case 'high':
@@ -107,28 +107,28 @@ const getPriorityColor = (priority: Priority) => {
   }
 }
 
-// ?�선?�위 ?�이�?const getPriorityIcon = (priority: Priority) => {
+// ?�선?�위 ?�이�?const getPriorityIcon = (priority: Priority) => {
   switch (priority) {
     case 'high':
-      return '?��'
+      return '?��'
     case 'medium':
-      return '?��'
+      return '?��'
     case 'low':
-      return '?��'
+      return '?��'
     default:
       return '??
   }
 }
 
-// ?�태�?배�? ?�상
+// ?�태�?배�? ?�상
 const getStatusBadge = (status: MaintenanceStatus) => {
   switch (status) {
     case 'scheduled':
-      return <Badge variant="secondary">?�정</Badge>
+      return <Badge variant="secondary">?�정</Badge>
     case 'in_progress':
-      return <Badge className="bg-blue-500 text-white">진행�?/Badge>
+      return <Badge className="bg-blue-500 text-white">진행�?/Badge>
     case 'completed':
-      return <Badge variant="success">?�료</Badge>
+      return <Badge variant="success">?�료</Badge>
     case 'overdue':
       return <Badge variant="destructive">지??/Badge>
     case 'cancelled':
@@ -140,17 +140,17 @@ const getStatusBadge = (status: MaintenanceStatus) => {
   }
 }
 
-// ?�간 ?�맷 ?�수
+// ?�간 ?�맷 ?�수
 const formatTimeAgo = (dateString: string) => {
   const now = new Date()
   const date = new Date(dateString)
   const diffMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
   
   if (diffMinutes < 60) {
-    return `${diffMinutes}�???
+    return `${diffMinutes}�???
   } else if (diffMinutes < 24 * 60) {
     const hours = Math.floor(diffMinutes / 60)
-    return `${hours}?�간 ??
+    return `${hours}?�간 ??
   } else {
     const days = Math.floor(diffMinutes / (24 * 60))
     return `${days}????
@@ -167,7 +167,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [selectedTask, setSelectedTask] = useState<string | null>(null)
 
-  // ?�터???�업 목록
+  // ?�터???�업 목록
   const filteredTasks = tasks.filter(task => {
     if (filter.priority && task.priority !== filter.priority) return false
     if (filter.status && task.status !== filter.status) return false
@@ -175,17 +175,17 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
     return true
   })
 
-  // ?�늘???�업�??�터�?  const todayTasks = filteredTasks.filter(task => {
+  // ?�늘???�업�??�터�?  const todayTasks = filteredTasks.filter(task => {
     const taskDate = new Date(task.scheduledDate)
     const today = new Date()
     return taskDate.toDateString() === today.toDateString()
   })
 
-  // ?�업 ?�료 처리
+  // ?�업 ?�료 처리
   const handleCompleteTask = useCallback(async (taskId: string) => {
     setIsLoading(true)
     try {
-      // ?�제 API ?�출 ?��??�이??      await new Promise(resolve => setTimeout(resolve, 1000))
+      // ?�제 API ?�출 ?��??�이??      await new Promise(resolve => setTimeout(resolve, 1000))
       
       setTasks(prev => prev.map(task => 
         task.id === taskId 
@@ -198,46 +198,46 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
           : task
       ))
       
-      // ?�공 메시지 ?�시 (?�제로는 toast ?�용)
-      console.log('?�업???�료?�었?�니??')
+      // ?�공 메시지 ?�시 (?�제로는 toast ?�용)
+      console.log('?�업???�료?�었?�니??')
     } catch (error) {
-      console.error('?�업 ?�료 �??�류가 발생?�습?�다:', error)
+      console.error('?�업 ?�료 �??�류가 발생?�습?�다:', error)
     } finally {
       setIsLoading(false)
     }
   }, [])
 
-  // ?�진 첨�? 처리
+  // ?�진 첨�? 처리
   const handleAttachPhoto = useCallback(async (taskId: string) => {
-    // ?�제로는 카메???�일 ?�로??모달???�어????    console.log('?�진 첨�? 기능 - ?�업 ID:', taskId)
+    // ?�제로는 카메???�일 ?�로??모달???�어????    console.log('?�진 첨�? 기능 - ?�업 ID:', taskId)
   }, [])
 
-  // ???�업 추�?
+  // ???�업 추�?
   const handleAddTask = useCallback(() => {
-    console.log('???�업 추�? 모달 ?�기')
+    console.log('???�업 추�? 모달 ?�기')
   }, [])
 
-  // ?�력 보기
+  // ?�력 보기
   const handleViewHistory = useCallback(() => {
-    console.log('?�비 ?�력 ?�이지�??�동')
+    console.log('?�비 ?�력 ?�이지�??�동')
   }, [])
 
   return (
     <div className={cn("space-y-6", className)}>
-      {/* ?�더 */}
+      {/* ?�더 */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-text-primary flex items-center gap-2">
             <Wrench className="h-6 w-6" />
-            ?�마???�비 ?��?줄러
+            ?�마???�비 ?��?줄러
           </h1>
-          <p className="text-text-secondary mt-1">?�설 ?�비 ?�업???�율?�으�?관리하?�요</p>
+          <p className="text-text-secondary mt-1">?�설 ?�비 ?�업???�율?�으�?관리하?�요</p>
         </div>
         
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="flex items-center gap-2">
             <Filter className="h-4 w-4" />
-            ?�터
+            ?�터
           </Button>
           <Button 
             variant="default" 
@@ -246,18 +246,18 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
             className="flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
-            ???�업
+            ???�업
           </Button>
         </div>
       </div>
 
-      {/* ?�체 ?�황 ?�약 */}
+      {/* ?�체 ?�황 ?�약 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="hover:shadow-notion-md transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-text-secondary">?�체 ?�업</p>
+                <p className="text-sm font-medium text-text-secondary">?�체 ?�업</p>
                 <p className="text-2xl font-bold text-text-primary">{mockStats.total}</p>
               </div>
               <div className="p-3 bg-primary-light rounded-notion-sm">
@@ -267,7 +267,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
             <div className="mt-4">
               <Progress value={(mockStats.completed / mockStats.total) * 100} className="h-2" />
               <p className="text-xs text-text-secondary mt-1">
-                ?�료??{Math.round((mockStats.completed / mockStats.total) * 100)}%
+                ?�료??{Math.round((mockStats.completed / mockStats.total) * 100)}%
               </p>
             </div>
           </CardContent>
@@ -277,7 +277,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-text-secondary">?�료</p>
+                <p className="text-sm font-medium text-text-secondary">?�료</p>
                 <p className="text-2xl font-bold text-green-600">{mockStats.completed}</p>
               </div>
               <div className="p-3 bg-green-100 rounded-notion-sm">
@@ -285,7 +285,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
               </div>
             </div>
             <p className="text-xs text-text-secondary mt-4">
-              ?�체??{Math.round((mockStats.completed / mockStats.total) * 100)}%
+              ?�체??{Math.round((mockStats.completed / mockStats.total) * 100)}%
             </p>
           </CardContent>
         </Card>
@@ -294,14 +294,14 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-text-secondary">?��?/p>
+                <p className="text-sm font-medium text-text-secondary">?��?/p>
                 <p className="text-2xl font-bold text-blue-600">{mockStats.pending}</p>
               </div>
               <div className="p-3 bg-blue-100 rounded-notion-sm">
                 <Clock className="h-5 w-5 text-blue-600" />
               </div>
             </div>
-            <p className="text-xs text-text-secondary mt-4">?�정???�업</p>
+            <p className="text-xs text-text-secondary mt-4">?�정???�업</p>
           </CardContent>
         </Card>
 
@@ -316,28 +316,28 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                 <AlertTriangle className="h-5 w-5 text-red-600" />
               </div>
             </div>
-            <p className="text-xs text-text-secondary mt-4">즉시 조치 ?�요</p>
+            <p className="text-xs text-text-secondary mt-4">즉시 조치 ?�요</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* ?�늘???�비 ?�업 */}
+      {/* ?�늘???�비 ?�업 */}
       <Card className="shadow-notion-sm">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Calendar className="h-5 w-5" />
-              ?�늘???�비 ?�업
+              ?�늘???�비 ?�업
             </CardTitle>
             <Badge variant="secondary" className="px-2 py-1">
-              {todayTasks.length}�?            </Badge>
+              {todayTasks.length}�?            </Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {todayTasks.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-4xl mb-2">??/div>
-              <p className="text-text-secondary">?�늘 ?�정???�비 ?�업???�습?�다</p>
+              <p className="text-text-secondary">?�늘 ?�정???�비 ?�업???�습?�다</p>
             </div>
           ) : (
             todayTasks.map((task) => (
@@ -368,7 +368,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                     <div className="flex flex-wrap items-center gap-3 text-xs text-text-tertiary">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {task.estimatedDuration}�?                      </span>
+                        {task.estimatedDuration}�?                      </span>
                       <span>{task.location}</span>
                       <span>{task.assignedTo.name}</span>
                       <span className="px-2 py-1 bg-background-hover rounded-full">
@@ -407,7 +407,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                           ) : (
                             <CheckCircle2 className="h-3 w-3" />
                           )}
-                          ?�료
+                          ?�료
                         </Button>
                       </>
                     )}
@@ -415,7 +415,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                     {task.status === 'completed' && (
                       <div className="flex items-center gap-1 text-green-600 text-sm">
                         <CheckCircle2 className="h-4 w-4" />
-                        ?�료??                      </div>
+                        ?�료??                      </div>
                     )}
                     
                     <ChevronRight 
@@ -427,12 +427,12 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                   </div>
                 </div>
                 
-                {/* ?�장???��? ?�보 */}
+                {/* ?�장???��? ?�보 */}
                 {selectedTask === task.id && (
                   <div className="mt-4 pt-4 border-t border-border space-y-3 animate-slideDown">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="font-medium text-text-secondary mb-1">?�정 ?�간</p>
+                        <p className="font-medium text-text-secondary mb-1">?�정 ?�간</p>
                         <p className="text-text-primary">
                           {new Date(task.scheduledDate).toLocaleString('ko-KR')}
                         </p>
@@ -440,7 +440,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                       
                       {task.completedDate && (
                         <div>
-                          <p className="font-medium text-text-secondary mb-1">?�료 ?�간</p>
+                          <p className="font-medium text-text-secondary mb-1">?�료 ?�간</p>
                           <p className="text-text-primary">
                             {new Date(task.completedDate).toLocaleString('ko-KR')}
                           </p>
@@ -448,12 +448,12 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                       )}
                       
                       <div>
-                        <p className="font-medium text-text-secondary mb-1">?�당??/p>
+                        <p className="font-medium text-text-secondary mb-1">?�당??/p>
                         <p className="text-text-primary">{task.assignedTo.name} ({task.assignedTo.role})</p>
                       </div>
                       
                       <div>
-                        <p className="font-medium text-text-secondary mb-1">?�치</p>
+                        <p className="font-medium text-text-secondary mb-1">?�치</p>
                         <p className="text-text-primary">{task.location}{task.subLocation ? ` - ${task.subLocation}` : ''}</p>
                       </div>
                     </div>
@@ -465,9 +465,9 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                       </div>
                     )}
                     
-                    {/* ?�전 ?�보 ?�시 */}
+                    {/* ?�전 ?�보 ?�시 */}
                     <div>
-                      <p className="font-medium text-text-secondary mb-2">?�전 ?�보</p>
+                      <p className="font-medium text-text-secondary mb-2">?�전 ?�보</p>
                       <div className="space-y-2">
                         <div className="flex flex-wrap gap-1">
                           {task.safety.requiredPPE.map((ppe, index) => (
@@ -475,17 +475,17 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
                           ))}
                         </div>
                         {task.safety.lockoutTagout && (
-                          <Badge variant="destructive" className="text-xs">LOTO ?�요</Badge>
+                          <Badge variant="destructive" className="text-xs">LOTO ?�요</Badge>
                         )}
                         {task.safety.permitRequired && (
-                          <Badge variant="secondary" className="text-xs">?�업?��????�요</Badge>
+                          <Badge variant="secondary" className="text-xs">?�업?��????�요</Badge>
                         )}
                       </div>
                     </div>
                     
                     {task.attachments && task.attachments.length > 0 && (
                       <div>
-                        <p className="font-medium text-text-secondary mb-2">첨�??�일</p>
+                        <p className="font-medium text-text-secondary mb-2">첨�??�일</p>
                         <div className="flex flex-wrap gap-2">
                           {task.attachments.map((attachment) => (
                             <div
@@ -511,7 +511,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
         </CardContent>
       </Card>
 
-      {/* ?�단 ?�션 버튼??*/}
+      {/* ?�단 ?�션 버튼??*/}
       <div className="flex flex-col sm:flex-row gap-3">
         <Button
           variant="outline"
@@ -519,7 +519,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
           className="flex items-center justify-center gap-2 h-12 text-base"
         >
           <Plus className="h-5 w-5" />
-          ???�업 추�?
+          ???�업 추�?
         </Button>
         
         <Button
@@ -528,7 +528,7 @@ export function MaintenanceScheduler({ className }: MaintenanceSchedulerProps) {
           className="flex items-center justify-center gap-2 h-12 text-base"
         >
           <BarChart3 className="h-5 w-5" />
-          ?�비 ?�력 보기
+          ?�비 ?�력 보기
         </Button>
       </div>
     </div>

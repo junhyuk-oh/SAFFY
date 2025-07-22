@@ -1,25 +1,16 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Equipment, FacilitySearchParams, Priority, FacilityArea } from "@/lib/types/facility"
+import { Equipment, FacilitySearchParams } from "@/lib/types/facility"
 import { EquipmentCard } from "./EquipmentCard"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { EQUIPMENT_STATUS } from "@/lib/constants/status"
-
-// 장비 그리드용 정렬 필드 타입
-type EquipmentSortField = 'name' | 'installDate' | 'lastMaintenanceDate' | 'nextMaintenanceDate' | 'criticality'
-
-// 장비 검색 파라미터 (FacilitySearchParams를 확장)
-interface EquipmentSearchParams extends Omit<FacilitySearchParams, 'sortBy'> {
-  sortBy?: EquipmentSortField
-}
+import { Badge } from "@/components/ui/display/badge"
+import { Button } from "@/components/ui/forms/button"
 
 interface EquipmentGridProps {
   equipment: Equipment[]
   loading?: boolean
-  searchParams?: EquipmentSearchParams
-  onSearch?: (params: EquipmentSearchParams) => void
+  searchParams?: FacilitySearchParams
+  onSearch?: (params: FacilitySearchParams) => void
   onAddEquipment?: () => void
   viewMode?: 'grid' | 'list' | 'map'
   onViewModeChange?: (mode: 'grid' | 'list' | 'map') => void
@@ -91,7 +82,7 @@ export function EquipmentGrid({
   const [selectedType, setSelectedType] = useState<string>('all')
   const [selectedLocation, setSelectedLocation] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [sortBy, setSortBy] = useState<EquipmentSortField>('name')
+  const [sortBy, setSortBy] = useState<'name' | 'installDate' | 'lastMaintenanceDate' | 'nextMaintenanceDate' | 'criticality'>('name')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [showMaintenanceDue, setShowMaintenanceDue] = useState(false)
 
@@ -151,8 +142,7 @@ export function EquipmentGrid({
 
     // 정렬
     filtered.sort((a, b) => {
-      let aValue: string | number
-      let bValue: string | number
+      let aValue: any, bValue: any
 
       switch (sortBy) {
         case 'name':
@@ -172,12 +162,7 @@ export function EquipmentGrid({
           bValue = b.nextMaintenanceDate ? new Date(b.nextMaintenanceDate).getTime() : Infinity
           break
         case 'criticality':
-          const criticalityOrder: Record<Equipment['criticality'], number> = { 
-            critical: 4, 
-            high: 3, 
-            medium: 2, 
-            low: 1 
-          }
+          const criticalityOrder = { critical: 4, high: 3, medium: 2, low: 1 }
           aValue = criticalityOrder[a.criticality]
           bValue = criticalityOrder[b.criticality]
           break
@@ -261,10 +246,10 @@ export function EquipmentGrid({
       onSearch({
         query: searchQuery,
         status: selectedStatus !== 'all' ? [selectedStatus] : undefined,
-        priority: selectedCriticality !== 'all' ? [selectedCriticality as Priority] : undefined,
+        priority: selectedCriticality !== 'all' ? [selectedCriticality as any] : undefined,
         type: selectedType !== 'all' ? [selectedType] : undefined,
-        location: selectedLocation !== 'all' ? [selectedLocation as FacilityArea] : undefined,
-        sortBy,
+        location: selectedLocation !== 'all' ? [selectedLocation as any] : undefined,
+        sortBy: sortBy as any,
         sortOrder
       })
     }
@@ -399,8 +384,8 @@ export function EquipmentGrid({
             value={`${sortBy}-${sortOrder}`}
             onChange={(e) => {
               const [field, order] = e.target.value.split('-')
-              setSortBy(field as EquipmentSortField)
-              setSortOrder(order as 'asc' | 'desc')
+              setSortBy(field as any)
+              setSortOrder(order as any)
             }}
             className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
           >
@@ -542,7 +527,7 @@ export function EquipmentGrid({
                                  eq.status === 'repair' || eq.status === 'out_of_service' ? 'destructive' :
                                  eq.status === 'maintenance' ? 'warning' : 'secondary'}
                         >
-                          {EQUIPMENT_STATUS[eq.status]?.label || eq.status}
+                          {statusConfig[eq.status]?.label || eq.status}
                         </Badge>
                       </td>
                       <td className="p-4">
@@ -595,6 +580,14 @@ export function EquipmentGrid({
   )
 }
 
+// 상태 설정
+const statusConfig = {
+  operational: { label: "정상" },
+  maintenance: { label: "정비중" },
+  repair: { label: "수리중" },
+  out_of_service: { label: "가동중지" },
+  decommissioned: { label: "폐기" }
+}
 
 // 중요도 설정
 const criticalityConfig = {

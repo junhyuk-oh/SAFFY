@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from '@/components/ui/display'
 import { Button } from "@/components/ui/button"
 import { type Schedule, ScheduleStatus, SchedulePriority } from "@/lib/types/schedule"
 

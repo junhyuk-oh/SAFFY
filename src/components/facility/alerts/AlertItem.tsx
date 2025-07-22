@@ -2,10 +2,8 @@
 
 import { useState } from "react"
 import { FacilityAlert } from "@/lib/types/facility"
-import { Badge } from "@/components/ui/display"
-import { Button } from "@/components/ui/button"
-import { SEVERITY_CONFIG, ALERT_STATUS } from "@/lib/constants/status"
-import { formatRelativeTime } from "@/lib/utils/date"
+import { Badge } from "@/components/ui/display/badge"
+import { Button } from "@/components/ui/forms/button"
 
 interface AlertItemProps {
   alert: FacilityAlert
@@ -18,23 +16,88 @@ interface AlertItemProps {
   compact?: boolean
 }
 
+const severityConfig = {
+  low: {
+    label: "낮음",
+    color: "text-success-text",
+    bg: "bg-success-bg",
+    borderColor: "border-l-success",
+    icon: "ℹ️"
+  },
+  medium: {
+    label: "보통",
+    color: "text-primary",
+    bg: "bg-blue-50",
+    borderColor: "border-l-primary",
+    icon: "⚠️"
+  },
+  high: {
+    label: "높음",
+    color: "text-warning-text",
+    bg: "bg-warning-bg",
+    borderColor: "border-l-warning",
+    icon: "🚨"
+  },
+  critical: {
+    label: "긴급",
+    color: "text-error-text",
+    bg: "bg-error-bg",
+    borderColor: "border-l-error",
+    icon: "🔴"
+  },
+  emergency: {
+    label: "비상",
+    color: "text-white",
+    bg: "bg-red-600",
+    borderColor: "border-l-red-600",
+    icon: "🆘"
+  }
+}
+
+const statusConfig = {
+  active: {
+    label: "활성",
+    color: "text-error-text",
+    bg: "bg-error-bg"
+  },
+  acknowledged: {
+    label: "확인됨",
+    color: "text-warning-text",
+    bg: "bg-warning-bg"
+  },
+  resolved: {
+    label: "해결됨",
+    color: "text-success-text",
+    bg: "bg-success-bg"
+  },
+  false_positive: {
+    label: "오탐지",
+    color: "text-text-secondary",
+    bg: "bg-background-hover"
+  },
+  escalated: {
+    label: "상급보고",
+    color: "text-primary",
+    bg: "bg-blue-50"
+  }
+}
 
 const categoryIcons: Record<string, string> = {
-  safety: "?���?,
-  equipment: "?�️",
-  environmental: "?��",
-  security: "?��",
-  operational: "?��",
-  compliance: "?��"
+  safety: "🛡️",
+  equipment: "⚙️",
+  environmental: "🌱",
+  security: "🔒",
+  operational: "🏭",
+  compliance: "📋"
 }
 
 const sourceIcons: Record<string, string> = {
-  ai_system: "?��",
-  sensor: "?��",
-  manual: "?��",
-  inspection: "?��",
-  maintenance: "?��",
-  external: "?��"
+  ai_system: "🤖",
+  sensor: "📡",
+  manual: "👤",
+  inspection: "🔍",
+  maintenance: "🔧",
+  external: "🌐"
 }
 
 export function AlertItem({
@@ -55,13 +118,34 @@ export function AlertItem({
     newAction: ''
   })
 
-  const severityInfo = SEVERITY_CONFIG[alert.severity]
-  const statusInfo = ALERT_STATUS[alert.status]
-  const categoryIcon = categoryIcons[alert.category] || "?��"
-  const sourceIcon = sourceIcons[alert.source] || "?��"
+  const severityInfo = severityConfig[alert.severity]
+  const statusInfo = statusConfig[alert.status]
+  const categoryIcon = categoryIcons[alert.category] || "📋"
+  const sourceIcon = sourceIcons[alert.source] || "📄"
 
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = now.getTime() - date.getTime()
+    const diffMinutes = Math.floor(diffTime / (1000 * 60))
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60))
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
 
-  // 처리 ?�간 계산
+    if (diffMinutes < 1) return '방금 전'
+    if (diffMinutes < 60) return `${diffMinutes}분 전`
+    if (diffHours < 24) return `${diffHours}시간 전`
+    if (diffDays < 7) return `${diffDays}일 전`
+    
+    return date.toLocaleDateString('ko-KR', {
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  // 처리 시간 계산
   const getProcessingTime = () => {
     if (!alert.resolvedDate) return null
     
@@ -71,8 +155,8 @@ export function AlertItem({
     const diffMinutes = Math.floor(diffTime / (1000 * 60))
     const diffHours = Math.floor(diffTime / (1000 * 60 * 60))
     
-    if (diffMinutes < 60) return `${diffMinutes}�?
-    return `${diffHours}?�간 ${diffMinutes % 60}�?
+    if (diffMinutes < 60) return `${diffMinutes}분`
+    return `${diffHours}시간 ${diffMinutes % 60}분`
   }
 
   const handleAcknowledge = () => {
@@ -136,11 +220,11 @@ export function AlertItem({
           </div>
           <div className="flex items-center gap-2 text-xs text-text-secondary">
             <span>{alert.location}</span>
-            <span>??/span>
-            <span>{formatRelativeTime(alert.detectedDate)}</span>
+            <span>•</span>
+            <span>{formatDate(alert.detectedDate)}</span>
             {alert.equipmentName && (
               <>
-                <span>??/span>
+                <span>•</span>
                 <span>{alert.equipmentName}</span>
               </>
             )}
@@ -158,7 +242,7 @@ export function AlertItem({
 
   return (
     <div className={`bg-background-secondary rounded-notion-md p-5 border border-border border-l-4 ${severityInfo.borderColor} transition-all duration-200 hover:shadow-lg relative`}>
-      {/* ?�더 */}
+      {/* 헤더 */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-start gap-3 flex-1">
           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${severityInfo.bg}`}>
@@ -176,18 +260,18 @@ export function AlertItem({
             <div className="flex items-center gap-2 text-sm text-text-secondary mb-2">
               <span>{sourceIcon}</span>
               <span className="capitalize">{alert.source.replace('_', ' ')}</span>
-              <span>??/span>
+              <span>•</span>
               <span>{alert.location}</span>
               {alert.subLocation && (
                 <>
-                  <span>??/span>
+                  <span>•</span>
                   <span>{alert.subLocation}</span>
                 </>
               )}
               {alert.equipmentName && (
                 <>
-                  <span>??/span>
-                  <span>?�️ {alert.equipmentName}</span>
+                  <span>•</span>
+                  <span>⚙️ {alert.equipmentName}</span>
                 </>
               )}
             </div>
@@ -209,12 +293,12 @@ export function AlertItem({
         </div>
       </div>
 
-      {/* ?�서 ?�이??�?AI 분석 */}
+      {/* 센서 데이터 및 AI 분석 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {alert.sensorData && (
           <div className="p-3 bg-background rounded-notion-sm">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-text-primary">?�서 ?�이??/span>
+              <span className="text-sm font-medium text-text-primary">센서 데이터</span>
               <span className="text-xs text-text-secondary">{alert.sensorData.sensorName}</span>
             </div>
             <div className="flex items-center gap-3">
@@ -225,7 +309,7 @@ export function AlertItem({
                 {alert.sensorData.currentValue} {alert.sensorData.unit}
               </div>
               <div className="text-sm text-text-secondary">
-                ?�계�? {alert.sensorData.thresholdValue} {alert.sensorData.unit}
+                임계값: {alert.sensorData.thresholdValue} {alert.sensorData.unit}
               </div>
             </div>
           </div>
@@ -235,31 +319,31 @@ export function AlertItem({
           <div className="p-3 bg-background rounded-notion-sm">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-text-primary">AI 분석</span>
-              <span className="text-xs text-text-secondary">?�뢰?? {alert.aiAnalysis.confidence}%</span>
+              <span className="text-xs text-text-secondary">신뢰도: {alert.aiAnalysis.confidence}%</span>
             </div>
             <p className="text-sm text-text-secondary">{alert.aiAnalysis.prediction}</p>
           </div>
         )}
       </div>
 
-      {/* AI 권장?�항 */}
+      {/* AI 권장사항 */}
       {alert.aiAnalysis?.recommendations && alert.aiAnalysis.recommendations.length > 0 && (
         <div className="mb-4">
-          <div className="text-sm font-medium text-text-primary mb-2">?�� AI 권장?�항</div>
+          <div className="text-sm font-medium text-text-primary mb-2">🤖 AI 권장사항</div>
           <div className="space-y-1">
             {alert.aiAnalysis.recommendations.map((recommendation, index) => (
               <div key={index} className="text-sm text-text-secondary bg-primary-light p-2 rounded-notion-sm">
-                ??{recommendation}
+                • {recommendation}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* ?�향 ?��? */}
+      {/* 영향 평가 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         <div className="text-center p-2 bg-background rounded-notion-sm">
-          <div className="text-xs text-text-secondary">?�전 ?�험</div>
+          <div className="text-xs text-text-secondary">안전 위험</div>
           <div className={`text-sm font-medium ${
             alert.impact.safetyRisk === 'critical' ? 'text-error-text' :
             alert.impact.safetyRisk === 'high' ? 'text-warning-text' : 'text-success-text'
@@ -268,7 +352,7 @@ export function AlertItem({
           </div>
         </div>
         <div className="text-center p-2 bg-background rounded-notion-sm">
-          <div className="text-xs text-text-secondary">?�영 ?�향</div>
+          <div className="text-xs text-text-secondary">운영 영향</div>
           <div className={`text-sm font-medium ${
             alert.impact.operationalImpact === 'critical' ? 'text-error-text' :
             alert.impact.operationalImpact === 'high' ? 'text-warning-text' : 'text-success-text'
@@ -278,39 +362,39 @@ export function AlertItem({
         </div>
         {alert.impact.estimatedDowntime && (
           <div className="text-center p-2 bg-background rounded-notion-sm">
-            <div className="text-xs text-text-secondary">?�상 중단</div>
+            <div className="text-xs text-text-secondary">예상 중단</div>
             <div className="text-sm font-medium text-text-primary">
-              {alert.impact.estimatedDowntime}�?
+              {alert.impact.estimatedDowntime}분
             </div>
           </div>
         )}
         {alert.impact.potentialCost && (
           <div className="text-center p-2 bg-background rounded-notion-sm">
-            <div className="text-xs text-text-secondary">?�상 비용</div>
+            <div className="text-xs text-text-secondary">예상 비용</div>
             <div className="text-sm font-medium text-text-primary">
-              ??alert.impact.potentialCost.toLocaleString()}
+              ₩{alert.impact.potentialCost.toLocaleString()}
             </div>
           </div>
         )}
       </div>
 
-      {/* ?�태 ?�보 */}
+      {/* 상태 정보 */}
       <div className="flex items-center justify-between text-sm text-text-tertiary mb-4">
         <div className="flex items-center gap-4">
-          <span>발생: {formatRelativeTime(alert.detectedDate)}</span>
+          <span>발생: {formatDate(alert.detectedDate)}</span>
           {alert.acknowledgedDate && alert.acknowledgedBy && (
-            <span>?�인: {alert.acknowledgedBy.name} ({formatRelativeTime(alert.acknowledgedDate)})</span>
+            <span>확인: {alert.acknowledgedBy.name} ({formatDate(alert.acknowledgedDate)})</span>
           )}
           {processingTime && (
-            <span>처리?�간: {processingTime}</span>
+            <span>처리시간: {processingTime}</span>
           )}
         </div>
         {alert.assignedTo && (
-          <span>?�당: {alert.assignedTo.name}</span>
+          <span>담당: {alert.assignedTo.name}</span>
         )}
       </div>
 
-      {/* ?�션 버튼 */}
+      {/* 액션 버튼 */}
       {(canAcknowledge || canResolve || canEscalate) && alert.status === 'active' && (
         <div className="flex items-center gap-2">
           {canAcknowledge && alert.status === 'active' && (
@@ -319,7 +403,7 @@ export function AlertItem({
               variant="outline"
               onClick={() => setShowActions(showActions === false ? 'acknowledge' : false)}
             >
-              ?�인
+              확인
             </Button>
           )}
           {canResolve && (
@@ -328,7 +412,7 @@ export function AlertItem({
               onClick={() => setShowActions(showActions === false ? 'resolve' : false)}
               className="bg-success hover:bg-success/90"
             >
-              ?�결
+              해결
             </Button>
           )}
           {canEscalate && (
@@ -337,23 +421,23 @@ export function AlertItem({
               variant="destructive"
               onClick={handleEscalate}
             >
-              ?�급보고
+              상급보고
             </Button>
           )}
         </div>
       )}
 
-      {/* ?�션 ??*/}
+      {/* 액션 폼 */}
       {showActions && (
         <div className="mt-4 p-4 bg-background rounded-notion-md border border-border">
           {showActions === 'acknowledge' && (
             <div className="space-y-3">
-              <h4 className="font-medium text-text-primary">?�림 ?�인</h4>
+              <h4 className="font-medium text-text-primary">알림 확인</h4>
               <textarea
                 value={acknowledgeNotes}
                 onChange={(e) => setAcknowledgeNotes(e.target.value)}
                 className="w-full px-3 py-2 rounded-notion-sm border border-border bg-background-secondary focus:border-border-focus focus:outline-none h-20 resize-none text-sm"
-                placeholder="?�인 ?�용?�나 조치 계획???�력?�세??(?�택?�항)..."
+                placeholder="확인 내용이나 조치 계획을 입력하세요 (선택사항)..."
               />
               <div className="flex items-center gap-2">
                 <Button
@@ -367,7 +451,7 @@ export function AlertItem({
                   size="sm"
                   onClick={handleAcknowledge}
                 >
-                  ?�인 ?�료
+                  확인 완료
                 </Button>
               </div>
             </div>
@@ -375,35 +459,35 @@ export function AlertItem({
 
           {showActions === 'resolve' && (
             <div className="space-y-4">
-              <h4 className="font-medium text-text-primary">?�림 ?�결</h4>
+              <h4 className="font-medium text-text-primary">알림 해결</h4>
               
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
-                  ?�결 방법 <span className="text-error-text">*</span>
+                  해결 방법 <span className="text-error-text">*</span>
                 </label>
                 <textarea
                   value={resolutionData.resolution}
                   onChange={(e) => setResolutionData(prev => ({ ...prev, resolution: e.target.value }))}
                   className="w-full px-3 py-2 rounded-notion-sm border border-border bg-background-secondary focus:border-border-focus focus:outline-none h-20 resize-none text-sm"
-                  placeholder="문제 ?�결 방법???�세???�명?�세??.."
+                  placeholder="문제 해결 방법을 상세히 설명하세요..."
                   required
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
-                  ?�행??조치
+                  실행한 조치
                 </label>
                 <div className="space-y-2">
                   {resolutionData.actionsTaken.map((action, index) => (
                     <div key={index} className="flex items-center justify-between p-2 bg-success-bg rounded-notion-sm">
-                      <span className="text-sm text-success-text">??{action}</span>
+                      <span className="text-sm text-success-text">• {action}</span>
                       <button
                         type="button"
                         onClick={() => removeAction(index)}
                         className="text-error-text hover:text-error text-sm"
                       >
-                        ??
+                        ✕
                       </button>
                     </div>
                   ))}
@@ -413,7 +497,7 @@ export function AlertItem({
                       value={resolutionData.newAction}
                       onChange={(e) => setResolutionData(prev => ({ ...prev, newAction: e.target.value }))}
                       className="flex-1 px-3 py-2 rounded-notion-sm border border-border bg-background-secondary focus:border-border-focus focus:outline-none text-sm"
-                      placeholder="?�행??조치�?추�??�세??.."
+                      placeholder="실행한 조치를 추가하세요..."
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault()
@@ -426,7 +510,7 @@ export function AlertItem({
                       size="sm"
                       onClick={addAction}
                     >
-                      추�?
+                      추가
                     </Button>
                   </div>
                 </div>
@@ -446,7 +530,7 @@ export function AlertItem({
                   disabled={!resolutionData.resolution.trim()}
                   className="bg-success hover:bg-success/90"
                 >
-                  ?�결 ?�료
+                  해결 완료
                 </Button>
               </div>
             </div>
@@ -454,14 +538,14 @@ export function AlertItem({
         </div>
       )}
 
-      {/* 긴급 ?�림 ?�시 */}
+      {/* 긴급 알림 표시 */}
       {alert.severity === 'emergency' && (
         <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full font-semibold animate-pulse">
           비상
         </div>
       )}
 
-      {/* AI ?�성 ?�시 */}
+      {/* AI 생성 표시 */}
       {alert.source === 'ai_system' && (
         <div className="absolute top-3 left-3 bg-primary text-white text-xs px-2 py-1 rounded-full font-semibold">
           AI

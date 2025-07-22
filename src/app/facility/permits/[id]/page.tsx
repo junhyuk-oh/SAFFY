@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { WorkPermit } from '@/lib/types/facility';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Breadcrumb } from '@/components/ui/display';
 import { 
   Shield, Clock, Calendar, MapPin, User, AlertTriangle, 
   CheckCircle, XCircle, FileText, Edit, Trash2, Send,

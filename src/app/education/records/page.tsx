@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from 'react'
-import { Breadcrumb } from '@/components/ui/breadcrumb'
-import { BackButton } from '@/components/ui/back-button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Breadcrumb } from '@/components/ui/display'
+import { BackButton } from '@/components/ui/layout'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/display'
 import CertificateUploader from '@/components/education/CertificateUploader'
 import EducationStats from '@/components/education/EducationStats'
 

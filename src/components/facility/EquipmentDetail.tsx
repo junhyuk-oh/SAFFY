@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Equipment } from "@/lib/types/facility"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/display/badge"
+import { Button } from "@/components/ui/forms/button"
 
 interface EquipmentDetailProps {
   equipment: Equipment

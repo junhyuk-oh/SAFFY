@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PermitForm } from '@/components/facility/PermitForm';
 import { CreateWorkPermitRequest } from '@/lib/types/facility';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Breadcrumb } from '@/components/ui/display';
 
 export default function CreatePermitPage() {
   const router = useRouter();

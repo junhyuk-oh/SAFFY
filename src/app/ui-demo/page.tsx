@@ -2,22 +2,23 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Modal, ModalHeader, ModalBody, ModalFooter, ConfirmModal } from "@/components/ui/modal"
-import { ToastContainer, useToast } from "@/components/ui/toast"
-import { LoadingSpinner, Skeleton, CardSkeleton, LoadingPage } from "@/components/ui/loading"
-import { ErrorMessage, EmptyState } from "@/components/ui/error"
-import { FormField, FormGroup, FormSection, FormActions, FormHelperText } from "@/components/ui/form"
-import { PageTransition } from "@/components/ui/page-transition"
+import { Input } from '@/components/ui/forms'
+import { Label } from '@/components/ui/forms'
+import { Select } from '@/components/ui/forms'
+import { Textarea } from '@/components/ui/forms'
+import { Checkbox } from '@/components/ui/forms'
+import { Card } from "@/components/ui/display"
+import { Badge } from '@/components/ui/display'
+import { Progress } from '@/components/ui/feedback'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/display'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/display'
+import { Modal, ModalHeader, ModalBody, ModalFooter, ConfirmModal } from '@/components/ui/layout'
+import { ToastContainer, useToast } from '@/components/ui/feedback'
+import { LoadingSpinner } from "@/components/common"
+import { Skeleton, CardSkeleton, LoadingPage } from "@/components/ui/feedback"
+import { ErrorMessage, EmptyState } from "@/components/ui/feedback"
+import { FormField, FormGroup, FormSection, FormActions, FormHelperText } from '@/components/ui/forms'
+import { PageTransition } from '@/components/ui/layout'
 
 export default function UIDemo() {
   const [isModalOpen, setIsModalOpen] = useState(false)

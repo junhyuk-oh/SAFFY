@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCenter, AlertDashboard } from '@/components/facility';
 import { FacilityAlert, AlertStatus } from '@/lib/types/facility';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Breadcrumb } from '@/components/ui/display';
 
 export default function AlertsPage() {
   const router = useRouter();

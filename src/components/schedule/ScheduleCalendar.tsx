@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display'
 import { ChevronLeft, ChevronRight, Plus, Calendar, Clock, Grid3x3, List } from 'lucide-react'
 import type { Schedule } from '@/lib/types/schedule'
 

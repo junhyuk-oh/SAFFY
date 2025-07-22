@@ -2,8 +2,8 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display'
+import { Badge } from '@/components/ui/display'
 import { Calendar, User, FileText, Hash } from 'lucide-react'
 
 interface Metadata {

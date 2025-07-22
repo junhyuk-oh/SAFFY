@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display'
+import { Progress } from '@/components/ui/feedback'
 import { 
   BarChart,
   Bar,

@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Breadcrumb } from "@/components/ui/breadcrumb"
-import { BackButton } from "@/components/ui/back-button"
+import { Breadcrumb } from "@/components/ui/display"
+import { BackButton } from "@/components/ui/layout"
 import { useParams, useRouter } from "next/navigation"
 import { useDocument } from "@/lib/hooks/use-documents"
 import { BaseDocument, Status } from "@/lib/types"
-import { STATUS_CONFIG } from "@/lib/constants/status"
+import { DOCUMENT_STATUS } from "@/lib/constants/status"
 import { formatKoreanDate } from "@/lib/utils/date"
 
 
@@ -66,7 +66,11 @@ export default function DocumentDetailPage() {
     )
   }
 
-  const statusInfo = STATUS_CONFIG[document.status as Status]
+  const statusInfo = DOCUMENT_STATUS[document.status as Status] || {
+    label: '알 수 없음',
+    color: 'text-text-secondary',
+    bg: 'bg-background-hover'
+  }
 
   const handleEdit = () => {
     // 편집 모드로 전환

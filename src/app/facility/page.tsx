@@ -1,5 +1,5 @@
 import { FacilityDashboard } from '@/components/facility';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Breadcrumb } from '@/components/ui/display';
 
 export default function FacilityPage() {
   return (

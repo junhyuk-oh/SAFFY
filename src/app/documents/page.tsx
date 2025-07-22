@@ -1,11 +1,11 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Breadcrumb } from "@/components/ui/breadcrumb"
+import { Breadcrumb } from "@/components/ui/display"
 import { DocumentSearch, DocumentList } from "@/components/documents/shared"
 import { useDocuments, useDocumentSearch } from "@/lib/hooks/use-documents"
-import { LoadingSpinner } from "@/components/ui/loading"
-import { ErrorDisplay } from "@/components/ui/error"
+import { LoadingSpinner } from "@/components/common"
+import { ErrorDisplay } from "@/components/ui/feedback"
 import Link from "next/link"
 
 const documentTypes = [

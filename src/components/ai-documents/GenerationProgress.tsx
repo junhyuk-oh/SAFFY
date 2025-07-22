@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import { Progress } from '@/components/ui/progress'
+import { Progress } from '@/components/ui/feedback'
 import { cn } from '@/lib/utils'
 
 export interface GenerationStep {

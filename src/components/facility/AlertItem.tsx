@@ -4,8 +4,6 @@ import { useState } from "react"
 import { FacilityAlert } from "@/lib/types/facility"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { SEVERITY_CONFIG, ALERT_STATUS } from "@/lib/constants/status"
-import { formatRelativeTime } from "@/lib/utils/date"
 
 interface AlertItemProps {
   alert: FacilityAlert
@@ -18,6 +16,71 @@ interface AlertItemProps {
   compact?: boolean
 }
 
+const severityConfig = {
+  low: {
+    label: "낮음",
+    color: "text-success-text",
+    bg: "bg-success-bg",
+    borderColor: "border-l-success",
+    icon: "ℹ️"
+  },
+  medium: {
+    label: "보통",
+    color: "text-primary",
+    bg: "bg-blue-50",
+    borderColor: "border-l-primary",
+    icon: "⚠️"
+  },
+  high: {
+    label: "높음",
+    color: "text-warning-text",
+    bg: "bg-warning-bg",
+    borderColor: "border-l-warning",
+    icon: "🚨"
+  },
+  critical: {
+    label: "긴급",
+    color: "text-error-text",
+    bg: "bg-error-bg",
+    borderColor: "border-l-error",
+    icon: "🔴"
+  },
+  emergency: {
+    label: "비상",
+    color: "text-white",
+    bg: "bg-red-600",
+    borderColor: "border-l-red-600",
+    icon: "🆘"
+  }
+}
+
+const statusConfig = {
+  active: {
+    label: "활성",
+    color: "text-error-text",
+    bg: "bg-error-bg"
+  },
+  acknowledged: {
+    label: "확인됨",
+    color: "text-warning-text",
+    bg: "bg-warning-bg"
+  },
+  resolved: {
+    label: "해결됨",
+    color: "text-success-text",
+    bg: "bg-success-bg"
+  },
+  false_positive: {
+    label: "오탐지",
+    color: "text-text-secondary",
+    bg: "bg-background-hover"
+  },
+  escalated: {
+    label: "상급보고",
+    color: "text-primary",
+    bg: "bg-blue-50"
+  }
+}
 
 const categoryIcons: Record<string, string> = {
   safety: "🛡️",
@@ -55,11 +118,32 @@ export function AlertItem({
     newAction: ''
   })
 
-  const severityInfo = SEVERITY_CONFIG[alert.severity]
-  const statusInfo = ALERT_STATUS[alert.status]
+  const severityInfo = severityConfig[alert.severity]
+  const statusInfo = statusConfig[alert.status]
   const categoryIcon = categoryIcons[alert.category] || "📋"
   const sourceIcon = sourceIcons[alert.source] || "📄"
 
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = now.getTime() - date.getTime()
+    const diffMinutes = Math.floor(diffTime / (1000 * 60))
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60))
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffMinutes < 1) return '방금 전'
+    if (diffMinutes < 60) return `${diffMinutes}분 전`
+    if (diffHours < 24) return `${diffHours}시간 전`
+    if (diffDays < 7) return `${diffDays}일 전`
+    
+    return date.toLocaleDateString('ko-KR', {
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
 
   // 처리 시간 계산
   const getProcessingTime = () => {
@@ -137,7 +221,7 @@ export function AlertItem({
           <div className="flex items-center gap-2 text-xs text-text-secondary">
             <span>{alert.location}</span>
             <span>•</span>
-            <span>{formatRelativeTime(alert.detectedDate)}</span>
+            <span>{formatDate(alert.detectedDate)}</span>
             {alert.equipmentName && (
               <>
                 <span>•</span>
@@ -297,9 +381,9 @@ export function AlertItem({
       {/* 상태 정보 */}
       <div className="flex items-center justify-between text-sm text-text-tertiary mb-4">
         <div className="flex items-center gap-4">
-          <span>발생: {formatRelativeTime(alert.detectedDate)}</span>
+          <span>발생: {formatDate(alert.detectedDate)}</span>
           {alert.acknowledgedDate && alert.acknowledgedBy && (
-            <span>확인: {alert.acknowledgedBy.name} ({formatRelativeTime(alert.acknowledgedDate)})</span>
+            <span>확인: {alert.acknowledgedBy.name} ({formatDate(alert.acknowledgedDate)})</span>
           )}
           {processingTime && (
             <span>처리시간: {processingTime}</span>
