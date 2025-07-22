@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { WorkPermit } from "@/lib/types/facility"
-import { Badge } from "@/components/ui/display"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/display/badge"
+import { Button } from "@/components/ui/forms/button"
 
 interface PermitApprovalProps {
   permit: WorkPermit
@@ -15,33 +15,33 @@ interface PermitApprovalProps {
 }
 
 const approvalStages = [
-  { stage: 'safety_review', label: '?�전검??, role: 'safety_manager', icon: '?���? },
-  { stage: 'technical_review', label: '기술검??, role: 'technical_manager', icon: '?��' },
-  { stage: 'management_approval', label: '관리승??, role: 'facility_manager', icon: '?��?��? },
-  { stage: 'final_approval', label: '최종?�인', role: 'plant_manager', icon: '?? }
+  { stage: 'safety_review', label: '?�전검??, role: 'safety_manager', icon: '?���? },
+  { stage: 'technical_review', label: '기술검??, role: 'technical_manager', icon: '?��' },
+  { stage: 'management_approval', label: '관리승??, role: 'facility_manager', icon: '?��?��? },
+  { stage: 'final_approval', label: '최종?�인', role: 'plant_manager', icon: '?? }
 ]
 
 const statusConfig = {
   pending: {
-    label: "?�기중",
+    label: "?�기중",
     color: "text-text-secondary",
     bg: "bg-background-hover",
     icon: "??
   },
   approved: {
-    label: "?�인??,
+    label: "?�인??,
     color: "text-success-text",
     bg: "bg-success-bg",
     icon: "??
   },
   rejected: {
-    label: "거�???,
+    label: "거�???,
     color: "text-error-text",
     bg: "bg-error-bg",
     icon: "??
   },
   info_requested: {
-    label: "?�보?�청",
+    label: "?�보?�청",
     color: "text-warning-text",
     bg: "bg-warning-bg",
     icon: "??
@@ -65,7 +65,7 @@ export function PermitApproval({
   const [conditions, setConditions] = useState<string[]>([])
   const [newCondition, setNewCondition] = useState('')
 
-  // ?�짜 ?�맷???�수
+  // ?�짜 ?�맷???�수
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleString('ko-KR', {
@@ -77,14 +77,14 @@ export function PermitApproval({
     })
   }
 
-  // ?�재 ?�용?��? ?�인?????�는 ?�계 ?�인
+  // ?�재 ?�용?��? ?�인?????�는 ?�계 ?�인
   const getCurrentApprovalStage = () => {
     return permit.approvals.find(approval => 
       approval.approverRole === currentUserRole && approval.status === 'pending'
     )
   }
 
-  // ?�인 진행�?계산
+  // ?�인 진행�?계산
   const getApprovalProgress = () => {
     const totalStages = permit.approvals.length
     const completedStages = permit.approvals.filter(approval => 
@@ -117,14 +117,14 @@ export function PermitApproval({
           break
         case 'reject':
           if (!comments.trim()) {
-            alert('거�? ?�유�??�력?�주?�요.')
+            alert('거�? ?�유�??�력?�주?�요.')
             return
           }
           await onReject(activeAction.stage, comments)
           break
         case 'info_request':
           if (!comments.trim()) {
-            alert('?�청 ?�용???�력?�주?�요.')
+            alert('?�청 ?�용???�력?�주?�요.')
             return
           }
           await onRequestInfo(activeAction.stage, comments)
@@ -136,8 +136,8 @@ export function PermitApproval({
       setComments('')
       setConditions([])
     } catch (error) {
-      console.error('?�인 처리 �??�류:', error)
-      alert('처리 �??�류가 발생?�습?�다.')
+      console.error('?�인 처리 �??�류:', error)
+      alert('처리 �??�류가 발생?�습?�다.')
     }
   }
 
@@ -150,7 +150,7 @@ export function PermitApproval({
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* ?��????�보 ?�더 */}
+      {/* ?��????�보 ?�더 */}
       <div className="bg-background-secondary rounded-notion-md p-6">
         <div className="flex items-start justify-between mb-4">
           <div>
@@ -169,24 +169,24 @@ export function PermitApproval({
                      permit.priority === 'high' ? 'warning' : 'secondary'}
             >
               {permit.priority === 'critical' ? '긴급' :
-               permit.priority === 'high' ? '?�음' :
-               permit.priority === 'medium' ? '보통' : '??��'}
+               permit.priority === 'high' ? '?�음' :
+               permit.priority === 'medium' ? '보통' : '??��'}
             </Badge>
             <Badge 
               variant={permit.status === 'approved' ? 'success' :
                      permit.status === 'rejected' ? 'destructive' : 'secondary'}
             >
-              {permit.status === 'approved' ? '?�인?? :
-               permit.status === 'rejected' ? '거�??? :
-               permit.status === 'under_review' ? '검?�중' : permit.status}
+              {permit.status === 'approved' ? '?�인?? :
+               permit.status === 'rejected' ? '거�??? :
+               permit.status === 'under_review' ? '검?�중' : permit.status}
             </Badge>
           </div>
         </div>
 
-        {/* ?�청???�보 */}
+        {/* ?�청???�보 */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <div className="text-text-secondary">?�청??/div>
+            <div className="text-text-secondary">?�청??/div>
             <div className="font-medium text-text-primary mt-1">{permit.requestedBy.name}</div>
           </div>
           <div>
@@ -194,21 +194,21 @@ export function PermitApproval({
             <div className="font-medium text-text-primary mt-1">{permit.requestedBy.department}</div>
           </div>
           <div>
-            <div className="text-text-secondary">?�업기간</div>
+            <div className="text-text-secondary">?�업기간</div>
             <div className="font-medium text-text-primary mt-1">
               {formatDateTime(permit.startDate)} ~ {formatDateTime(permit.endDate)}
             </div>
           </div>
           <div>
-            <div className="text-text-secondary">?�상?�간</div>
-            <div className="font-medium text-text-primary mt-1">{permit.estimatedDuration}?�간</div>
+            <div className="text-text-secondary">?�상?�간</div>
+            <div className="font-medium text-text-primary mt-1">{permit.estimatedDuration}?�간</div>
           </div>
         </div>
 
-        {/* ?�인 진행�?*/}
+        {/* ?�인 진행�?*/}
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-text-primary">?�인 진행�?/span>
+            <span className="text-sm font-medium text-text-primary">?�인 진행�?/span>
             <span className="text-sm font-medium text-text-primary">{progress}%</span>
           </div>
           <div className="w-full h-3 bg-background-hover rounded-full overflow-hidden">
@@ -220,9 +220,9 @@ export function PermitApproval({
         </div>
       </div>
 
-      {/* ?�인 ?�계 */}
+      {/* ?�인 ?�계 */}
       <div className="bg-background-secondary rounded-notion-md p-6">
-        <h3 className="text-lg font-semibold text-text-primary mb-4">?�인 ?�계</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">?�인 ?�계</h3>
         
         <div className="space-y-4">
           {permit.approvals.map((approval, index) => {
@@ -241,7 +241,7 @@ export function PermitApproval({
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${statusInfo.bg}`}>
-                      <span className="text-lg">{stageInfo?.icon || '?��'}</span>
+                      <span className="text-lg">{stageInfo?.icon || '?��'}</span>
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold text-text-primary flex items-center gap-2">
@@ -252,19 +252,19 @@ export function PermitApproval({
                         </Badge>
                       </h4>
                       <div className="text-sm text-text-secondary mt-1">
-                        ?�당?? {approval.approverName || `${approval.approverRole} (미배??`}
+                        ?�당?? {approval.approverName || `${approval.approverRole} (미배??`}
                       </div>
                       
                       {approval.comments && (
                         <div className="mt-2 p-3 bg-background rounded-notion-sm">
-                          <div className="text-sm font-medium text-text-primary mb-1">?�견:</div>
+                          <div className="text-sm font-medium text-text-primary mb-1">?�견:</div>
                           <div className="text-sm text-text-secondary">{approval.comments}</div>
                         </div>
                       )}
                       
                       {approval.conditions && approval.conditions.length > 0 && (
                         <div className="mt-2">
-                          <div className="text-sm font-medium text-text-primary mb-1">?�인 조건:</div>
+                          <div className="text-sm font-medium text-text-primary mb-1">?�인 조건:</div>
                           <ul className="space-y-1">
                             {approval.conditions.map((condition, condIndex) => (
                               <li key={condIndex} className="text-sm text-warning-text bg-warning-bg px-2 py-1 rounded">
@@ -277,14 +277,14 @@ export function PermitApproval({
                       
                       {approval.date && (
                         <div className="text-xs text-text-tertiary mt-2">
-                          {approval.status === 'approved' ? '?�인?�시' : 
-                           approval.status === 'rejected' ? '거�??�시' : '처리?�시'}: {formatDate(approval.date)}
+                          {approval.status === 'approved' ? '?�인?�시' : 
+                           approval.status === 'rejected' ? '거�??�시' : '처리?�시'}: {formatDate(approval.date)}
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* ?�션 버튼 */}
+                  {/* ?�션 버튼 */}
                   {isCurrentUserStage && canApprove && (
                     <div className="flex items-center gap-2 ml-4">
                       <Button
@@ -292,57 +292,57 @@ export function PermitApproval({
                         onClick={() => setActiveAction({ type: 'approve', stage: approval.stage })}
                         className="bg-success hover:bg-success/90"
                       >
-                        ?�인
+                        ?�인
                       </Button>
                       <Button
                         size="sm"
                         variant="destructive"
                         onClick={() => setActiveAction({ type: 'reject', stage: approval.stage })}
                       >
-                        거�?
+                        거�?
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => setActiveAction({ type: 'info_request', stage: approval.stage })}
                       >
-                        ?�보?�청
+                        ?�보?�청
                       </Button>
                     </div>
                   )}
                 </div>
 
-                {/* ?�션 ??*/}
+                {/* ?�션 ??*/}
                 {isActive && (
                   <div className="mt-4 p-4 bg-background rounded-notion-md border border-border">
                     <h5 className="font-medium text-text-primary mb-3">
-                      {activeAction.type === 'approve' ? '?�인 처리' :
-                       activeAction.type === 'reject' ? '거�? 처리' : '?�보 ?�청'}
+                      {activeAction.type === 'approve' ? '?�인 처리' :
+                       activeAction.type === 'reject' ? '거�? 처리' : '?�보 ?�청'}
                     </h5>
 
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-text-primary mb-2">
-                          {activeAction.type === 'approve' ? '?�인 ?�견 (?�택?�항)' :
-                           activeAction.type === 'reject' ? '거�? ?�유 (?�수)' : '?�청 ?�용 (?�수)'}
+                          {activeAction.type === 'approve' ? '?�인 ?�견 (?�택?�항)' :
+                           activeAction.type === 'reject' ? '거�? ?�유 (?�수)' : '?�청 ?�용 (?�수)'}
                         </label>
                         <textarea
                           value={comments}
                           onChange={(e) => setComments(e.target.value)}
                           className="w-full px-3 py-2 rounded-notion-sm border border-border bg-background-secondary focus:border-border-focus focus:outline-none h-24 resize-none"
                           placeholder={
-                            activeAction.type === 'approve' ? '?�인 ?�견?�나 참고?�항???�력?�세??..' :
-                            activeAction.type === 'reject' ? '거�? ?�유�?명확???�력?�세??..' :
-                            '추�?�??�요???�보???�류�??�청?�세??..'
+                            activeAction.type === 'approve' ? '?�인 ?�견?�나 참고?�항???�력?�세??..' :
+                            activeAction.type === 'reject' ? '거�? ?�유�?명확???�력?�세??..' :
+                            '추�?�??�요???�보???�류�??�청?�세??..'
                           }
                         />
                       </div>
 
-                      {/* ?�인 조건 (?�인 ?�만) */}
+                      {/* ?�인 조건 (?�인 ?�만) */}
                       {activeAction.type === 'approve' && (
                         <div>
                           <label className="block text-sm font-medium text-text-primary mb-2">
-                            ?�인 조건 (?�택?�항)
+                            ?�인 조건 (?�택?�항)
                           </label>
                           <div className="space-y-2">
                             {conditions.map((condition, condIndex) => (
@@ -363,7 +363,7 @@ export function PermitApproval({
                                 value={newCondition}
                                 onChange={(e) => setNewCondition(e.target.value)}
                                 className="flex-1 px-3 py-2 rounded-notion-sm border border-border bg-background-secondary focus:border-border-focus focus:outline-none text-sm"
-                                placeholder="?�인 조건???�력?�세??.."
+                                placeholder="?�인 조건???�력?�세??.."
                                 onKeyPress={(e) => {
                                   if (e.key === 'Enter') {
                                     e.preventDefault()
@@ -376,7 +376,7 @@ export function PermitApproval({
                                 size="sm"
                                 onClick={handleAddCondition}
                               >
-                                추�?
+                                추�?
                               </Button>
                             </div>
                           </div>
@@ -401,8 +401,8 @@ export function PermitApproval({
                           'bg-warning hover:bg-warning/90'
                         }
                       >
-                        {activeAction.type === 'approve' ? '?�인 ?�료' :
-                         activeAction.type === 'reject' ? '거�? ?�정' : '?�보 ?�청'}
+                        {activeAction.type === 'approve' ? '?�인 ?�료' :
+                         activeAction.type === 'reject' ? '거�? ?�정' : '?�보 ?�청'}
                       </Button>
                     </div>
                   </div>
@@ -413,20 +413,20 @@ export function PermitApproval({
         </div>
       </div>
 
-      {/* ?��????�세 ?�보 미리보기 */}
+      {/* ?��????�세 ?�보 미리보기 */}
       <div className="bg-background-secondary rounded-notion-md p-6">
-        <h3 className="text-lg font-semibold text-text-primary mb-4">?��????�세 ?�보</h3>
+        <h3 className="text-lg font-semibold text-text-primary mb-4">?��????�세 ?�보</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium text-text-primary mb-2">?�업 ?�명</h4>
+            <h4 className="font-medium text-text-primary mb-2">?�업 ?�명</h4>
             <p className="text-sm text-text-secondary bg-background p-3 rounded-notion-sm">
               {permit.description}
             </p>
           </div>
 
           <div>
-            <h4 className="font-medium text-text-primary mb-2">?�험???��?</h4>
+            <h4 className="font-medium text-text-primary mb-2">?�험???��?</h4>
             <div className="space-y-2">
               <div className={`inline-flex items-center px-3 py-1 rounded-md text-sm ${
                 permit.hazards.riskLevel === 'critical' ? 'bg-red-100 text-red-800' :
@@ -434,13 +434,13 @@ export function PermitApproval({
                 permit.hazards.riskLevel === 'medium' ? 'bg-warning-bg text-warning-text' :
                 'bg-success-bg text-success-text'
               }`}>
-                ?�험?? {permit.hazards.riskLevel === 'critical' ? '긴급' :
-                        permit.hazards.riskLevel === 'high' ? '?�음' :
-                        permit.hazards.riskLevel === 'medium' ? '보통' : '??��'}
+                ?�험?? {permit.hazards.riskLevel === 'critical' ? '긴급' :
+                        permit.hazards.riskLevel === 'high' ? '?�음' :
+                        permit.hazards.riskLevel === 'medium' ? '보통' : '??��'}
               </div>
               {permit.hazards.identified.length > 0 && (
                 <div className="text-sm text-text-secondary">
-                  <strong>?�별???�험:</strong> {permit.hazards.identified.join(', ')}
+                  <strong>?�별???�험:</strong> {permit.hazards.identified.join(', ')}
                 </div>
               )}
             </div>
@@ -448,7 +448,7 @@ export function PermitApproval({
 
           {permit.safety.requiredPPE.length > 0 && (
             <div>
-              <h4 className="font-medium text-text-primary mb-2">?�요??보호�?/h4>
+              <h4 className="font-medium text-text-primary mb-2">?�요??보호�?/h4>
               <div className="flex flex-wrap gap-1">
                 {permit.safety.requiredPPE.map((ppe, index) => (
                   <span key={index} className="inline-block px-2 py-1 bg-primary-light text-primary text-xs rounded-md">
@@ -460,28 +460,28 @@ export function PermitApproval({
           )}
 
           <div>
-            <h4 className="font-medium text-text-primary mb-2">?�전 ?�구?�항</h4>
+            <h4 className="font-medium text-text-primary mb-2">?�전 ?�구?�항</h4>
             <div className="space-y-1 text-sm">
               {permit.safety.fireWatchRequired && (
                 <div className="flex items-center gap-2 text-error-text">
-                  <span>?��</span>
-                  <span>?�재감시???�요</span>
+                  <span>?��</span>
+                  <span>?�재감시???�요</span>
                 </div>
               )}
               {permit.safety.gasTestRequired && (
                 <div className="flex items-center gap-2 text-warning-text">
-                  <span>?��</span>
-                  <span>가?�측???�요</span>
+                  <span>?��</span>
+                  <span>가?�측???�요</span>
                 </div>
               )}
               {permit.safety.isolationRequired && (
                 <div className="flex items-center gap-2 text-primary">
-                  <span>?��</span>
-                  <span>격리조치 ?�요</span>
+                  <span>?��</span>
+                  <span>격리조치 ?�요</span>
                 </div>
               )}
               {!permit.safety.fireWatchRequired && !permit.safety.gasTestRequired && !permit.safety.isolationRequired && (
-                <div className="text-text-secondary">?�별???�전 ?�구?�항 ?�음</div>
+                <div className="text-text-secondary">?�별???�전 ?�구?�항 ?�음</div>
               )}
             </div>
           </div>
@@ -489,24 +489,24 @@ export function PermitApproval({
 
         {permit.contractor && (
           <div className="mt-4 p-4 bg-background rounded-notion-sm">
-            <h4 className="font-medium text-text-primary mb-2">?�주?�체 ?�보</h4>
+            <h4 className="font-medium text-text-primary mb-2">?�주?�체 ?�보</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <div className="text-text-secondary">?�체�?/div>
+                <div className="text-text-secondary">?�체�?/div>
                 <div className="font-medium text-text-primary">{permit.contractor.companyName}</div>
               </div>
               <div>
-                <div className="text-text-secondary">?�당??/div>
+                <div className="text-text-secondary">?�당??/div>
                 <div className="font-medium text-text-primary">{permit.contractor.contactPerson}</div>
               </div>
               <div>
-                <div className="text-text-secondary">?�락�?/div>
+                <div className="text-text-secondary">?�락�?/div>
                 <div className="font-medium text-text-primary">{permit.contractor.contact}</div>
               </div>
               <div>
                 <div className="text-text-secondary">보험 가??/div>
                 <div className={`font-medium ${permit.contractor.insurance ? 'text-success-text' : 'text-error-text'}`}>
-                  {permit.contractor.insurance ? '??가?? : '??미�???}
+                  {permit.contractor.insurance ? '??가?? : '??미�???}
                 </div>
               </div>
             </div>
@@ -514,22 +514,22 @@ export function PermitApproval({
         )}
       </div>
 
-      {/* ?�재 ?�용???�태 ?�내 */}
+      {/* ?�재 ?�용???�태 ?�내 */}
       {canApprove && (
         <div className="bg-primary-light rounded-notion-md p-4 text-center">
           {currentStage ? (
             <div>
               <div className="text-lg font-semibold text-primary mb-1">
-                ?�인 ?��?중인 ?�계가 ?�습?�다
+                ?�인 ?��?중인 ?�계가 ?�습?�다
               </div>
               <div className="text-sm text-primary">
-                {approvalStages.find(s => s.stage === currentStage.stage)?.label} ?�계?�서 귀?�의 ?�인??기다리고 ?�습?�다.
+                {approvalStages.find(s => s.stage === currentStage.stage)?.label} ?�계?�서 귀?�의 ?�인??기다리고 ?�습?�다.
               </div>
             </div>
           ) : (
             <div>
               <div className="text-sm text-text-secondary">
-                ?�재 귀?��? ?�인?????�는 ?�계가 ?�습?�다.
+                ?�재 귀?��? ?�인?????�는 ?�계가 ?�습?�다.
               </div>
             </div>
           )}

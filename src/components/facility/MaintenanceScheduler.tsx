@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/display/card'
+import { Button } from '@/components/ui/forms/button'
+import { Badge } from '@/components/ui/display/badge'
+import { Progress } from '@/components/ui/display/progress'
 import { cn } from '@/lib/utils'
 import { 
   Calendar, 

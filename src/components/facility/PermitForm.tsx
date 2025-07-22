@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { CreateWorkPermitRequest, UpdateWorkPermitRequest, WorkPermit, PermitType, FacilityArea, Priority } from "@/lib/types/facility"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/forms/button"
+import { Badge } from "@/components/ui/display/badge"
 
 interface PermitFormProps {
   permit?: WorkPermit // 수정 시 기존 허가서 데이터

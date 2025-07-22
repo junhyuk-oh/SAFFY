@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { Equipment } from "@/lib/types/facility"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/display/badge"
 
 interface EquipmentCardProps {
   equipment: Equipment

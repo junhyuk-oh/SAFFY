@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { CreateWorkPermitRequest, UpdateWorkPermitRequest, WorkPermit, PermitType, FacilityArea, Priority } from "@/lib/types/facility"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/display"
+import { Button } from "@/components/ui/forms/button"
+import { Badge } from "@/components/ui/display/badge"
 
 interface PermitFormProps {
-  permit?: WorkPermit // ?�정 ??기존 ?��????�이??
+  permit?: WorkPermit // ?�정 ??기존 ?��????�이??
   onSubmit: (data: CreateWorkPermitRequest | UpdateWorkPermitRequest) => Promise<void>
   onCancel: () => void
   loading?: boolean
@@ -14,67 +14,67 @@ interface PermitFormProps {
 }
 
 const permitTypes: { value: PermitType; label: string; icon: string; description: string }[] = [
-  { value: 'Hot Work', label: '?�기?�업', icon: '?��', description: '?�접, ?�단, ?�삭 ?? },
-  { value: 'Confined Space', label: '밀?�공�?, icon: '?���?, description: '?�크, 관�? ?�?�고 ?? },
-  { value: 'Electrical Work', label: '?�기?�업', icon: '??, description: '?�기?�비 ?�치 �??�리' },
-  { value: 'Chemical Work', label: '?�학?�업', icon: '?��', description: '?�학물질 취급 ?�업' },
-  { value: 'Height Work', label: '고소?�업', icon: '?���?, description: '2m ?�상 ?�이 ?�업' },
-  { value: 'Excavation', label: '굴착?�업', icon: '?�️', description: '???�기 �?굴착' },
-  { value: 'Welding', label: '?�접?�업', icon: '?��', description: '각종 ?�접 ?�업' },
-  { value: 'Cutting', label: '?�단?�업', icon: '?�️', description: '금속 �??�료 ?�단' },
-  { value: 'Radiation Work', label: '방사?�작??, icon: '??��', description: '방사??물질 취급' },
-  { value: 'Crane Operation', label: '?�레?�작??, icon: '?���?, description: '?�레??�?중장�??�업' },
-  { value: 'Shutdown Work', label: '?��??�업', icon: '?��', description: '?�비 ?��? ???�업' },
-  { value: 'Emergency Work', label: '?�급?�업', icon: '?��', description: '긴급 ?�리 ?�업' },
-  { value: 'Contractor Work', label: '?�주?�업', icon: '?��', description: '?��? ?�체 ?�업' },
-  { value: 'Maintenance Work', label: '?�비?�업', icon: '?��', description: '?�반 ?�비 ?�업' },
-  { value: 'Construction Work', label: '건설?�업', icon: '?���?, description: '?�축 �?개조 ?�업' }
+  { value: 'Hot Work', label: '?�기?�업', icon: '?��', description: '?�접, ?�단, ?�삭 ?? },
+  { value: 'Confined Space', label: '밀?�공�?, icon: '?���?, description: '?�크, 관�? ?�?�고 ?? },
+  { value: 'Electrical Work', label: '?�기?�업', icon: '??, description: '?�기?�비 ?�치 �??�리' },
+  { value: 'Chemical Work', label: '?�학?�업', icon: '?��', description: '?�학물질 취급 ?�업' },
+  { value: 'Height Work', label: '고소?�업', icon: '?���?, description: '2m ?�상 ?�이 ?�업' },
+  { value: 'Excavation', label: '굴착?�업', icon: '?�️', description: '???�기 �?굴착' },
+  { value: 'Welding', label: '?�접?�업', icon: '?��', description: '각종 ?�접 ?�업' },
+  { value: 'Cutting', label: '?�단?�업', icon: '?�️', description: '금속 �??�료 ?�단' },
+  { value: 'Radiation Work', label: '방사?�작??, icon: '??��', description: '방사??물질 취급' },
+  { value: 'Crane Operation', label: '?�레?�작??, icon: '?���?, description: '?�레??�?중장�??�업' },
+  { value: 'Shutdown Work', label: '?��??�업', icon: '?��', description: '?�비 ?��? ???�업' },
+  { value: 'Emergency Work', label: '?�급?�업', icon: '?��', description: '긴급 ?�리 ?�업' },
+  { value: 'Contractor Work', label: '?�주?�업', icon: '?��', description: '?��? ?�체 ?�업' },
+  { value: 'Maintenance Work', label: '?�비?�업', icon: '?��', description: '?�반 ?�비 ?�업' },
+  { value: 'Construction Work', label: '건설?�업', icon: '?���?, description: '?�축 �?개조 ?�업' }
 ]
 
 const locations: { value: FacilityArea; label: string }[] = [
-  { value: 'Production Floor', label: '?�산�? },
-  { value: 'Lab Building', label: '?�험?? },
+  { value: 'Production Floor', label: '?�산�? },
+  { value: 'Lab Building', label: '?�험?? },
   { value: 'Warehouse', label: '창고' },
-  { value: 'Office Building', label: '?�무?? },
-  { value: 'Utility Room', label: '?�틸리티�? },
-  { value: 'Chemical Storage', label: '?�학물질 ?�?�소' },
-  { value: 'Electrical Room', label: '?�기?? },
+  { value: 'Office Building', label: '?�무?? },
+  { value: 'Utility Room', label: '?�틸리티�? },
+  { value: 'Chemical Storage', label: '?�학물질 ?�?�소' },
+  { value: 'Electrical Room', label: '?�기?? },
   { value: 'HVAC Room', label: 'HVAC?? },
-  { value: 'Emergency Exit', label: '비상�? },
+  { value: 'Emergency Exit', label: '비상�? },
   { value: 'Parking Area', label: '주차?? },
-  { value: 'Loading Dock', label: '?�역?? },
-  { value: 'Server Room', label: '?�버?? }
+  { value: 'Loading Dock', label: '?�역?? },
+  { value: 'Server Room', label: '?�버?? }
 ]
 
 const priorities: { value: Priority; label: string; color: string }[] = [
-  { value: 'low', label: '??��', color: 'text-success-text bg-success-bg' },
+  { value: 'low', label: '??��', color: 'text-success-text bg-success-bg' },
   { value: 'medium', label: '보통', color: 'text-warning-text bg-warning-bg' },
-  { value: 'high', label: '?�음', color: 'text-error-text bg-error-bg' },
+  { value: 'high', label: '?�음', color: 'text-error-text bg-error-bg' },
   { value: 'critical', label: '긴급', color: 'text-white bg-red-600' }
 ]
 
 const commonHazards = [
-  '?�재/??�� ?�험', '?�기 감전', '?�학물질 ?�출', '질식 ?�험', '?�하 ?�험',
-  '?�임 ?�험', '?�상 ?�험', '중독 ?�험', '방사???�출', '?�음/진동',
-  '고온/?�??, '?�력 ?�험', '?�물?�적 ?�험', '구조�?붕괴'
+  '?�재/??�� ?�험', '?�기 감전', '?�학물질 ?�출', '질식 ?�험', '?�하 ?�험',
+  '?�임 ?�험', '?�상 ?�험', '중독 ?�험', '방사???�출', '?�음/진동',
+  '고온/?�??, '?�력 ?�험', '?�물?�적 ?�험', '구조�?붕괴'
 ]
 
 const commonPPE = [
-  '?�전�?, '?�전??, '보안�?, '?�갑', '반사조끼', '?�흡보호�?,
-  '귀마개', '?�전벨트', '?�학�?, '?�연?�갑', '?�접마스??, '방독�?,
-  '?�화�?, '?�연??, '?�전?�', '구명조끼'
+  '?�전�?, '?�전??, '보안�?, '?�갑', '반사조끼', '?�흡보호�?,
+  '귀마개', '?�전벨트', '?�학�?, '?�연?�갑', '?�접마스??, '방독�?,
+  '?�화�?, '?�연??, '?�전?�', '구명조끼'
 ]
 
 const commonTraining = [
-  '?�반 ?�전교육', '?�기?�업 교육', '밀?�공�?교육', '?�기?�전 교육',
-  '?�학물질 취급 교육', '고소?�업 교육', '?�레??조작 교육',
-  '?�급처치 교육', '?�방?�전 교육', '방사???�전교육'
+  '?�반 ?�전교육', '?�기?�업 교육', '밀?�공�?교육', '?�기?�전 교육',
+  '?�학물질 취급 교육', '고소?�업 교육', '?�레??조작 교육',
+  '?�급처치 교육', '?�방?�전 교육', '방사???�전교육'
 ]
 
 const commonEquipment = [
-  '가?�탐지�?, '?�기??, '조명?�비', '?�신?�비', '?�화�?, '비상기구??,
-  '구급?�자', '?�전로프', '?�다�?, '비계', '?�레??, '?�접�?,
-  '?�단�?, '측정?�비', '보호?�구'
+  '가?�탐지�?, '?�기??, '조명?�비', '?�신?�비', '?�화�?, '비상기구??,
+  '구급?�자', '?�전로프', '?�다�?, '비계', '?�레??, '?�접�?,
+  '?�단�?, '측정?�비', '보호?�구'
 ]
 
 export function PermitForm({
@@ -164,7 +164,7 @@ export function PermitForm({
     chemical: { name: '', quantity: '', msdsAvailable: false }
   })
 
-  // 기존 ?��????�이?�로 ??초기??
+  // 기존 ?��????�이?�로 ??초기??
   useEffect(() => {
     if (permit && mode === 'edit') {
       setFormData({
@@ -301,14 +301,14 @@ export function PermitForm({
   return (
     <div className="max-w-4xl mx-auto">
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* ?�더 */}
+        {/* ?�더 */}
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-text-primary">
-              {mode === 'create' ? '???�업?��??? : '?��????�정'}
+              {mode === 'create' ? '???�업?��??? : '?��????�정'}
             </h2>
             <p className="text-text-secondary mt-1">
-              {mode === 'create' ? '?�로???�업?��??��? ?�청?�니?? : '기존 ?��??�의 ?�보�??�정?�니??}
+              {mode === 'create' ? '?�로???�업?��??��? ?�청?�니?? : '기존 ?��??�의 ?�보�??�정?�니??}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -316,59 +316,59 @@ export function PermitForm({
               취소
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? '?�??�?..' : (mode === 'create' ? '?��????�청' : '변�??�??)}
+              {loading ? '?�??�?..' : (mode === 'create' ? '?��????�청' : '변�??�??)}
             </Button>
           </div>
         </div>
 
-        {/* 기본 ?�보 */}
+        {/* 기본 ?�보 */}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">기본 ?�보</h3>
+          <h3 className="text-lg font-semibold text-text-primary">기본 ?�보</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-text-primary mb-2">
-                ?�업 ?�목 <span className="text-error-text">*</span>
+                ?�업 ?�목 <span className="text-error-text">*</span>
               </label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none"
-                placeholder="?? 보일??#1 ?�기?��????�한 ?�기?�업"
+                placeholder="?? 보일??#1 ?�기?��????�한 ?�기?�업"
                 required
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-text-primary mb-2">?�업 ?�명</label>
+              <label className="block text-sm font-medium text-text-primary mb-2">?�업 ?�명</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 className="w-full px-4 py-3 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none h-24 resize-none"
-                placeholder="?�업???�??개요�??�력?�세??.."
+                placeholder="?�업???�??개요�??�력?�세??.."
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-text-primary mb-2">?�세 ?�업 ?�용</label>
+              <label className="block text-sm font-medium text-text-primary mb-2">?�세 ?�업 ?�용</label>
               <textarea
                 value={formData.workDescription}
                 onChange={(e) => handleInputChange('workDescription', e.target.value)}
                 className="w-full px-4 py-3 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none h-32 resize-none"
-                placeholder="구체?�인 ?�업 ?�용�??�차�??�세??기술?�세??.."
+                placeholder="구체?�인 ?�업 ?�용�??�차�??�세??기술?�세??.."
               />
             </div>
           </div>
         </div>
 
-        {/* ?�업 ?�형 �??�선?�위 */}
+        {/* ?�업 ?�형 �??�선?�위 */}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">?�업 ?�형 �??�선?�위</h3>
+          <h3 className="text-lg font-semibold text-text-primary">?�업 ?�형 �??�선?�위</h3>
           
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">
-              ?�업 ?�형 <span className="text-error-text">*</span>
+              ?�업 ?�형 <span className="text-error-text">*</span>
             </label>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-4">
               {permitTypes.slice(0, 8).map((type) => (
@@ -404,7 +404,7 @@ export function PermitForm({
 
           <div>
             <label className="block text-sm font-medium text-text-primary mb-2">
-              ?�선?�위 <span className="text-error-text">*</span>
+              ?�선?�위 <span className="text-error-text">*</span>
             </label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {priorities.map((priority) => (
@@ -425,14 +425,14 @@ export function PermitForm({
           </div>
         </div>
 
-        {/* ?�치 �??�정 */}
+        {/* ?�치 �??�정 */}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">?�치 �??�정</h3>
+          <h3 className="text-lg font-semibold text-text-primary">?�치 �??�정</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                ?�업 ?�치 <span className="text-error-text">*</span>
+                ?�업 ?�치 <span className="text-error-text">*</span>
               </label>
               <select
                 value={formData.location}
@@ -449,19 +449,19 @@ export function PermitForm({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-text-primary mb-2">?�세 ?�치</label>
+              <label className="block text-sm font-medium text-text-primary mb-2">?�세 ?�치</label>
               <input
                 type="text"
                 value={formData.subLocation}
                 onChange={(e) => handleInputChange('subLocation', e.target.value)}
                 className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none"
-                placeholder="?? A??2�??�쪽 구역"
+                placeholder="?? A??2�??�쪽 구역"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                ?�업 ?�작?�시 <span className="text-error-text">*</span>
+                ?�업 ?�작?�시 <span className="text-error-text">*</span>
               </label>
               <input
                 type="datetime-local"
@@ -474,7 +474,7 @@ export function PermitForm({
 
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                ?�업 ?�료?�시 <span className="text-error-text">*</span>
+                ?�업 ?�료?�시 <span className="text-error-text">*</span>
               </label>
               <input
                 type="datetime-local"
@@ -487,7 +487,7 @@ export function PermitForm({
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-text-primary mb-2">
-                ?�상 ?�업?�간 (?�간)
+                ?�상 ?�업?�간 (?�간)
               </label>
               <input
                 type="number"
@@ -501,14 +501,14 @@ export function PermitForm({
           </div>
         </div>
 
-        {/* ?�청???�보 */}
+        {/* ?�청???�보 */}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">?�청???�보</h3>
+          <h3 className="text-lg font-semibold text-text-primary">?�청???�보</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                ?�청???�름 <span className="text-error-text">*</span>
+                ?�청???�름 <span className="text-error-text">*</span>
               </label>
               <input
                 type="text"
@@ -534,7 +534,7 @@ export function PermitForm({
 
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-text-primary mb-2">
-                ?�락�?<span className="text-error-text">*</span>
+                ?�락�?<span className="text-error-text">*</span>
               </label>
               <input
                 type="tel"
@@ -548,10 +548,10 @@ export function PermitForm({
           </div>
         </div>
 
-        {/* ?�주?�체 ?�보 */}
+        {/* ?�주?�체 ?�보 */}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-4">
           <div className="flex items-center gap-3">
-            <h3 className="text-lg font-semibold text-text-primary">?�주?�체 ?�보</h3>
+            <h3 className="text-lg font-semibold text-text-primary">?�주?�체 ?�보</h3>
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -559,7 +559,7 @@ export function PermitForm({
                 onChange={(e) => setContractor(prev => ({ ...prev, hasContractor: e.target.checked }))}
                 className="rounded border-border"
               />
-              <span className="text-sm text-text-secondary">?�주?�체 ?�업</span>
+              <span className="text-sm text-text-secondary">?�주?�체 ?�업</span>
             </label>
           </div>
 
@@ -567,7 +567,7 @@ export function PermitForm({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
-                  ?�체�?<span className="text-error-text">*</span>
+                  ?�체�?<span className="text-error-text">*</span>
                 </label>
                 <input
                   type="text"
@@ -580,7 +580,7 @@ export function PermitForm({
 
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
-                  ?�당??<span className="text-error-text">*</span>
+                  ?�당??<span className="text-error-text">*</span>
                 </label>
                 <input
                   type="text"
@@ -593,7 +593,7 @@ export function PermitForm({
 
               <div>
                 <label className="block text-sm font-medium text-text-primary mb-2">
-                  ?�락�?<span className="text-error-text">*</span>
+                  ?�락�?<span className="text-error-text">*</span>
                 </label>
                 <input
                   type="tel"
@@ -641,13 +641,13 @@ export function PermitForm({
           )}
         </div>
 
-        {/* ?�험?�소 �??�전조치 */}
+        {/* ?�험?�소 �??�전조치 */}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-text-primary">?�험?�소 �??�전조치</h3>
+          <h3 className="text-lg font-semibold text-text-primary">?�험?�소 �??�전조치</h3>
 
-          {/* ?�험?�소 ?�별 */}
+          {/* ?�험?�소 ?�별 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">?�별???�험?�소</label>
+            <label className="block text-sm font-medium text-text-primary mb-2">?�별???�험?�소</label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
               {commonHazards.map((hazard) => (
                 <button
@@ -675,7 +675,7 @@ export function PermitForm({
                 value={customInputs.hazard}
                 onChange={(e) => setCustomInputs(prev => ({ ...prev, hazard: e.target.value }))}
                 className="flex-1 px-3 py-2 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none text-sm"
-                placeholder="기�? ?�험?�소 추�?"
+                placeholder="기�? ?�험?�소 추�?"
               />
               <Button
                 type="button"
@@ -690,14 +690,14 @@ export function PermitForm({
                   }
                 }}
               >
-                추�?
+                추�?
               </Button>
             </div>
           </div>
 
-          {/* ?�험???��? */}
+          {/* ?�험???��? */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">?�험???��?</label>
+            <label className="block text-sm font-medium text-text-primary mb-2">?�험???��?</label>
             <div className="grid grid-cols-4 gap-3">
               {priorities.map((priority) => (
                 <button
@@ -716,16 +716,16 @@ export function PermitForm({
             </div>
           </div>
 
-          {/* ?��?방안 */}
+          {/* ?��?방안 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">?�험 ?��?방안</label>
+            <label className="block text-sm font-medium text-text-primary mb-2">?�험 ?��?방안</label>
             <div className="flex gap-2 mb-3">
               <input
                 type="text"
                 value={customInputs.mitigation}
                 onChange={(e) => setCustomInputs(prev => ({ ...prev, mitigation: e.target.value }))}
                 className="flex-1 px-3 py-2 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none text-sm"
-                placeholder="?��?방안???�력?�세??
+                placeholder="?��?방안???�력?�세??
               />
               <Button
                 type="button"
@@ -740,7 +740,7 @@ export function PermitForm({
                   }
                 }}
               >
-                추�?
+                추�?
               </Button>
             </div>
             {hazards.mitigation.length > 0 && (
@@ -764,7 +764,7 @@ export function PermitForm({
             )}
           </div>
 
-          {/* ?�전 ?�구?�항 */}
+          {/* ?�전 ?�구?�항 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <label className="flex items-center space-x-3">
               <input
@@ -774,7 +774,7 @@ export function PermitForm({
                 className="rounded border-border"
               />
               <span className="text-sm font-medium text-text-primary">
-                ?�� ?�재감시???�요
+                ?�� ?�재감시???�요
               </span>
             </label>
 
@@ -786,7 +786,7 @@ export function PermitForm({
                 className="rounded border-border"
               />
               <span className="text-sm font-medium text-text-primary">
-                ?�� 가?�측???�요
+                ?�� 가?�측???�요
               </span>
             </label>
 
@@ -798,19 +798,19 @@ export function PermitForm({
                 className="rounded border-border"
               />
               <span className="text-sm font-medium text-text-primary">
-                ?�� 격리조치 ?�요
+                ?�� 격리조치 ?�요
               </span>
             </label>
           </div>
         </div>
 
-        {/* ?�요 교육 �?보호�?*/}
+        {/* ?�요 교육 �?보호�?*/}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-6">
-          <h3 className="text-lg font-semibold text-text-primary">?�요 교육 �?보호�?/h3>
+          <h3 className="text-lg font-semibold text-text-primary">?�요 교육 �?보호�?/h3>
 
-          {/* ?�요??교육 */}
+          {/* ?�요??교육 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">?�요??교육</label>
+            <label className="block text-sm font-medium text-text-primary mb-2">?�요??교육</label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
               {commonTraining.map((training) => (
                 <button
@@ -834,9 +834,9 @@ export function PermitForm({
             </div>
           </div>
 
-          {/* ?�요??보호�?*/}
+          {/* ?�요??보호�?*/}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">?�요??보호�?(PPE)</label>
+            <label className="block text-sm font-medium text-text-primary mb-2">?�요??보호�?(PPE)</label>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
               {commonPPE.map((ppe) => (
                 <button
@@ -860,26 +860,26 @@ export function PermitForm({
             </div>
           </div>
 
-          {/* 비상?�차 */}
+          {/* 비상?�차 */}
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">비상?�차</label>
+            <label className="block text-sm font-medium text-text-primary mb-2">비상?�차</label>
             <textarea
               value={safety.emergencyProcedure}
               onChange={(e) => setSafety(prev => ({ ...prev, emergencyProcedure: e.target.value }))}
               className="w-full px-4 py-3 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none h-24 resize-none"
-              placeholder="비상?�황 발생 ???�차�??�세??기술?�세??.."
+              placeholder="비상?�황 발생 ???�차�??�세??기술?�세??.."
             />
           </div>
         </div>
 
-        {/* ?�락�?�??�통 */}
+        {/* ?�락�?�??�통 */}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">?�락�?�??�통</h3>
+          <h3 className="text-lg font-semibold text-text-primary">?�락�?�??�통</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                ?�장 ?�당??<span className="text-error-text">*</span>
+                ?�장 ?�당??<span className="text-error-text">*</span>
               </label>
               <input
                 type="text"
@@ -892,42 +892,42 @@ export function PermitForm({
 
             <div>
               <label className="block text-sm font-medium text-text-primary mb-2">
-                비상 ?�락�?<span className="text-error-text">*</span>
+                비상 ?�락�?<span className="text-error-text">*</span>
               </label>
               <input
                 type="tel"
                 value={communication.emergencyContact}
                 onChange={(e) => setCommunication(prev => ({ ...prev, emergencyContact: e.target.value }))}
                 className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none"
-                placeholder="119, ?�내 비상?�락�???
+                placeholder="119, ?�내 비상?�락�???
                 required
               />
             </div>
           </div>
         </div>
 
-        {/* 추�? 메모 */}
+        {/* 추�? 메모 */}
         <div className="bg-background-secondary rounded-notion-md p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-text-primary">추�? 메모</h3>
+          <h3 className="text-lg font-semibold text-text-primary">추�? 메모</h3>
           <textarea
             value={formData.notes}
             onChange={(e) => handleInputChange('notes', e.target.value)}
             className="w-full px-4 py-3 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none h-32 resize-none"
-            placeholder="기�? ?�별 지?�사??��??참고?�항???�력?�세??.."
+            placeholder="기�? ?�별 지?�사??��??참고?�항???�력?�세??.."
           />
         </div>
 
         {/* ??버튼 */}
         <div className="flex items-center justify-between pt-6 border-t border-border">
           <div className="text-sm text-text-secondary">
-            <span className="text-error-text">*</span> ?�수 ?�력 ??��
+            <span className="text-error-text">*</span> ?�수 ?�력 ??��
           </div>
           <div className="flex items-center gap-3">
             <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
               취소
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? '?�??�?..' : (mode === 'create' ? '?��????�청' : '변�??�??)}
+              {loading ? '?�??�?..' : (mode === 'create' ? '?��????�청' : '변�??�??)}
             </Button>
           </div>
         </div>

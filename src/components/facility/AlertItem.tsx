@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { FacilityAlert } from "@/lib/types/facility"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/display/badge"
+import { Button } from "@/components/ui/forms/button"
 
 interface AlertItemProps {
   alert: FacilityAlert

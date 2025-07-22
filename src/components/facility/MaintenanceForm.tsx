@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { CreateMaintenanceTaskRequest, UpdateMaintenanceTaskRequest, MaintenanceTask, MaintenanceCategory, FacilityArea, Priority } from "@/lib/types/facility"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/forms/button"
+import { Badge } from "@/components/ui/display/badge"
 
 interface MaintenanceFormProps {
   task?: MaintenanceTask // 수정 시 기존 작업 데이터
