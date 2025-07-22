@@ -1,31 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockFacilityService } from '@/lib/services/mockFacilityService';
 import { UpdateEquipmentRequest } from '@/lib/types/facility';
+import { handleApiError } from '@/lib/utils/error-handling';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const equipment = await mockFacilityService.getEquipment(params.id);
+    const { id } = await params;
+    const equipment = await mockFacilityService.getEquipment(id);
     return NextResponse.json(equipment);
-  } catch (error: any) {
-    console.error('Error fetching equipment:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch equipment' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const updateRequest: UpdateEquipmentRequest = {
-      id: params.id,
+      id,
       updates: body
     };
     
@@ -34,27 +33,20 @@ export async function PUT(
     
     const equipment = await mockFacilityService.updateEquipment(updateRequest, userId);
     return NextResponse.json(equipment);
-  } catch (error: any) {
-    console.error('Error updating equipment:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to update equipment' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await mockFacilityService.deleteEquipment(params.id);
+    const { id } = await params;
+    await mockFacilityService.deleteEquipment(id);
     return NextResponse.json({ message: 'Equipment deleted successfully' });
-  } catch (error: any) {
-    console.error('Error deleting equipment:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to delete equipment' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }

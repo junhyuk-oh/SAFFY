@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockFacilityService } from '@/lib/services/mockFacilityService';
-import { CreateEquipmentRequest } from '@/lib/types/facility';
+import { CreateEquipmentRequest, FacilityArea } from '@/lib/types/facility';
+import { handleApiError } from '@/lib/utils/error-handling';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
     
     const params = {
       status: searchParams.get('status')?.split(','),
-      location: searchParams.get('location')?.split(','),
+      location: searchParams.get('location')?.split(',') as FacilityArea[] | undefined,
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 10
     };
@@ -16,12 +17,8 @@ export async function GET(request: NextRequest) {
     const result = await mockFacilityService.getEquipments(params);
     
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error('Error fetching equipment:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch equipment' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }
 
@@ -35,11 +32,7 @@ export async function POST(request: NextRequest) {
     const equipment = await mockFacilityService.createEquipment(body, userId);
     
     return NextResponse.json(equipment, { status: 201 });
-  } catch (error: any) {
-    console.error('Error creating equipment:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create equipment' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }

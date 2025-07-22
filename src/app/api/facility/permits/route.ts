@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockFacilityService } from '@/lib/services/mockFacilityService';
-import { CreateWorkPermitRequest } from '@/lib/types/facility';
+import { CreateWorkPermitRequest, Priority, PermitType } from '@/lib/types/facility';
+import { handleApiError } from '@/lib/utils/error-handling';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,8 +9,8 @@ export async function GET(request: NextRequest) {
     
     const params = {
       status: searchParams.get('status')?.split(','),
-      priority: searchParams.get('priority')?.split(','),
-      type: searchParams.get('type')?.split(','),
+      priority: searchParams.get('priority')?.split(',') as Priority[] | undefined,
+      type: searchParams.get('type')?.split(',') as PermitType[] | undefined,
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 10
     };
@@ -17,12 +18,8 @@ export async function GET(request: NextRequest) {
     const result = await mockFacilityService.getWorkPermits(params);
     
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error('Error fetching work permits:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch work permits' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }
 
@@ -36,11 +33,7 @@ export async function POST(request: NextRequest) {
     const permit = await mockFacilityService.createWorkPermit(body, userId);
     
     return NextResponse.json(permit, { status: 201 });
-  } catch (error: any) {
-    console.error('Error creating work permit:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create work permit' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }

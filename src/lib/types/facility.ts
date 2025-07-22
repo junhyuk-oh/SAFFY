@@ -24,12 +24,14 @@ export type PermitStatus =
   | 'active' 
   | 'completed';
 
-export type AlertSeverity = 
+export type Priority = 
   | 'low' 
   | 'medium' 
   | 'high' 
   | 'critical' 
   | 'emergency';
+
+export type AlertSeverity = Priority;
 
 export type AlertStatus = 
   | 'active' 
@@ -681,41 +683,3 @@ export interface FileUploadResponse {
   uploadedDate: string;
 }
 
-// === Export all types ===
-export type {
-  // Status and priority types
-  MaintenanceStatus,
-  PermitStatus,
-  AlertSeverity,
-  AlertStatus,
-  EquipmentStatus,
-  FacilityArea,
-  MaintenanceCategory,
-  PermitType,
-  
-  // Main entity types
-  Equipment,
-  MaintenanceTask,
-  WorkPermit,
-  FacilityAlert,
-  
-  // Search and filter types
-  FacilitySearchParams,
-  
-  // Request/Response types
-  CreateMaintenanceTaskRequest,
-  UpdateMaintenanceTaskRequest,
-  CreateWorkPermitRequest,
-  UpdateWorkPermitRequest,
-  CreateEquipmentRequest,
-  UpdateEquipmentRequest,
-  FacilityAlertAcknowledgeRequest,
-  FacilityAlertResolveRequest,
-  
-  // Statistics and dashboard types
-  FacilityStatistics,
-  
-  // File upload types
-  FileUploadRequest,
-  FileUploadResponse
-};

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCenter, AlertDashboard } from '@/components/facility';
-import { FacilityAlert } from '@/lib/types/facility';
+import { FacilityAlert, AlertStatus } from '@/lib/types/facility';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 export default function AlertsPage() {
@@ -52,13 +52,16 @@ export default function AlertsPage() {
         alert.id === id 
           ? { 
               ...alert, 
-              status: 'acknowledged' as const,
-              acknowledgedDate: new Date().toISOString(),
-              acknowledgedBy: {
-                userId: 'current-user-id',
-                name: '현재 사용자',
-                department: '시설관리팀'
-              }
+              status: 'acknowledged' as AlertStatus,
+              history: [
+                ...alert.history,
+                {
+                  action: 'acknowledged',
+                  performedBy: 'current-user-id',
+                  performedDate: new Date().toISOString(),
+                  details: '알림 확인됨'
+                }
+              ]
             } 
           : alert
       ));

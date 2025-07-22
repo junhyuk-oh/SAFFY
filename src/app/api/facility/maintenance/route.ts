@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockFacilityService } from '@/lib/services/mockFacilityService';
-import { CreateMaintenanceTaskRequest } from '@/lib/types/facility';
+import { CreateMaintenanceTaskRequest, Priority, FacilityArea } from '@/lib/types/facility';
+import { handleApiError } from '@/lib/utils/error-handling';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,24 +9,20 @@ export async function GET(request: NextRequest) {
     
     const params = {
       status: searchParams.get('status')?.split(','),
-      priority: searchParams.get('priority')?.split(','),
-      location: searchParams.get('location')?.split(','),
+      priority: searchParams.get('priority')?.split(',') as Priority[] | undefined,
+      location: searchParams.get('location')?.split(',') as FacilityArea[] | undefined,
       query: searchParams.get('query') || undefined,
       page: searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1,
       limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 10,
-      sortBy: searchParams.get('sortBy') as any,
-      sortOrder: searchParams.get('sortOrder') as any
+      sortBy: searchParams.get('sortBy') || undefined,
+      sortOrder: searchParams.get('sortOrder') || undefined
     };
 
     const result = await mockFacilityService.getMaintenanceTasks(params);
     
     return NextResponse.json(result);
-  } catch (error: any) {
-    console.error('Error fetching maintenance tasks:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch maintenance tasks' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }
 
@@ -39,11 +36,7 @@ export async function POST(request: NextRequest) {
     const task = await mockFacilityService.createMaintenanceTask(body, userId);
     
     return NextResponse.json(task, { status: 201 });
-  } catch (error: any) {
-    console.error('Error creating maintenance task:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create maintenance task' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }

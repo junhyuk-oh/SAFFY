@@ -1,31 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockFacilityService } from '@/lib/services/mockFacilityService';
 import { UpdateWorkPermitRequest } from '@/lib/types/facility';
+import { handleApiError } from '@/lib/utils/error-handling';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const permit = await mockFacilityService.getWorkPermit(params.id);
+    const { id } = await params;
+    const permit = await mockFacilityService.getWorkPermit(id);
     return NextResponse.json(permit);
-  } catch (error: any) {
-    console.error('Error fetching work permit:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch work permit' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const updateRequest: UpdateWorkPermitRequest = {
-      id: params.id,
+      id,
       ...body
     };
     
@@ -34,27 +33,20 @@ export async function PUT(
     
     const permit = await mockFacilityService.updateWorkPermit(updateRequest, userId);
     return NextResponse.json(permit);
-  } catch (error: any) {
-    console.error('Error updating work permit:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to update work permit' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await mockFacilityService.deleteWorkPermit(params.id);
+    const { id } = await params;
+    await mockFacilityService.deleteWorkPermit(id);
     return NextResponse.json({ message: 'Work permit deleted successfully' });
-  } catch (error: any) {
-    console.error('Error deleting work permit:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to delete work permit' },
-      { status: error.statusCode || 500 }
-    );
+  } catch (error) {
+    return handleApiError(error);
   }
 }

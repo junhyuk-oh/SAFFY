@@ -22,14 +22,14 @@ const severityColors = {
   low: { bg: 'bg-green-100', text: 'text-green-700', border: 'border-green-300' }
 };
 
-const categoryIcons: Record<string, any> = {
+const categoryIcons = {
   safety: Shield,
   equipment: Settings,
   environmental: Activity,
   security: AlertCircle,
   operational: Settings,
   compliance: CheckCircle
-};
+} as const;
 
 export function AlertDashboard({ alerts, refreshInterval = 30, onRefresh }: AlertDashboardProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState<'24h' | '7d' | '30d'>('24h');
@@ -175,7 +175,7 @@ export function AlertDashboard({ alerts, refreshInterval = 30, onRefresh }: Aler
           </div>
           <select
             value={selectedTimeRange}
-            onChange={(e) => setSelectedTimeRange(e.target.value as any)}
+            onChange={(e) => setSelectedTimeRange(e.target.value as '24h' | '7d' | '30d')}
             className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
           >
             <option value="24h">최근 24시간</option>

@@ -23,7 +23,8 @@ import {
   FacilityStatistics,
   FacilitySearchParams
 } from '@/lib/types/facility';
-import { AppError, ValidationError } from '@/lib/types/error';
+import { ApiError } from '@/lib/utils/error-handling';
+import { sortByField } from '@/lib/utils/sort';
 
 // Mock 데이터 저장소
 const maintenanceTasks: MaintenanceTask[] = [];
@@ -587,7 +588,7 @@ export class MockFacilityService {
 
     const index = maintenanceTasks.findIndex(task => task.id === request.id);
     if (index === -1) {
-      throw new AppError('Maintenance task not found', 404);
+      throw new ApiError('Maintenance task not found', 404);
     }
 
     const updatedTask = {
@@ -615,7 +616,7 @@ export class MockFacilityService {
 
     const index = maintenanceTasks.findIndex(task => task.id === id);
     if (index === -1) {
-      throw new AppError('Maintenance task not found', 404);
+      throw new ApiError('Maintenance task not found', 404);
     }
 
     maintenanceTasks.splice(index, 1);
@@ -626,7 +627,7 @@ export class MockFacilityService {
 
     const task = maintenanceTasks.find(task => task.id === id);
     if (!task) {
-      throw new AppError('Maintenance task not found', 404);
+      throw new ApiError('Maintenance task not found', 404);
     }
 
     return task;
@@ -656,13 +657,12 @@ export class MockFacilityService {
     }
 
     // 정렬
-    if (params?.sortBy) {
-      filtered.sort((a, b) => {
-        const aVal = a[params.sortBy as keyof MaintenanceTask];
-        const bVal = b[params.sortBy as keyof MaintenanceTask];
-        const order = params.sortOrder === 'desc' ? -1 : 1;
-        return aVal > bVal ? order : -order;
-      });
+    if (params?.sortBy && params.sortBy in (filtered[0] || {})) {
+      filtered = sortByField(
+        filtered,
+        params.sortBy as keyof MaintenanceTask,
+        params.sortOrder as 'asc' | 'desc' || 'asc'
+      );
     }
 
     // 페이징
@@ -744,7 +744,7 @@ export class MockFacilityService {
 
     const index = workPermits.findIndex(permit => permit.id === request.id);
     if (index === -1) {
-      throw new AppError('Work permit not found', 404);
+      throw new ApiError('Work permit not found', 404);
     }
 
     let updatedPermit = {
@@ -787,7 +787,7 @@ export class MockFacilityService {
 
     const index = workPermits.findIndex(permit => permit.id === id);
     if (index === -1) {
-      throw new AppError('Work permit not found', 404);
+      throw new ApiError('Work permit not found', 404);
     }
 
     workPermits.splice(index, 1);
@@ -798,7 +798,7 @@ export class MockFacilityService {
 
     const permit = workPermits.find(permit => permit.id === id);
     if (!permit) {
-      throw new AppError('Work permit not found', 404);
+      throw new ApiError('Work permit not found', 404);
     }
 
     return permit;
@@ -878,7 +878,7 @@ export class MockFacilityService {
 
     const index = equipments.findIndex(equip => equip.id === request.id);
     if (index === -1) {
-      throw new AppError('Equipment not found', 404);
+      throw new ApiError('Equipment not found', 404);
     }
 
     const updatedEquipment = {
@@ -896,7 +896,7 @@ export class MockFacilityService {
 
     const index = equipments.findIndex(equip => equip.id === id);
     if (index === -1) {
-      throw new AppError('Equipment not found', 404);
+      throw new ApiError('Equipment not found', 404);
     }
 
     equipments.splice(index, 1);
@@ -907,7 +907,7 @@ export class MockFacilityService {
 
     const equipment = equipments.find(equip => equip.id === id);
     if (!equipment) {
-      throw new AppError('Equipment not found', 404);
+      throw new ApiError('Equipment not found', 404);
     }
 
     return equipment;
@@ -983,7 +983,7 @@ export class MockFacilityService {
 
     const index = facilityAlerts.findIndex(alert => alert.id === request.id);
     if (index === -1) {
-      throw new AppError('Alert not found', 404);
+      throw new ApiError('Alert not found', 404);
     }
 
     const updatedAlert = {
@@ -1014,7 +1014,7 @@ export class MockFacilityService {
 
     const index = facilityAlerts.findIndex(alert => alert.id === request.id);
     if (index === -1) {
-      throw new AppError('Alert not found', 404);
+      throw new ApiError('Alert not found', 404);
     }
 
     const updatedAlert = {
@@ -1046,7 +1046,7 @@ export class MockFacilityService {
 
     const alert = facilityAlerts.find(alert => alert.id === id);
     if (!alert) {
-      throw new AppError('Alert not found', 404);
+      throw new ApiError('Alert not found', 404);
     }
 
     return alert;
