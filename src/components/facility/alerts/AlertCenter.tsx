@@ -1,0 +1,584 @@
+"use client"
+
+import { useState, useMemo } from "react"
+import { FacilityAlert, FacilitySearchParams, AlertSeverity } from "@/lib/types/facility"
+import { AlertItem } from "./AlertItem"
+import { Badge } from "@/components/ui/display"
+import { Button } from "@/components/ui/button"
+
+// ?åÎ¶º ?ºÌÑ∞???ïÎ†¨ ?ÑÎìú ?Ä??
+type AlertSortField = 'detectedDate' | 'severity' | 'status' | 'category'
+
+// ?åÎ¶º Í≤Ä???åÎùºÎØ∏ÌÑ∞ (FacilitySearchParamsÎ•??ïÏû•)
+interface AlertSearchParams extends Omit<FacilitySearchParams, 'sortBy'> {
+  sortBy?: AlertSortField
+}
+
+interface AlertCenterProps {
+  alerts: FacilityAlert[]
+  loading?: boolean
+  searchParams?: AlertSearchParams
+  onSearch?: (params: AlertSearchParams) => void
+  onAcknowledge?: (id: string, notes?: string) => void
+  onResolve?: (id: string, resolution: string, actionsTaken: string[]) => void
+  onEscalate?: (id: string) => void
+  onBulkAction?: (ids: string[], action: 'acknowledge' | 'resolve' | 'escalate') => void
+  canAcknowledge?: boolean
+  canResolve?: boolean
+  canEscalate?: boolean
+  showBulkActions?: boolean
+}
+
+const severityOptions = [
+  { value: 'all', label: '?ÑÏ≤¥ ?¨Í∞Å?? },
+  { value: 'emergency', label: 'ÎπÑÏÉÅ' },
+  { value: 'critical', label: 'Í∏¥Í∏â' },
+  { value: 'high', label: '?íÏùå' },
+  { value: 'medium', label: 'Î≥¥ÌÜµ' },
+  { value: 'low', label: '??ùå' }
+]
+
+const statusOptions = [
+  { value: 'all', label: '?ÑÏ≤¥ ?ÅÌÉú' },
+  { value: 'active', label: '?úÏÑ±' },
+  { value: 'acknowledged', label: '?ïÏù∏?? },
+  { value: 'resolved', label: '?¥Í≤∞?? },
+  { value: 'escalated', label: '?ÅÍ∏âÎ≥¥Í≥†' },
+  { value: 'false_positive', label: '?§ÌÉêÏßÄ' }
+]
+
+const categoryOptions = [
+  { value: 'all', label: '?ÑÏ≤¥ Ïπ¥ÌÖåÍ≥†Î¶¨' },
+  { value: 'safety', label: '?àÏ†Ñ' },
+  { value: 'equipment', label: '?•ÎπÑ' },
+  { value: 'environmental', label: '?òÍ≤Ω' },
+  { value: 'security', label: 'Î≥¥Ïïà' },
+  { value: 'operational', label: '?¥ÏòÅ' },
+  { value: 'compliance', label: 'Í∑úÏ†ïÏ§Ä?? }
+]
+
+const sourceOptions = [
+  { value: 'all', label: '?ÑÏ≤¥ ?åÏä§' },
+  { value: 'ai_system', label: 'AI ?úÏä§?? },
+  { value: 'sensor', label: '?ºÏÑú' },
+  { value: 'manual', label: '?òÎèô' },
+  { value: 'inspection', label: '?êÍ?' },
+  { value: 'maintenance', label: '?ïÎπÑ' },
+  { value: 'external', label: '?∏Î?' }
+]
+
+export function AlertCenter({
+  alerts,
+  loading = false,
+  searchParams = {},
+  onSearch,
+  onAcknowledge,
+  onResolve,
+  onEscalate,
+  onBulkAction,
+  canAcknowledge = false,
+  canResolve = false,
+  canEscalate = false,
+  showBulkActions = false
+}: AlertCenterProps) {
+  const [selectedSeverity, setSelectedSeverity] = useState<string>('all')
+  const [selectedStatus, setSelectedStatus] = useState<string>('all')
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [selectedSource, setSelectedSource] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [sortBy, setSortBy] = useState<AlertSortField>('detectedDate')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
+  const [showOnlyActive, setShowOnlyActive] = useState(true)
+  const [selectedAlerts, setSelectedAlerts] = useState<Set<string>>(new Set())
+  const [viewMode, setViewMode] = useState<'detailed' | 'compact'>('detailed')
+
+  // ?ÑÌÑ∞Îß?Î∞??ïÎ†¨???åÎ¶º Î™©Î°ù
+  const filteredAndSortedAlerts = useMemo(() => {
+    let filtered = alerts
+
+    // ?úÏÑ± ?åÎ¶ºÎß??úÏãú ?µÏÖò
+    if (showOnlyActive) {
+      filtered = filtered.filter(alert => alert.status === 'active' || alert.status === 'acknowledged')
+    }
+
+    // Í≤Ä??ÏøºÎ¶¨ ?ÑÌÑ∞Îß?
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(alert => 
+        alert.title.toLowerCase().includes(query) ||
+        alert.message.toLowerCase().includes(query) ||
+        alert.location.toLowerCase().includes(query) ||
+        alert.equipmentName?.toLowerCase().includes(query) ||
+        alert.category.toLowerCase().includes(query) ||
+        alert.type.toLowerCase().includes(query)
+      )
+    }
+
+    // ?¨Í∞Å???ÑÌÑ∞Îß?
+    if (selectedSeverity !== 'all') {
+      filtered = filtered.filter(alert => alert.severity === selectedSeverity)
+    }
+
+    // ?ÅÌÉú ?ÑÌÑ∞Îß?
+    if (selectedStatus !== 'all') {
+      filtered = filtered.filter(alert => alert.status === selectedStatus)
+    }
+
+    // Ïπ¥ÌÖåÍ≥†Î¶¨ ?ÑÌÑ∞Îß?
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(alert => alert.category === selectedCategory)
+    }
+
+    // ?åÏä§ ?ÑÌÑ∞Îß?
+    if (selectedSource !== 'all') {
+      filtered = filtered.filter(alert => alert.source === selectedSource)
+    }
+
+    // ?ïÎ†¨
+    filtered.sort((a, b) => {
+      let aValue: string | number
+      let bValue: string | number
+
+      switch (sortBy) {
+        case 'detectedDate':
+          aValue = new Date(a.detectedDate).getTime()
+          bValue = new Date(b.detectedDate).getTime()
+          break
+        case 'severity':
+          const severityOrder: Record<FacilityAlert['severity'], number> = { 
+            emergency: 5, 
+            critical: 4, 
+            high: 3, 
+            medium: 2, 
+            low: 1 
+          }
+          aValue = severityOrder[a.severity]
+          bValue = severityOrder[b.severity]
+          break
+        case 'status':
+          const statusOrder: Record<FacilityAlert['status'], number> = { 
+            active: 4, 
+            acknowledged: 3, 
+            escalated: 2, 
+            resolved: 1, 
+            false_positive: 0 
+          }
+          aValue = statusOrder[a.status]
+          bValue = statusOrder[b.status]
+          break
+        case 'category':
+          aValue = a.category.toLowerCase()
+          bValue = b.category.toLowerCase()
+          break
+        default:
+          return 0
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0
+      }
+    })
+
+    return filtered
+  }, [alerts, searchQuery, selectedSeverity, selectedStatus, selectedCategory, selectedSource, showOnlyActive, sortBy, sortOrder])
+
+  // ?µÍ≥Ñ Í≥ÑÏÇ∞
+  const stats = useMemo(() => {
+    const total = alerts.length
+    const active = alerts.filter(alert => alert.status === 'active').length
+    const acknowledged = alerts.filter(alert => alert.status === 'acknowledged').length
+    const resolved = alerts.filter(alert => alert.status === 'resolved').length
+    const escalated = alerts.filter(alert => alert.status === 'escalated').length
+
+    const bySeverity = alerts.reduce((acc, alert) => {
+      acc[alert.severity] = (acc[alert.severity] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
+    const byCategory = alerts.reduce((acc, alert) => {
+      acc[alert.category] = (acc[alert.category] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+
+    // ÏµúÍ∑º 24?úÍ∞Ñ ???åÎ¶º
+    const last24Hours = alerts.filter(alert => {
+      const alertTime = new Date(alert.detectedDate)
+      const now = new Date()
+      const diffTime = now.getTime() - alertTime.getTime()
+      const diffHours = diffTime / (1000 * 60 * 60)
+      return diffHours <= 24
+    }).length
+
+    // AI ?ùÏÑ± ?åÎ¶º
+    const aiGenerated = alerts.filter(alert => alert.source === 'ai_system').length
+
+    // ?âÍ∑† ?¥Í≤∞ ?úÍ∞Ñ Í≥ÑÏÇ∞ (?¥Í≤∞???åÎ¶ºÎß?
+    const resolvedAlerts = alerts.filter(alert => alert.status === 'resolved' && alert.resolvedDate)
+    const avgResolutionTime = resolvedAlerts.length > 0 
+      ? Math.round(resolvedAlerts.reduce((sum, alert) => {
+          const detected = new Date(alert.detectedDate)
+          const resolved = new Date(alert.resolvedDate!)
+          return sum + (resolved.getTime() - detected.getTime()) / (1000 * 60)
+        }, 0) / resolvedAlerts.length)
+      : 0
+
+    return {
+      total,
+      active,
+      acknowledged,
+      resolved,
+      escalated,
+      bySeverity,
+      byCategory,
+      last24Hours,
+      aiGenerated,
+      avgResolutionTime,
+      criticalActive: alerts.filter(alert => 
+        (alert.severity === 'critical' || alert.severity === 'emergency') && 
+        (alert.status === 'active' || alert.status === 'acknowledged')
+      ).length
+    }
+  }, [alerts])
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (onSearch) {
+      onSearch({
+        query: searchQuery,
+        severity: selectedSeverity !== 'all' ? [selectedSeverity as AlertSeverity] : undefined,
+        status: selectedStatus !== 'all' ? [selectedStatus] : undefined,
+        category: selectedCategory !== 'all' ? [selectedCategory] : undefined,
+        sortBy,
+        sortOrder
+      })
+    }
+  }
+
+  const handleSelectAll = () => {
+    if (selectedAlerts.size === filteredAndSortedAlerts.length) {
+      setSelectedAlerts(new Set())
+    } else {
+      setSelectedAlerts(new Set(filteredAndSortedAlerts.map(alert => alert.id)))
+    }
+  }
+
+  const handleSelectAlert = (alertId: string) => {
+    const newSelected = new Set(selectedAlerts)
+    if (newSelected.has(alertId)) {
+      newSelected.delete(alertId)
+    } else {
+      newSelected.add(alertId)
+    }
+    setSelectedAlerts(newSelected)
+  }
+
+  const handleBulkAction = (action: 'acknowledge' | 'resolve' | 'escalate') => {
+    if (onBulkAction && selectedAlerts.size > 0) {
+      onBulkAction(Array.from(selectedAlerts), action)
+      setSelectedAlerts(new Set())
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="h-8 bg-background-hover rounded w-48 animate-pulse"></div>
+          <div className="h-10 bg-background-hover rounded w-32 animate-pulse"></div>
+        </div>
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="h-32 bg-background-hover rounded-notion-md animate-pulse"></div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* ?§Îçî Î∞??µÍ≥Ñ */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-text-primary mb-2">?åÎ¶º ?ºÌÑ∞</h2>
+          <div className="flex items-center gap-4 text-sm text-text-secondary">
+            <span>?ÑÏ≤¥ {stats.total}Í∞?/span>
+            <span>??/span>
+            <span className="text-error-text">?úÏÑ± {stats.active}Í∞?/span>
+            <span>??/span>
+            <span className="text-warning-text">?ïÏù∏ {stats.acknowledged}Í∞?/span>
+            <span>??/span>
+            <span className="text-red-600">Í∏¥Í∏â {stats.criticalActive}Í∞?/span>
+            <span>??/span>
+            <span className="text-success-text">?¥Í≤∞ {stats.resolved}Í∞?/span>
+          </div>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setViewMode(viewMode === 'detailed' ? 'compact' : 'detailed')}
+          >
+            {viewMode === 'detailed' ? '?ìã Í∞ÑÎûµ?? : '?ìÑ ?ÅÏÑ∏??}
+          </Button>
+          {stats.active > 0 && (
+            <Badge variant="destructive" className="animate-pulse">
+              {stats.active}Í∞??åÎ¶º
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {/* Í≤Ä??Î∞??ÑÌÑ∞ */}
+      <div className="bg-background-secondary rounded-notion-md p-4 space-y-4">
+        <form onSubmit={handleSearch} className="flex gap-3">
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="?åÎ¶º ?úÎ™©, Î©îÏãúÏßÄ, ?ÑÏπò, ?•ÎπÑÎ™?Í≤Ä??.."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 rounded-notion-sm border border-border bg-background focus:border-border-focus focus:outline-none"
+            />
+          </div>
+          <Button type="submit" size="sm">
+            ?îç Í≤Ä??
+          </Button>
+        </form>
+
+        <div className="flex flex-wrap gap-3 items-center">
+          {/* ?¨Í∞Å???ÑÌÑ∞ */}
+          <select
+            value={selectedSeverity}
+            onChange={(e) => setSelectedSeverity(e.target.value)}
+            className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
+          >
+            {severityOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          {/* ?ÅÌÉú ?ÑÌÑ∞ */}
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
+          >
+            {statusOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Ïπ¥ÌÖåÍ≥†Î¶¨ ?ÑÌÑ∞ */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
+          >
+            {categoryOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          {/* ?åÏä§ ?ÑÌÑ∞ */}
+          <select
+            value={selectedSource}
+            onChange={(e) => setSelectedSource(e.target.value)}
+            className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
+          >
+            {sourceOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          {/* ?ïÎ†¨ */}
+          <select
+            value={`${sortBy}-${sortOrder}`}
+            onChange={(e) => {
+              const [field, order] = e.target.value.split('-')
+              setSortBy(field as AlertSortField)
+              setSortOrder(order as 'asc' | 'desc')
+            }}
+            className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
+          >
+            <option value="detectedDate-desc">ÏµúÏã†??/option>
+            <option value="detectedDate-asc">?§Îûò?úÏàú</option>
+            <option value="severity-desc">?¨Í∞Å???íÏ???/option>
+            <option value="severity-asc">?¨Í∞Å???????/option>
+            <option value="status-desc">?ÅÌÉú??/option>
+            <option value="category-asc">Ïπ¥ÌÖåÍ≥†Î¶¨??/option>
+          </select>
+
+          {/* ?úÏÑ± ?åÎ¶ºÎß??†Í? */}
+          <label className="flex items-center space-x-2 px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showOnlyActive}
+              onChange={(e) => setShowOnlyActive(e.target.checked)}
+              className="rounded border-border"
+            />
+            <span>?úÏÑ± ?åÎ¶ºÎß?/span>
+          </label>
+        </div>
+      </div>
+
+      {/* Îπ†Î•∏ ?µÍ≥Ñ Ïπ¥Îìú */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+        <div className="bg-background-secondary rounded-notion-md p-4 text-center">
+          <div className="text-2xl font-bold text-error-text">{stats.active}</div>
+          <div className="text-sm text-text-secondary">?úÏÑ±</div>
+        </div>
+        <div className="bg-background-secondary rounded-notion-md p-4 text-center">
+          <div className="text-2xl font-bold text-red-600">{stats.criticalActive}</div>
+          <div className="text-sm text-text-secondary">Í∏¥Í∏â</div>
+        </div>
+        <div className="bg-background-secondary rounded-notion-md p-4 text-center">
+          <div className="text-2xl font-bold text-warning-text">{stats.acknowledged}</div>
+          <div className="text-sm text-text-secondary">?ïÏù∏</div>
+        </div>
+        <div className="bg-background-secondary rounded-notion-md p-4 text-center">
+          <div className="text-2xl font-bold text-primary">{stats.escalated}</div>
+          <div className="text-sm text-text-secondary">?ÅÍ∏âÎ≥¥Í≥†</div>
+        </div>
+        <div className="bg-background-secondary rounded-notion-md p-4 text-center">
+          <div className="text-2xl font-bold text-primary">{stats.aiGenerated}</div>
+          <div className="text-sm text-text-secondary">AI ?ùÏÑ±</div>
+        </div>
+        <div className="bg-background-secondary rounded-notion-md p-4 text-center">
+          <div className="text-2xl font-bold text-text-primary">{stats.avgResolutionTime}Î∂?/div>
+          <div className="text-sm text-text-secondary">?âÍ∑† ?¥Í≤∞</div>
+        </div>
+      </div>
+
+      {/* ?Ä???ëÏóÖ Î≤ÑÌäº */}
+      {showBulkActions && selectedAlerts.size > 0 && (
+        <div className="bg-primary-light border border-primary rounded-notion-md p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-primary font-medium">
+              {selectedAlerts.size}Í∞??åÎ¶º???†ÌÉù?òÏóà?µÎãà??
+            </span>
+            <div className="flex items-center gap-2">
+              {canAcknowledge && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handleBulkAction('acknowledge')}
+                >
+                  ?ºÍ¥Ñ ?ïÏù∏
+                </Button>
+              )}
+              {canResolve && (
+                <Button
+                  size="sm"
+                  onClick={() => handleBulkAction('resolve')}
+                  className="bg-success hover:bg-success/90"
+                >
+                  ?ºÍ¥Ñ ?¥Í≤∞
+                </Button>
+              )}
+              {canEscalate && (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleBulkAction('escalate')}
+                >
+                  ?ºÍ¥Ñ ?ÅÍ∏âÎ≥¥Í≥†
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSelectedAlerts(new Set())}
+              >
+                ?†ÌÉù ?¥Ï†ú
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ?åÎ¶º Î™©Î°ù */}
+      {filteredAndSortedAlerts.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">?îî</div>
+          <h3 className="text-lg font-semibold text-text-primary mb-2">
+            {searchQuery || selectedSeverity !== 'all' || selectedStatus !== 'all' || selectedCategory !== 'all' || selectedSource !== 'all'
+              ? 'Í≤Ä??Í≤∞Í≥ºÍ∞Ä ?ÜÏäµ?àÎã§'
+              : showOnlyActive
+                ? '?úÏÑ± ?åÎ¶º???ÜÏäµ?àÎã§'
+                : '?åÎ¶º???ÜÏäµ?àÎã§'
+            }
+          </h3>
+          <p className="text-text-secondary">
+            {searchQuery || selectedSeverity !== 'all' || selectedStatus !== 'all' || selectedCategory !== 'all' || selectedSource !== 'all'
+              ? '?§Î•∏ Ï°∞Í±¥?ºÎ°ú Í≤Ä?âÌï¥Î≥¥ÏÑ∏??
+              : 'Î™®Îì† ?úÏä§?úÏù¥ ?ïÏÉÅ?ÅÏúºÎ°??ëÎèô?òÍ≥† ?àÏäµ?àÎã§'
+            }
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <p className="text-sm text-text-secondary">
+                {filteredAndSortedAlerts.length}Í∞úÏùò ?åÎ¶º???àÏäµ?àÎã§
+                {showOnlyActive && ' (?úÏÑ±Îß?'}
+              </p>
+              {showBulkActions && (
+                <button
+                  onClick={handleSelectAll}
+                  className="text-sm text-primary hover:underline"
+                >
+                  {selectedAlerts.size === filteredAndSortedAlerts.length ? '?ÑÏ≤¥ ?¥Ï†ú' : '?ÑÏ≤¥ ?†ÌÉù'}
+                </button>
+              )}
+            </div>
+            <div className="text-xs text-text-tertiary">
+              ÎßàÏ?Îß??ÖÎç∞?¥Ìä∏: {new Date().toLocaleString('ko-KR')}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {filteredAndSortedAlerts.map((alert) => (
+              <div key={alert.id} className="relative">
+                {showBulkActions && (
+                  <div className="absolute top-3 left-3 z-10">
+                    <input
+                      type="checkbox"
+                      checked={selectedAlerts.has(alert.id)}
+                      onChange={() => handleSelectAlert(alert.id)}
+                      className="rounded border-border"
+                    />
+                  </div>
+                )}
+                <div className={showBulkActions ? 'ml-8' : ''}>
+                  <AlertItem
+                    alert={alert}
+                    onAcknowledge={onAcknowledge}
+                    onResolve={onResolve}
+                    onEscalate={onEscalate}
+                    canAcknowledge={canAcknowledge}
+                    canResolve={canResolve}
+                    canEscalate={canEscalate}
+                    compact={viewMode === 'compact'}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}

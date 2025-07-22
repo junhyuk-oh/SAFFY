@@ -3,6 +3,8 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
+import { useAppStore } from "@/stores"
+import { X } from "lucide-react"
 
 interface SidebarItem {
   title: string
@@ -69,6 +71,7 @@ const sidebarSections: SidebarSection[] = [
 export function Sidebar() {
   const pathname = usePathname()
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
+  const { sidebarOpen, setSidebarOpen, breakpoint } = useAppStore()
 
   // 현재 경로에 해당하는 메뉴를 자동으로 펼치기
   useEffect(() => {
@@ -104,8 +107,55 @@ export function Sidebar() {
     return pathname === itemHref || pathname.startsWith(itemHref + '/')
   }
 
+  // 모바일에서 사이드바 외부 클릭 시 닫기
+  useEffect(() => {
+    if (breakpoint === 'mobile' && sidebarOpen) {
+      const handleClickOutside = (e: MouseEvent) => {
+        const sidebar = document.getElementById('sidebar')
+        if (sidebar && !sidebar.contains(e.target as Node)) {
+          setSidebarOpen(false)
+        }
+      }
+
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [breakpoint, sidebarOpen, setSidebarOpen])
+
+  // 페이지 이동 시 모바일에서는 사이드바 닫기
+  useEffect(() => {
+    if (breakpoint === 'mobile') {
+      setSidebarOpen(false)
+    }
+  }, [pathname, breakpoint, setSidebarOpen])
+
+  if (!sidebarOpen) return null
+
   return (
-    <>
+    <div 
+      id="sidebar"
+      className={`
+        fixed md:relative z-40
+        ${breakpoint === 'mobile' ? 'inset-0 bg-black/50' : ''}
+      `}
+    >
+      <div className={`
+        bg-background h-full overflow-y-auto
+        ${breakpoint === 'mobile' ? 'w-80 shadow-xl' : ''}
+      `}>
+        {/* 모바일 헤더 */}
+        {breakpoint === 'mobile' && (
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <h2 className="text-lg font-semibold">메뉴</h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 hover:bg-background-hover rounded-notion-sm"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        )}
+        <div className="p-4">
       {sidebarSections.map((section) => (
         <div key={section.title} className="mb-6">
           <div className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">{section.title}</div>
@@ -217,6 +267,8 @@ export function Sidebar() {
           })}
         </div>
       ))}
-    </>
+        </div>
+      </div>
+    </div>
   )
 }
