@@ -26,7 +26,10 @@
       "Bash(ping:*)",
       "Bash(mkdir:*)",
       "Bash(mkdir:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(git clean:*)",
+      "Bash(tree:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

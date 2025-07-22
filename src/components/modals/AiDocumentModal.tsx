@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ModalTemplate } from "@/components/ui/modal-template"
+import { BaseModal } from "@/components/ui/BaseModal"
 
 interface AiDocumentModalProps {
   isOpen: boolean
@@ -40,7 +40,7 @@ export function AiDocumentModal({ isOpen, onClose }: AiDocumentModalProps) {
   )
 
   return (
-    <ModalTemplate
+    <BaseModal
       isOpen={isOpen}
       onClose={onClose}
       title="AI 위험성평가서 자동 생성"
@@ -114,6 +114,6 @@ export function AiDocumentModal({ isOpen, onClose }: AiDocumentModalProps) {
           </ul>
         </div>
       </div>
-    </ModalTemplate>
+    </BaseModal>
   )
 }
