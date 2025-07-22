@@ -29,7 +29,8 @@
       "Bash(mkdir:*)",
       "Bash(git clean:*)",
       "Bash(tree:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(touch:*)"
     ],
     "deny": []
   }

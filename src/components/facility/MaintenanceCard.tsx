@@ -2,67 +2,18 @@
 
 import { MaintenanceTask } from '@/lib/types/facility';
 import { Wrench, Clock, AlertCircle, CheckCircle, XCircle, Calendar, MapPin } from 'lucide-react';
+import { MAINTENANCE_STATUS, PRIORITY_CONFIG } from '@/lib/constants/status';
+import { formatDateTime } from '@/lib/utils/date';
 
 interface MaintenanceCardProps {
   task: MaintenanceTask;
   onClick?: (task: MaintenanceTask) => void;
 }
 
-const statusConfig = {
-  scheduled: { 
-    label: '예정됨', 
-    color: 'text-blue-600', 
-    bg: 'bg-blue-50', 
-    border: 'border-l-blue-500',
-    icon: Calendar 
-  },
-  in_progress: { 
-    label: '진행중', 
-    color: 'text-yellow-600', 
-    bg: 'bg-yellow-50', 
-    border: 'border-l-yellow-500',
-    icon: Clock 
-  },
-  completed: { 
-    label: '완료', 
-    color: 'text-green-600', 
-    bg: 'bg-green-50', 
-    border: 'border-l-green-500',
-    icon: CheckCircle 
-  },
-  overdue: { 
-    label: '지연', 
-    color: 'text-red-600', 
-    bg: 'bg-red-50', 
-    border: 'border-l-red-500',
-    icon: AlertCircle 
-  },
-  cancelled: { 
-    label: '취소됨', 
-    color: 'text-gray-600', 
-    bg: 'bg-gray-50', 
-    border: 'border-l-gray-500',
-    icon: XCircle 
-  },
-  on_hold: { 
-    label: '보류', 
-    color: 'text-purple-600', 
-    bg: 'bg-purple-50', 
-    border: 'border-l-purple-500',
-    icon: Clock 
-  }
-};
-
-const priorityConfig = {
-  critical: { label: '긴급', color: 'text-red-600', bg: 'bg-red-100' },
-  high: { label: '높음', color: 'text-orange-600', bg: 'bg-orange-100' },
-  medium: { label: '중간', color: 'text-yellow-600', bg: 'bg-yellow-100' },
-  low: { label: '낮음', color: 'text-green-600', bg: 'bg-green-100' }
-};
 
 export function MaintenanceCard({ task, onClick }: MaintenanceCardProps) {
-  const status = statusConfig[task.status];
-  const priority = priorityConfig[task.priority];
+  const status = MAINTENANCE_STATUS[task.status];
+  const priority = PRIORITY_CONFIG[task.priority];
   const StatusIcon = status.icon;
 
   return (
@@ -98,7 +49,7 @@ export function MaintenanceCard({ task, onClick }: MaintenanceCardProps) {
         </div>
         <div className="flex items-center gap-1">
           <Clock className="w-4 h-4" />
-          <span>{new Date(task.scheduledDate).toLocaleDateString('ko-KR')}</span>
+          <span>{formatDateTime(task.scheduledDate, { includeTime: false })}</span>
         </div>
         {task.equipmentName && (
           <div className="flex items-center gap-1">

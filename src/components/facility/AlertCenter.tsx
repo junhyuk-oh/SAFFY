@@ -1,16 +1,24 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { FacilityAlert, FacilitySearchParams } from "@/lib/types/facility"
+import { FacilityAlert, FacilitySearchParams, AlertSeverity } from "@/lib/types/facility"
 import { AlertItem } from "./AlertItem"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
+// 알림 센터용 정렬 필드 타입
+type AlertSortField = 'detectedDate' | 'severity' | 'status' | 'category'
+
+// 알림 검색 파라미터 (FacilitySearchParams를 확장)
+interface AlertSearchParams extends Omit<FacilitySearchParams, 'sortBy'> {
+  sortBy?: AlertSortField
+}
+
 interface AlertCenterProps {
   alerts: FacilityAlert[]
   loading?: boolean
-  searchParams?: FacilitySearchParams
-  onSearch?: (params: FacilitySearchParams) => void
+  searchParams?: AlertSearchParams
+  onSearch?: (params: AlertSearchParams) => void
   onAcknowledge?: (id: string, notes?: string) => void
   onResolve?: (id: string, resolution: string, actionsTaken: string[]) => void
   onEscalate?: (id: string) => void
@@ -78,7 +86,7 @@ export function AlertCenter({
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [selectedSource, setSelectedSource] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [sortBy, setSortBy] = useState<'detectedDate' | 'severity' | 'status' | 'category'>('detectedDate')
+  const [sortBy, setSortBy] = useState<AlertSortField>('detectedDate')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [showOnlyActive, setShowOnlyActive] = useState(true)
   const [selectedAlerts, setSelectedAlerts] = useState<Set<string>>(new Set())
@@ -128,7 +136,8 @@ export function AlertCenter({
 
     // 정렬
     filtered.sort((a, b) => {
-      let aValue: any, bValue: any
+      let aValue: string | number
+      let bValue: string | number
 
       switch (sortBy) {
         case 'detectedDate':
@@ -136,12 +145,24 @@ export function AlertCenter({
           bValue = new Date(b.detectedDate).getTime()
           break
         case 'severity':
-          const severityOrder = { emergency: 5, critical: 4, high: 3, medium: 2, low: 1 }
+          const severityOrder: Record<FacilityAlert['severity'], number> = { 
+            emergency: 5, 
+            critical: 4, 
+            high: 3, 
+            medium: 2, 
+            low: 1 
+          }
           aValue = severityOrder[a.severity]
           bValue = severityOrder[b.severity]
           break
         case 'status':
-          const statusOrder = { active: 4, acknowledged: 3, escalated: 2, resolved: 1, false_positive: 0 }
+          const statusOrder: Record<FacilityAlert['status'], number> = { 
+            active: 4, 
+            acknowledged: 3, 
+            escalated: 2, 
+            resolved: 1, 
+            false_positive: 0 
+          }
           aValue = statusOrder[a.status]
           bValue = statusOrder[b.status]
           break
@@ -226,10 +247,10 @@ export function AlertCenter({
     if (onSearch) {
       onSearch({
         query: searchQuery,
-        severity: selectedSeverity !== 'all' ? [selectedSeverity as any] : undefined,
+        severity: selectedSeverity !== 'all' ? [selectedSeverity as AlertSeverity] : undefined,
         status: selectedStatus !== 'all' ? [selectedStatus] : undefined,
         category: selectedCategory !== 'all' ? [selectedCategory] : undefined,
-        sortBy: sortBy as any,
+        sortBy,
         sortOrder
       })
     }
@@ -386,8 +407,8 @@ export function AlertCenter({
             value={`${sortBy}-${sortOrder}`}
             onChange={(e) => {
               const [field, order] = e.target.value.split('-')
-              setSortBy(field as any)
-              setSortOrder(order as any)
+              setSortBy(field as AlertSortField)
+              setSortOrder(order as 'asc' | 'desc')
             }}
             className="px-3 py-1.5 rounded-notion-sm border border-border bg-background text-sm"
           >

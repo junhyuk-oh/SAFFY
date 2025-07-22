@@ -2,70 +2,14 @@
 
 import { WorkPermit } from '@/lib/types/facility';
 import { Shield, Clock, AlertTriangle, CheckCircle, XCircle, User, Calendar, MapPin } from 'lucide-react';
+import { PERMIT_STATUS, PRIORITY_CONFIG } from '@/lib/constants/status';
+import { formatDateTime } from '@/lib/utils/date';
 
 interface PermitCardProps {
   permit: WorkPermit;
   onClick?: (permit: WorkPermit) => void;
 }
 
-const statusConfig = {
-  draft: { 
-    label: '초안', 
-    color: 'text-gray-600', 
-    bg: 'bg-gray-50', 
-    border: 'border-l-gray-500',
-    icon: Clock 
-  },
-  submitted: { 
-    label: '제출됨', 
-    color: 'text-blue-600', 
-    bg: 'bg-blue-50', 
-    border: 'border-l-blue-500',
-    icon: Clock 
-  },
-  under_review: { 
-    label: '검토중', 
-    color: 'text-yellow-600', 
-    bg: 'bg-yellow-50', 
-    border: 'border-l-yellow-500',
-    icon: Clock 
-  },
-  approved: { 
-    label: '승인됨', 
-    color: 'text-green-600', 
-    bg: 'bg-green-50', 
-    border: 'border-l-green-500',
-    icon: CheckCircle 
-  },
-  rejected: { 
-    label: '거부됨', 
-    color: 'text-red-600', 
-    bg: 'bg-red-50', 
-    border: 'border-l-red-500',
-    icon: XCircle 
-  },
-  expired: { 
-    label: '만료됨', 
-    color: 'text-gray-600', 
-    bg: 'bg-gray-50', 
-    border: 'border-l-gray-500',
-    icon: Clock 
-  },
-  active: { 
-    label: '진행중', 
-    color: 'text-primary', 
-    bg: 'bg-primary-light', 
-    border: 'border-l-primary',
-    icon: Shield 
-  },
-  completed: { 
-    label: '완료', 
-    color: 'text-green-600', 
-    bg: 'bg-green-50', 
-    border: 'border-l-green-500',
-    icon: CheckCircle 
-  }
-};
 
 const permitTypeIcons: Record<string, string> = {
   'Hot Work': '🔥',
@@ -93,7 +37,7 @@ const riskLevelConfig = {
 };
 
 export function PermitCard({ permit, onClick }: PermitCardProps) {
-  const status = statusConfig[permit.status];
+  const status = PERMIT_STATUS[permit.status];
   const StatusIcon = status.icon;
   const riskLevel = riskLevelConfig[permit.hazards.riskLevel];
   const typeIcon = permitTypeIcons[permit.type] || '📋';
@@ -148,7 +92,7 @@ export function PermitCard({ permit, onClick }: PermitCardProps) {
           </div>
           <div className="flex items-center gap-1">
             <Calendar className="w-4 h-4" />
-            <span>{startDate.toLocaleDateString('ko-KR')}</span>
+            <span>{formatDateTime(startDate, { includeTime: false })}</span>
             <span className="text-text-tertiary">({durationDays}일간)</span>
           </div>
         </div>

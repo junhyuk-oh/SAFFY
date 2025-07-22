@@ -4,6 +4,8 @@ import Link from "next/link"
 import { useState } from "react"
 import { Equipment } from "@/lib/types/facility"
 import { Badge } from "@/components/ui/badge"
+import { EQUIPMENT_STATUS } from "@/lib/constants/status"
+import { formatDateTime } from "@/lib/utils/date"
 
 interface EquipmentCardProps {
   equipment: Equipment
@@ -11,43 +13,6 @@ interface EquipmentCardProps {
   onMaintenanceRequest?: (id: string) => void
 }
 
-const statusConfig = {
-  operational: {
-    label: "정상",
-    color: "text-success-text",
-    bg: "bg-success-bg",
-    borderColor: "border-l-success",
-    icon: "✅"
-  },
-  maintenance: {
-    label: "정비중",
-    color: "text-warning-text",
-    bg: "bg-warning-bg",
-    borderColor: "border-l-warning",
-    icon: "🔧"
-  },
-  repair: {
-    label: "수리중",
-    color: "text-error-text",
-    bg: "bg-error-bg",
-    borderColor: "border-l-error",
-    icon: "🚨"
-  },
-  out_of_service: {
-    label: "가동중지",
-    color: "text-text-tertiary",
-    bg: "bg-gray-100",
-    borderColor: "border-l-gray-300",
-    icon: "🔴"
-  },
-  decommissioned: {
-    label: "폐기",
-    color: "text-text-tertiary",
-    bg: "bg-gray-100",
-    borderColor: "border-l-gray-300",
-    icon: "❌"
-  }
-}
 
 const criticalityConfig = {
   low: {
@@ -96,20 +61,10 @@ export function EquipmentCard({
   onMaintenanceRequest
 }: EquipmentCardProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const statusInfo = statusConfig[equipment.status]
+  const statusInfo = EQUIPMENT_STATUS[equipment.status]
   const criticalityInfo = criticalityConfig[equipment.criticality]
   const equipmentIcon = equipmentTypeIcons[equipment.type] || "⚙️"
 
-  // 날짜 포맷팅 함수
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '-'
-    const date = new Date(dateString)
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    })
-  }
 
   // 다음 정비까지 남은 일수 계산
   const getDaysUntilMaintenance = () => {
@@ -246,7 +201,7 @@ export function EquipmentCard({
             <div>
               <div className="text-sm font-medium text-text-primary">다음 정비</div>
               <div className="text-xs text-text-secondary">
-                {formatDate(equipment.nextMaintenanceDate)}
+                {equipment.nextMaintenanceDate ? formatDateTime(equipment.nextMaintenanceDate, { includeTime: false }) : '-'}
               </div>
             </div>
             <div className={`text-sm font-medium text-right ${
@@ -291,14 +246,14 @@ export function EquipmentCard({
         {/* 하단 정보 */}
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
           <div className="flex items-center gap-3 text-xs text-text-tertiary">
-            <span>설치: {formatDate(equipment.installDate)}</span>
+            <span>설치: {formatDateTime(equipment.installDate, { includeTime: false })}</span>
             <span>•</span>
             <span>S/N: {equipment.serialNumber.slice(-6)}</span>
           </div>
           
           {equipment.lastMaintenanceDate && (
             <span className="text-xs text-text-secondary">
-              최종 정비: {formatDate(equipment.lastMaintenanceDate)}
+              최종 정비: {equipment.lastMaintenanceDate ? formatDateTime(equipment.lastMaintenanceDate, { includeTime: false }) : '-'}
             </span>
           )}
         </div>

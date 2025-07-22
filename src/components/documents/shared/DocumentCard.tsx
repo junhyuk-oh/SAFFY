@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState } from "react"
 import { BaseDocument } from "@/lib/types"
+import { formatDateTime } from "@/lib/utils/date"
 
 interface DocumentCardProps extends BaseDocument {
   description?: string // 추가 필드
@@ -88,15 +89,6 @@ export function DocumentCard({
   const statusInfo = statusConfig[status]
   const documentIcon = typeIcons[type] || "📄"
   
-  // 날짜 포맷팅 함수
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).replace(/\./g, '.')
-  }
 
   const handleAction = (e: React.MouseEvent, action: string) => {
     e.preventDefault()
@@ -161,11 +153,11 @@ export function DocumentCard({
 
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center gap-3 text-xs text-text-tertiary">
-            <span>생성: {formatDate(createdAt)}</span>
+            <span>생성: {formatDateTime(createdAt, { includeTime: false })}</span>
             {updatedAt && updatedAt !== createdAt && (
               <>
                 <span>•</span>
-                <span>수정: {formatDate(updatedAt)}</span>
+                <span>수정: {formatDateTime(updatedAt, { includeTime: false })}</span>
               </>
             )}
           </div>
