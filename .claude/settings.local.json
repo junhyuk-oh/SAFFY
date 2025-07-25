@@ -1,48 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run typecheck:*)",
-      "Bash(npm install:*)",
-      "Bash(tail:*)",
-      "Bash(curl:*)",
-      "Bash(pkill:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(ls:*)",
-      "Bash(find:*)",
-      "Bash(grep:*)",
-      "Bash(npx tsc:*)",
-      "Bash(rm:*)",
-      "Bash(npm run build:*)",
-      "Bash(npm run dev:*)",
-      "Bash(del nul)",
-      "Bash(npm run lint)",
-      "Bash(start \"\" npm run dev)",
-      "Bash(cat:*)",
-      "Bash(taskkill:*)",
-      "Bash(true)",
-      "Bash(npm cache clean:*)",
-      "Bash(mv:*)",
-      "Bash(ping:*)",
-      "Bash(mkdir:*)",
-      "Bash(mkdir:*)",
-      "Bash(mkdir:*)",
-      "Bash(git clean:*)",
-      "Bash(tree:*)",
-      "Bash(rg:*)",
-      "Bash(touch:*)",
-      "Bash(powershell:*)",
-      "Bash(git checkout:*)",
-      "Bash(node fix-imports.js)",
-      "Bash(cp:*)",
-      "Bash(npx next dev:*)",
-      "Bash(timeout 3 npx next dev -p 3002)",
-      "Bash(wc:*)",
-      "Bash(cd:*)",
-      "Bash(del \"C:\\Users\\오준혁\\ai-safety-saas\\src\\components\\ai-documents\\DocumentCard.tsx\")",
-      "Bash(dir:*)",
-      "Bash(del CLAUDE-WINDOWS.md)"
+      "Bash(git add:*)"
     ],
     "deny": []
+  },
+  "mcpServers": {
+    "github": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ]
+    }
   }
 }
