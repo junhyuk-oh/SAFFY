@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from 'react';
 import { WorkPermit } from '@/lib/types/facility';
 import { Shield, Clock, AlertTriangle, CheckCircle, XCircle, User, Calendar, MapPin } from 'lucide-react';
 import { PERMIT_STATUS, PRIORITY_CONFIG } from '@/lib/constants/status';
@@ -36,7 +37,7 @@ const riskLevelConfig = {
   critical: { label: '매우높음', color: 'text-red-600', bg: 'bg-red-100' }
 };
 
-export function PermitCard({ permit, onClick }: PermitCardProps) {
+export const PermitCard = memo(function PermitCard({ permit, onClick }: PermitCardProps) {
   const status = PERMIT_STATUS[permit.status];
   const StatusIcon = status.icon;
   const riskLevel = riskLevelConfig[permit.hazards.riskLevel];
@@ -171,4 +172,4 @@ export function PermitCard({ permit, onClick }: PermitCardProps) {
       </div>
     </div>
   );
-}
+})

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { Equipment } from "@/lib/types/facility"
 import { Badge } from "@/components/ui/display/badge"
 import { Button } from "@/components/ui/forms/button"
@@ -107,7 +107,7 @@ export function EquipmentDetail({
   const equipmentIcon = equipmentTypeIcons[equipment.type] || "⚙️"
 
   // 날짜 포맷팅 함수
-  const formatDate = (dateString?: string) => {
+  const formatDate = useCallback((dateString?: string) => {
     if (!dateString) return '-'
     const date = new Date(dateString)
     return date.toLocaleString('ko-KR', {
@@ -117,10 +117,10 @@ export function EquipmentDetail({
       hour: '2-digit',
       minute: '2-digit'
     })
-  }
+  }, [])
 
   // 운영 시간 계산
-  const getOperatingTime = () => {
+  const operatingTime = useMemo(() => {
     const installDate = new Date(equipment.installDate)
     const now = new Date()
     const diffTime = now.getTime() - installDate.getTime()
@@ -132,10 +132,10 @@ export function EquipmentDetail({
     } else {
       return `${diffMonths}개월`
     }
-  }
+  }, [equipment.installDate])
 
   // 다음 정비까지 남은 일수
-  const getDaysUntilMaintenance = () => {
+  const maintenanceInfo = useMemo(() => {
     if (!equipment.nextMaintenanceDate) return null
     
     const now = new Date()
@@ -147,10 +147,10 @@ export function EquipmentDetail({
     if (diffDays === 0) return { text: "오늘", urgent: true, overdue: false }
     if (diffDays <= 7) return { text: `${diffDays}일 남음`, urgent: true, overdue: false }
     return { text: `${diffDays}일 남음`, urgent: false, overdue: false }
-  }
+  }, [equipment.nextMaintenanceDate])
 
   // 보증기간 상태
-  const getWarrantyStatus = () => {
+  const warrantyInfo = useMemo(() => {
     if (!equipment.warrantyExpiry) return null
     
     const now = new Date()
@@ -161,19 +161,15 @@ export function EquipmentDetail({
     if (diffDays < 0) return { text: "만료", expired: true }
     if (diffDays <= 30) return { text: `${diffDays}일 남음`, expiring: true }
     return { text: "유효", valid: true }
-  }
+  }, [equipment.warrantyExpiry])
 
-  const maintenanceInfo = getDaysUntilMaintenance()
-  const warrantyInfo = getWarrantyStatus()
-  const operatingTime = getOperatingTime()
-
-  const handleMaintenanceRequest = () => {
+  const handleMaintenanceRequest = useCallback(() => {
     if (onMaintenanceRequest) {
       onMaintenanceRequest()
       setShowMaintenanceModal(false)
       setMaintenanceRequestNotes('')
     }
-  }
+  }, [onMaintenanceRequest])
 
   const tabs = [
     { id: 'overview', label: '개요', icon: '📋' },

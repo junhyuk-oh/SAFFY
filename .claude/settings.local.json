@@ -37,7 +37,11 @@
       "Bash(cp:*)",
       "Bash(npx next dev:*)",
       "Bash(timeout 3 npx next dev -p 3002)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(cd:*)",
+      "Bash(del \"C:\\Users\\오준혁\\ai-safety-saas\\src\\components\\ai-documents\\DocumentCard.tsx\")",
+      "Bash(dir:*)",
+      "Bash(del CLAUDE-WINDOWS.md)"
     ],
     "deny": []
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from 'react';
 import { MaintenanceTask } from '@/lib/types/facility';
 import { Wrench, Clock, AlertCircle, CheckCircle, XCircle, Calendar, MapPin } from 'lucide-react';
 import { MAINTENANCE_STATUS, PRIORITY_CONFIG } from '@/lib/constants/status';
@@ -11,7 +12,7 @@ interface MaintenanceCardProps {
 }
 
 
-export function MaintenanceCard({ task, onClick }: MaintenanceCardProps) {
+export const MaintenanceCard = memo(function MaintenanceCard({ task, onClick }: MaintenanceCardProps) {
   const status = MAINTENANCE_STATUS[task.status];
   const priority = PRIORITY_CONFIG[task.priority];
   const StatusIcon = status.icon;
@@ -84,4 +85,4 @@ export function MaintenanceCard({ task, onClick }: MaintenanceCardProps) {
       )}
     </div>
   );
-}
+});

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { Breadcrumb } from "@/components/ui/display"
 import { DocumentSearch, DocumentList } from "@/components/documents/shared"
 import { useDocuments } from "@/hooks/queries"
@@ -82,17 +82,17 @@ export default function DocumentsPage() {
     }, {} as Record<string, typeof documents>)
   }, [filteredDocuments])
 
-  const handleStatusClick = (status: string) => {
-    setSelectedStatus(status === selectedStatus ? null : status)
-  }
+  const handleStatusClick = useCallback((status: string) => {
+    setSelectedStatus(prev => status === prev ? null : status)
+  }, [])
 
-  const handleSearch = (query: string) => {
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query)
-  }
+  }, [])
 
-  const handleFilterChange = (newFilters: FilterOptions) => {
+  const handleFilterChange = useCallback((newFilters: FilterOptions) => {
     setFilters(newFilters)
-  }
+  }, [])
 
   if (error) {
     return (

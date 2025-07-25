@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, memo } from "react"
 import { Equipment } from "@/lib/types/facility"
 import { Badge } from "@/components/ui/display/badge"
 
@@ -90,7 +90,7 @@ const equipmentTypeIcons: Record<string, string> = {
   "Chiller": "❄️"
 }
 
-export function EquipmentCard({
+export const EquipmentCard = memo(function EquipmentCard({
   equipment,
   onStatusChange,
   onMaintenanceRequest
@@ -383,4 +383,4 @@ export function EquipmentCard({
       </div>
     </Link>
   )
-}
+})

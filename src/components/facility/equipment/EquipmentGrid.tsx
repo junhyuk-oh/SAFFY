@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { Equipment, FacilitySearchParams } from "@/lib/types/facility"
 import { EquipmentCard } from "./EquipmentCard"
 import { Badge } from "@/components/ui/display/badge"
@@ -240,7 +240,7 @@ export function EquipmentGrid({
     }
   }, [equipment])
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     if (onSearch) {
       onSearch({
@@ -253,7 +253,7 @@ export function EquipmentGrid({
         sortOrder
       })
     }
-  }
+  }, [onSearch, searchQuery, selectedStatus, selectedCriticality, selectedType, selectedLocation, sortBy, sortOrder])
 
   if (loading) {
     return (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, memo } from "react"
 import { FacilityAlert } from "@/lib/types/facility"
 import { Badge } from "@/components/ui/display/badge"
 import { Button } from "@/components/ui/forms/button"
@@ -100,7 +100,7 @@ const sourceIcons: Record<string, string> = {
   external: "🌐"
 }
 
-export function AlertItem({
+export const AlertItem = memo(function AlertItem({
   alert,
   onAcknowledge,
   onResolve,
@@ -553,4 +553,4 @@ export function AlertItem({
       )}
     </div>
   )
-}
+})

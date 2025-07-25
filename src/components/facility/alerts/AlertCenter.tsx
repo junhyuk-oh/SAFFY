@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { FacilityAlert, FacilitySearchParams } from "@/lib/types/facility"
 import { AlertItem } from "./AlertItem"
 import { Badge } from "@/components/ui/display/badge"
@@ -221,7 +221,7 @@ export function AlertCenter({
     }
   }, [alerts])
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault()
     if (onSearch) {
       onSearch({
@@ -233,17 +233,17 @@ export function AlertCenter({
         sortOrder
       })
     }
-  }
+  }, [onSearch, searchQuery, selectedSeverity, selectedStatus, selectedCategory, sortBy, sortOrder])
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     if (selectedAlerts.size === filteredAndSortedAlerts.length) {
       setSelectedAlerts(new Set())
     } else {
       setSelectedAlerts(new Set(filteredAndSortedAlerts.map(alert => alert.id)))
     }
-  }
+  }, [selectedAlerts.size, filteredAndSortedAlerts])
 
-  const handleSelectAlert = (alertId: string) => {
+  const handleSelectAlert = useCallback((alertId: string) => {
     const newSelected = new Set(selectedAlerts)
     if (newSelected.has(alertId)) {
       newSelected.delete(alertId)
@@ -251,14 +251,14 @@ export function AlertCenter({
       newSelected.add(alertId)
     }
     setSelectedAlerts(newSelected)
-  }
+  }, [selectedAlerts])
 
-  const handleBulkAction = (action: 'acknowledge' | 'resolve' | 'escalate') => {
+  const handleBulkAction = useCallback((action: 'acknowledge' | 'resolve' | 'escalate') => {
     if (onBulkAction && selectedAlerts.size > 0) {
       onBulkAction(Array.from(selectedAlerts), action)
       setSelectedAlerts(new Set())
     }
-  }
+  }, [onBulkAction, selectedAlerts])
 
   if (loading) {
     return (

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, memo } from "react"
 import { BaseDocument } from "@/lib/types"
 import { formatDateTime } from "@/lib/utils/date"
 
@@ -72,7 +72,7 @@ const typeIcons: Record<string, string> = {
   "분기보고서": "📊"
 }
 
-export function DocumentCard({
+export const DocumentCard = memo(function DocumentCard({
   id,
   title,
   type,
@@ -229,4 +229,4 @@ export function DocumentCard({
       </div>
     </Link>
   )
-}
+})
