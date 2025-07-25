@@ -1,0 +1,142 @@
+
+> ai-safety-saas@0.1.0 build
+> next build
+
+   ▲ Next.js 15.4.1
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 6.0s
+   Linting and checking validity of types ...
+
+./src/app/api/ai-documents/generate/route.ts
+7:3  Warning: 'ApiError' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/documents/search/route.ts
+11:3  Warning: 'toApiResponse' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/documents/statistics/route.ts
+19:27  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/education/dashboard/route.ts
+4:27  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/education/requirements/route.ts
+6:3  Warning: 'EducationFilterOptions' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/education/status/route.ts
+7:11  Warning: 'department' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/api/education/upload/route.ts
+95:15  Warning: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/documents/[id]/page.tsx
+6:10  Warning: 'useParams' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/ui-demo/page.tsx
+17:50  Warning: 'TableSkeleton' is defined but never used.  @typescript-eslint/no-unused-vars
+18:24  Warning: 'ErrorPage' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/ai-documents/DocumentPreview.tsx
+44:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+66:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/documents/annual/AnnualSafetyPlan.tsx
+8:10  Warning: 'Textarea' is defined but never used.  @typescript-eslint/no-unused-vars
+9:10  Warning: 'Select' is defined but never used.  @typescript-eslint/no-unused-vars
+26:3  Warning: 'Briefcase' is defined but never used.  @typescript-eslint/no-unused-vars
+32:3  Warning: 'AnnualGoal' is defined but never used.  @typescript-eslint/no-unused-vars
+33:3  Warning: 'AnnualBudgetItem' is defined but never used.  @typescript-eslint/no-unused-vars
+34:3  Warning: 'AnnualEducationPlan' is defined but never used.  @typescript-eslint/no-unused-vars
+35:3  Warning: 'AnnualInspectionSchedule' is defined but never used.  @typescript-eslint/no-unused-vars
+126:9  Warning: 'goalCategories' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/documents/monthly/EducationLog.tsx
+121:6  Warning: React Hook React.useEffect has a missing dependency: 'calculateProgress'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/documents/monthly/RiskAssessment.tsx
+12:10  Warning: 'Table' is defined but never used.  @typescript-eslint/no-unused-vars
+12:17  Warning: 'TableBody' is defined but never used.  @typescript-eslint/no-unused-vars
+12:28  Warning: 'TableCell' is defined but never used.  @typescript-eslint/no-unused-vars
+12:39  Warning: 'TableHead' is defined but never used.  @typescript-eslint/no-unused-vars
+12:50  Warning: 'TableHeader' is defined but never used.  @typescript-eslint/no-unused-vars
+12:63  Warning: 'TableRow' is defined but never used.  @typescript-eslint/no-unused-vars
+184:6  Warning: React Hook React.useEffect has missing dependencies: 'calculateProgress' and 'updateSummary'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/documents/monthly/SafetyInspection.tsx
+12:10  Warning: 'AlertCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+12:23  Warning: 'CheckCircle2' is defined but never used.  @typescript-eslint/no-unused-vars
+154:6  Warning: React Hook React.useEffect has a missing dependency: 'calculateProgress'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+250:64  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/documents/quarterly/QuarterlyReport.tsx
+11:10  Warning: 'Table' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+23:3  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+26:3  Warning: 'PieChart' is defined but never used.  @typescript-eslint/no-unused-vars
+31:79  Warning: 'QuarterlyImprovement' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/documents/shared/DocumentCard.tsx
+86:6  Warning: 'props' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/documents/weekly/ChemicalUsageReport.tsx
+5:44  Warning: 'TrendingUp' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/education/EducationDashboard.tsx
+3:20  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+11:3  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+13:3  Warning: 'Award' is defined but never used.  @typescript-eslint/no-unused-vars
+35:17  Warning: 'setStats' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+59:30  Warning: 'setUpcomingEducations' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/education/RequirementMatrix.tsx
+4:29  Warning: 'CardHeader' is defined but never used.  @typescript-eslint/no-unused-vars
+4:41  Warning: 'CardTitle' is defined but never used.  @typescript-eslint/no-unused-vars
+13:3  Warning: 'Filter' is defined but never used.  @typescript-eslint/no-unused-vars
+82:9  Warning: 'getStatusBadge' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/layout/Header.tsx
+3:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/ocr/OcrProgress.tsx
+20:10  Warning: 'estimatedTime' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/schedule/ScheduleCalendar.tsx
+3:27  Warning: 'useCallback' is defined but never used.  @typescript-eslint/no-unused-vars
+3:40  Warning: 'useRef' is defined but never used.  @typescript-eslint/no-unused-vars
+3:48  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+206:3  Warning: 'schedules' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+207:3  Warning: 'onDateClick' is defined but never used.  @typescript-eslint/no-unused-vars
+208:3  Warning: 'onEventClick' is defined but never used.  @typescript-eslint/no-unused-vars
+209:3  Warning: 'isEditMode' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+214:18  Warning: 'setEvents' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+245:10  Warning: 'isAddingEvent' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/schedule/ScheduleToolbar.tsx
+3:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/ui/toast.tsx
+49:6  Warning: React Hook useEffect has a missing dependency: 'handleClose'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/lib/ai/openai.ts
+25:9  Warning: 'prompt' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/hooks/use-documents.ts
+67:6  Warning: React Hook useEffect has a missing dependency: 'fetchDocuments'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/lib/services/documentService.ts
+14:3  Warning: 'DocumentTemplate' is defined but never used.  @typescript-eslint/no-unused-vars
+15:3  Warning: 'DocumentVersion' is defined but never used.  @typescript-eslint/no-unused-vars
+23:6  Warning: 'DocumentInsert' is defined but never used.  @typescript-eslint/no-unused-vars
+24:6  Warning: 'DocumentUpdate' is defined but never used.  @typescript-eslint/no-unused-vars
+577:5  Warning: 'reason' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/types/document.ts
+11:3  Warning: 'Priority' is defined but never used.  @typescript-eslint/no-unused-vars
+12:3  Warning: 'RiskLevel' is defined but never used.  @typescript-eslint/no-unused-vars
+13:3  Warning: 'SafetyStatus' is defined but never used.  @typescript-eslint/no-unused-vars
+15:3  Warning: 'Quarter' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/types/index.ts
+119:3  Warning: 'statusCode' is defined but never used.  @typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

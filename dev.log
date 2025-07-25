@@ -1,0 +1,17 @@
+
+> ai-safety-saas@0.1.0 dev
+> next dev
+
+ ⚠ Warning: Found multiple lockfiles. Selecting C:\Users\오준혁\package-lock.json.
+   Consider removing the lockfiles at:
+   * C:\Users\오준혁\ai-safety-saas\package-lock.json
+
+ ⚠ Port 3000 is in use by process 4756, using available port 3001 instead.
+   ▲ Next.js 15.4.1
+   - Local:        http://localhost:3001
+      Reload env: .env.local
+   Reload env: .env.local
+[?25h
+✓ Ready in 4.1s
+   Reload env: .env.local
+   Reload env: .env.local
