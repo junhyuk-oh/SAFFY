@@ -1,0 +1,45 @@
+
+> ai-safety-saas@0.1.0 dev
+> next dev --turbopack
+
+ ⚠ Port 3000 is in use by an unknown process, using available port 3001 instead.
+   ▲ Next.js 15.4.1 (Turbopack)
+   - Local:        http://localhost:3001
+   - Network:      http://10.255.255.254:3001
+
+ ✓ Starting...
+ ✓ Ready in 21.6s
+ ○ Compiling / ...
+ ✓ Compiled / in 8.9s
+ ⨯ ./src/app/globals.css
+Error evaluating Node.js code
+Error: It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
+    [at We (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/tailwindcss/dist/lib.js:35:2121)]
+    [at eval (turbopack:///[turbopack-node]/transforms/postcss.ts:56:14)]
+    [at <anonymous>]
+    [at Module.init (turbopack:///[turbopack-node]/transforms/postcss.ts:43:33)]
+    [at run (turbopack:///[turbopack-node]/ipc/evaluate.ts:77:20)]
+
+Import trace:
+  ./src/app/globals.css [Client Component Browser]
+  ./src/app/layout.tsx [Server Component]
+
+
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 4.1s
+ GET /?id=01841d6a-cba6-49a1-835f-fad42f204c8a&vscodeBrowserReqId=1752833887331 500 in 17182ms
+Error: Cannot apply unknown utility class `text-3xl`. Are you using CSS modules or similar and missing `@reference`? https://tailwindcss.com/docs/functions-and-directives#reference-directive
+    [2m[at onInvalidCandidate (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/tailwindcss/dist/lib.js:18:1312)][0m
+    [2m[at ge (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/tailwindcss/dist/lib.js:13:29803)][0m
+    [2m[at /mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/tailwindcss/dist/lib.js:18:373][0m
+    [2m[at I (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/tailwindcss/dist/lib.js:3:1656)][0m
+    [2m[at je (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/tailwindcss/dist/lib.js:18:172)][0m
+    [2m[at bi (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/tailwindcss/dist/lib.js:35:780)][0m
+    [2m[at process.processTicksAndRejections (node:internal/process/task_queues:95:5)][0m
+    [2m[at async yi (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/tailwindcss/dist/lib.js:35:1123)][0m
+    [2m[at async _r (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/@tailwindcss/node/dist/index.js:10:3384)][0m
+    [2m[at async p (/mnt/c/Users/오준혁/AI-Safety-SaaS/node_modules/@tailwindcss/postcss/dist/index.js:10:4019)][0m
+ ✓ Compiled in 5.9s
+ ✓ Compiled / in 256ms
+ GET /?id=01841d6a-cba6-49a1-835f-fad42f204c8a&vscodeBrowserReqId=1752833887331 200 in 442ms
+[?25h
